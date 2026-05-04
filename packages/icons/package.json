@@ -1,0 +1,26 @@
+{
+  "name": "@field-ds/icons",
+  "version": "0.0.0",
+  "description": "M-Icon library — SVGs synced from Figma + React Native components.",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./Icon": "./src/Icon.tsx",
+    "./svg/*": "./src/svg/*"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "fetch": "tsx scripts/fetch-from-figma.ts",
+    "build": "tsx scripts/svg-to-rn.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-svg": "*"
+  }
+}

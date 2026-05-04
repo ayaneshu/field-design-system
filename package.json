@@ -1,0 +1,22 @@
+{
+  "name": "field-design-system",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Field Design System — tokens, typography, icons, and React Native components for noon.",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build:tokens": "pnpm --filter @field-ds/tokens build",
+    "build:icons": "pnpm --filter @field-ds/icons build",
+    "fetch:icons": "pnpm --filter @field-ds/icons fetch",
+    "playground": "pnpm --filter playground start"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
