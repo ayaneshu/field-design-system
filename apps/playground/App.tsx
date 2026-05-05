@@ -1,141 +1,83 @@
+import "react-native-gesture-handler";
+
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
-import { ScrollView, Text, View, Pressable } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { NavigationContainer, type Theme } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { noontreeFonts } from "@field-ds/fonts";
-import { Icon, iconNames, type IconName } from "@field-ds/icons";
-import {
-  base,
-  colour,
-  space,
-  textStyles,
-  type TextStyleName,
-} from "@field-ds/tokens";
+import { colour } from "@field-ds/tokens";
 
-type Tab = "Colors" | "Typography" | "Icons";
+import { HomeScreen } from "./src/screens/HomeScreen";
+import { FoundationsScreen } from "./src/screens/FoundationsScreen";
+import { ComponentsListScreen } from "./src/screens/ComponentsListScreen";
+import { PatternsScreen } from "./src/screens/PatternsScreen";
+import { IllustrationsScreen } from "./src/screens/IllustrationsScreen";
+import { AccordionScreen } from "./src/screens/AccordionScreen";
+import { CheckboxScreen } from "./src/screens/CheckboxScreen";
+import { BottomNavScreen } from "./src/screens/BottomNavScreen";
+import type { RootStackParamList } from "./src/navigation/types";
+import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
+
+const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   const [loaded] = useFonts(noontreeFonts);
-  const [tab, setTab] = useState<Tab>("Colors");
-
   if (!loaded) return null;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colour.surface.primary, paddingTop: 56 }}>
-      <StatusBar style="dark" />
-      <Text style={[textStyles.Heading_H24_Bold, { paddingHorizontal: space["20"], color: colour["text-n-icon"].primary }]}>
-        Field DS Playground
-      </Text>
-      <View style={{ flexDirection: "row", padding: space["12"], gap: space["8"] }}>
-        {(["Colors", "Typography", "Icons"] as Tab[]).map((t) => {
-          const active = tab === t;
-          return (
-            <Pressable
-              key={t}
-              onPress={() => setTab(t)}
-              style={{
-                paddingHorizontal: space["12"],
-                paddingVertical: space["8"],
-                borderRadius: 999,
-                backgroundColor: active ? colour["text-n-icon"].primary : colour.surface.secondary,
-              }}
-            >
-              <Text
-                style={[
-                  textStyles.Action_A14_SemiBold,
-                  { color: active ? colour["text-n-icon"]["on-surface-bold"] : colour["text-n-icon"].primary },
-                ]}
-              >
-                {t}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-      <ScrollView contentContainerStyle={{ padding: space["20"], paddingBottom: 80 }}>
-        {tab === "Colors" && <ColorsView />}
-        {tab === "Typography" && <TypographyView />}
-        {tab === "Icons" && <IconsView />}
-      </ScrollView>
-    </View>
+    <ThemeProvider initial="light">
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <ThemedNavigationShell />
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ThemeProvider>
   );
 }
 
-function ColorsView() {
-  const palettes = Object.entries(base.colour);
-  return (
-    <View style={{ gap: space["20"] }}>
-      {palettes.map(([name, shades]) => (
-        <View key={name}>
-          <Text style={[textStyles.Heading_H16_Bold, { color: colour["text-n-icon"].primary, marginBottom: space["8"] }]}>
-            {name}
-          </Text>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space["6"] }}>
-            {Object.entries(shades).map(([shade, hex]) => (
-              <View key={shade} style={{ width: 64, alignItems: "center" }}>
-                <View style={{ width: 56, height: 56, borderRadius: 8, backgroundColor: hex as string, borderWidth: 1, borderColor: colour.border.primary }} />
-                <Text style={[textStyles.Body_B11_Regular, { color: colour["text-n-icon"].secondary, marginTop: 2 }]}>{shade}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      ))}
-    </View>
-  );
-}
+/** Inner shell: reads the theme so the nav theme + status bar can flip. */
+function ThemedNavigationShell() {
+  const { mode, shell } = useTheme();
 
-function TypographyView() {
-  const samples: TextStyleName[] = [
-    "Heading_H40_Bold",
-    "Heading_H32_Bold",
-    "Heading_H24_Bold",
-    "Heading_H18_Bold",
-    "Body_B16_Regular",
-    "Body_B14_Regular",
-    "Action_A16_SemiBold",
-    "Action_A14_Bold",
-  ];
-  return (
-    <View style={{ gap: space["16"] }}>
-      {samples.map((name) => (
-        <View key={name}>
-          <Text style={[textStyles.Body_B11_Regular, { color: colour["text-n-icon"].tertiary, marginBottom: 2 }]}>{name}</Text>
-          <Text style={[textStyles[name], { color: colour["text-n-icon"].primary }]}>The quick brown fox</Text>
-        </View>
-      ))}
-    </View>
-  );
-}
+  const navTheme: Theme = {
+    dark: mode === "dark",
+    colors: {
+      primary: colour["text-n-icon"].action,
+      background: shell.pageBg,
+      card: shell.pageBg,
+      text: shell.textPrimary,
+      border: shell.border,
+      notification: colour["text-n-icon"].error,
+    },
+    fonts: {
+      regular: { fontFamily: "Noontree-Regular", fontWeight: "400" },
+      medium: { fontFamily: "Noontree-Medium", fontWeight: "500" },
+      bold: { fontFamily: "Noontree-Bold", fontWeight: "700" },
+      heavy: { fontFamily: "Noontree-ExtraBold", fontWeight: "800" },
+    },
+  };
 
-function IconsView() {
   return (
-    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space["12"] }}>
-      {iconNames.map((n: IconName) => (
-        <View key={n} style={{ alignItems: "center", width: 84 }}>
-          <View
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 8,
-              backgroundColor: colour.surface.secondary,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Icon name={n} size={24} color={colour["text-n-icon"].primary} />
-          </View>
-          <Text
-            style={[
-              textStyles.Body_B11_Regular,
-              { color: colour["text-n-icon"].tertiary, textAlign: "center", marginTop: 4 },
-            ]}
-            numberOfLines={2}
-          >
-            {n}
-          </Text>
-        </View>
-      ))}
-    </View>
+    <NavigationContainer theme={navTheme}>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <RootStack.Navigator
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: shell.pageBg },
+        }}
+      >
+        <RootStack.Screen name="Home" component={HomeScreen} />
+        <RootStack.Screen name="Foundations" component={FoundationsScreen} />
+        <RootStack.Screen name="Components" component={ComponentsListScreen} />
+        <RootStack.Screen name="Patterns" component={PatternsScreen} />
+        <RootStack.Screen name="Illustrations" component={IllustrationsScreen} />
+        <RootStack.Screen name="Accordion" component={AccordionScreen} />
+        <RootStack.Screen name="Checkbox" component={CheckboxScreen} />
+        <RootStack.Screen name="BottomNav" component={BottomNavScreen} />
+      </RootStack.Navigator>
+    </NavigationContainer>
   );
 }

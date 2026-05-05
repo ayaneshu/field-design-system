@@ -22,5 +22,11 @@
     "react": "*",
     "react-native": "*",
     "react-native-svg": "*"
+  },
+  "devDependencies": {
+    "@types/react": "~18.2.45",
+    "react": "18.2.0",
+    "react-native": "0.74.5",
+    "react-native-svg": "15.2.0"
   }
 }
