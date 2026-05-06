@@ -1,0 +1,30 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Introduction" />
+
+# Field Design System
+
+React Native components for the Field Design System (`@field-ds/components`), rendered in the browser via `react-native-web`.
+
+## What's in here
+
+Each component shipped from `packages/components/src/<ComponentName>` has a story under **Components** in the sidebar. Stories cover the default state, key variants, and at least one realistic composition.
+
+| Component  | Source                                                                   |
+| ---------- | ------------------------------------------------------------------------ |
+| Checkbox   | `packages/components/src/Checkbox/Checkbox.tsx`                          |
+| BottomNav  | `packages/components/src/BottomNav/BottomNav.tsx`                        |
+
+## Running locally
+
+```bash
+pnpm install
+pnpm --filter storybook dev
+```
+
+## Adding a story
+
+1. Add a folder for your component under `packages/components/src/<ComponentName>/` containing `<ComponentName>.tsx`, `index.ts`, and `README.md`.
+2. Re-export it from `packages/components/src/index.ts`.
+3. Add `apps/storybook/src/stories/<ComponentName>.stories.tsx`.
+4. Link the story from the component's `README.md`.

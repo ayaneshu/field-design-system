@@ -82,9 +82,10 @@ export function Checkbox({
   }, [selected, progress]);
 
   // Outline ring fades out as the fill box swells in.
+  // Explicit dep array — Reanimated requires it on web without the Babel plugin.
   const outlineStyle = useAnimatedStyle(() => ({
     opacity: interpolate(progress.value, [0, 0.6], [1, 0], "clamp"),
-  }));
+  }), [progress]);
 
   // Filled box scales from 70% → 100% with a snappy fade.
   const fillStyle = useAnimatedStyle(() => ({
@@ -92,7 +93,7 @@ export function Checkbox({
     transform: [
       { scale: interpolate(progress.value, [0, 1], [0.7, 1], "clamp") },
     ],
-  }));
+  }), [progress]);
 
   // Tick lands a beat after the box, scaling in from the centre.
   const checkStyle = useAnimatedStyle(() => ({
@@ -100,7 +101,7 @@ export function Checkbox({
     transform: [
       { scale: interpolate(progress.value, [0.35, 1], [0.6, 1], "clamp") },
     ],
-  }));
+  }), [progress]);
 
   const fillColor = selected
     ? disabled

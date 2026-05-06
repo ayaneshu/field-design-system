@@ -198,12 +198,13 @@ function BottomNavItem({
     });
   }, [active, progress]);
 
+  // Explicit dep array — Reanimated requires it on web without the Babel plugin.
   const highlightStyle = useAnimatedStyle(() => ({
     opacity: progress.value,
     transform: [
       { scaleX: interpolate(progress.value, [0, 1], [0.4, 1], "clamp") },
     ],
-  }));
+  }), [progress]);
 
   // Tiny pop on the icon when it lands as active (1 → 1.08 → 1).
   const iconStyle = useAnimatedStyle(() => ({
@@ -217,7 +218,7 @@ function BottomNavItem({
         ),
       },
     ],
-  }));
+  }), [progress]);
 
   return (
     <Pressable
