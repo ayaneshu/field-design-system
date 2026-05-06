@@ -42,10 +42,13 @@ export function IllustrationsScreen({ navigation }: Props) {
     { key: "illustrations", label: "Illustrations", active: true },
     { key: "library", label: "Library", indent: true, active: tab === "library" },
     { key: "playground", label: "Playground", indent: true, active: tab === "playground" },
+    { key: "radius", label: "Radius" },
+    { key: "spacing", label: "Spacing" },
     { key: "typography", label: "Typography" },
   ];
-  // Note: L0 entries (Colours, Icons, Illustrations, Typography) are already
-  // alphabetised; L1 sub-tabs (Library, Playground) are too.
+  // L0 entries are alphabetised (Colours, Icons, Illustrations, Radius,
+  // Spacing, Typography); the Library / Playground L1 sub-tabs sit under
+  // their parent.
 
   return (
     <View style={{ flex: 1, backgroundColor: colour.surface.primary }}>

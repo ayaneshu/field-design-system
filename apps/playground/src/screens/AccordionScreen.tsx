@@ -107,7 +107,9 @@ export function AccordionScreen({ navigation }: Props) {
     <PageScaffold
       topNavActive="Components"
       title="accordion"
-      subtitle="Disclosure control with Apple-style ease-out animation. Drives the typography spec rows on this site."
+      subtitle="An accordion is a tool used to hide and reveal content as part of progressive disclosure. Tapping the icon button on each accordion row will expand or collapse the content."
+      version="V0.1"
+      repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/apps/playground/src/components/Accordion.tsx"
       sidebar={componentsSidebar("Accordion")}
       onSidebarSelect={(key) => {
         if (key === "all") navigation.navigate("Components" as never);

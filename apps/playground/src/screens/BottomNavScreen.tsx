@@ -94,7 +94,9 @@ export function BottomNavScreen({ navigation }: Props) {
     <PageScaffold
       topNavActive="Components"
       title="bottom nav"
-      subtitle="Primary bottom tab bar. Drives navigation in shopping flows; one tab is active at a time."
+      subtitle="Primary bottom tab bar that drives navigation across noon's shopping flows. Supports 3 to 5 tabs, with one active at a time and an auto-swapping filled icon for the active state."
+      version="V0.1"
+      repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/BottomNav.tsx"
       sidebar={componentsSidebar("BottomNav")}
       onSidebarSelect={(key) => {
         if (key === "all") navigation.navigate("Components" as never);

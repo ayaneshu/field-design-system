@@ -1,4 +1,9 @@
-export type FoundationsSection = "colors" | "typography" | "icons";
+export type FoundationsSection =
+  | "colors"
+  | "icons"
+  | "radius"
+  | "spacing"
+  | "typography";
 
 export type RootStackParamList = {
   Home: undefined;
