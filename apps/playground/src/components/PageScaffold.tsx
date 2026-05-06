@@ -1,5 +1,7 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
+  Linking,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -7,10 +9,13 @@ import {
   useWindowDimensions,
 } from "react-native";
 
+import { Icon } from "@field-ds/icons";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { TopHeader } from "./TopHeader";
 import { useTheme } from "../theme/ThemeContext";
+
+type DetailMode = "design" | "develop";
 
 const SIDEBAR_BREAKPOINT = 960;
 const SPLIT_BREAKPOINT = 1100;
@@ -43,22 +48,30 @@ export type SidebarItem = {
 export function PageScaffold({
   topNavActive,
   title,
-  // `subtitle` accepted for back-compat but no longer rendered — pages now
-  // show only the title in the header (per the latest direction).
-  subtitle: _subtitle,
+  subtitle,
   sidebar,
   onSidebarSelect,
   rightSlot,
+  version,
+  repoUrl,
   children,
 }: {
   topNavActive?: "Foundations" | "Components" | "Patterns" | null;
   title: string;
+  /** Short description rendered under the title. Only renders on
+   * component-style pages (i.e. when `version` or `repoUrl` is set). */
   subtitle?: string;
   sidebar: SidebarItem[];
   onSidebarSelect?: (key: string) => void;
   /** Optional content rendered to the right of the title — e.g. view toggle
-   * on the colours page or a Download button on typography. */
+   * on the colours page or a Download button on typography. Mutually
+   * exclusive with `version` (which renders its own pill in the same slot). */
   rightSlot?: ReactNode;
+  /** Component version pill (e.g. "V0.1") shown to the right of the title. */
+  version?: string;
+  /** GitHub URL surfaced under the Develop tab. When set, a Design / Develop
+   * tab toggle renders below the title row. */
+  repoUrl?: string;
   children: ReactNode;
 }) {
   const { width } = useWindowDimensions();
@@ -66,6 +79,12 @@ export function PageScaffold({
   const showSidebar = width >= SIDEBAR_BREAKPOINT;
   const horizontalPad = width >= 1100 ? 60 : width >= 720 ? 32 : 20;
   const railGap = width >= 1100 ? 60 : width >= 720 ? 32 : space["32"];
+
+  // Component-style pages get the subtitle / version pill / Design-Develop
+  // tabs treatment. Foundations pages (no version, no repoUrl) keep the
+  // older title-only layout.
+  const isComponentStyle = !!version || !!repoUrl;
+  const [mode, setMode] = useState<DetailMode>("design");
 
   // Title scales toward the 100px Figma reference at full width.
   const titleSize =
@@ -106,7 +125,11 @@ export function PageScaffold({
               alignItems: "flex-start",
               justifyContent: "space-between",
               gap: space["32"],
-              marginBottom: width >= SPLIT_BREAKPOINT ? space["56"] : space["32"],
+              marginBottom: isComponentStyle
+                ? space["20"]
+                : width >= SPLIT_BREAKPOINT
+                  ? space["56"]
+                  : space["32"],
             }}
           >
             <View style={{ flex: 1, minWidth: 0, maxWidth: 720 }}>
@@ -121,14 +144,59 @@ export function PageScaffold({
               >
                 {title}
               </Text>
+              {isComponentStyle && subtitle ? (
+                <Text
+                  style={[
+                    textStyles.Body_B16_Regular,
+                    {
+                      color: shell.textTertiary,
+                      marginTop: space["16"],
+                      maxWidth: 640,
+                    },
+                  ]}
+                >
+                  {subtitle}
+                </Text>
+              ) : null}
             </View>
-            {rightSlot ? (
+            {version ? (
+              <View style={{ flexShrink: 0, marginTop: space["12"] }}>
+                <VersionPill label={version} />
+              </View>
+            ) : rightSlot ? (
               <View style={{ flexShrink: 0, marginTop: space["12"] }}>
                 {rightSlot}
               </View>
             ) : null}
           </View>
-          {children}
+
+          {isComponentStyle ? (
+            <>
+              <View
+                style={{
+                  height: 1,
+                  backgroundColor: shell.border,
+                  marginBottom: 60,
+                }}
+              />
+              {repoUrl ? (
+                <View
+                  style={{
+                    alignItems: "flex-start",
+                    marginBottom: space["32"],
+                  }}
+                >
+                  <DesignDevelopToggle value={mode} onChange={setMode} />
+                </View>
+              ) : null}
+            </>
+          ) : null}
+
+          {repoUrl && mode === "develop" ? (
+            <DevelopPanel repoUrl={repoUrl} />
+          ) : (
+            children
+          )}
         </View>
       </View>
     </ScrollView>
@@ -369,5 +437,170 @@ function SidebarPills({
         </Pressable>
       ))}
     </ScrollView>
+  );
+}
+
+function VersionPill({ label }: { label: string }) {
+  const { shell } = useTheme();
+  return (
+    <View
+      style={{
+        paddingHorizontal: space["16"],
+        paddingVertical: space["10"],
+        borderRadius: radius.rounded,
+        backgroundColor: shell.sidebarBg,
+      }}
+    >
+      <Text
+        style={[
+          textStyles.Body_B14_SemiBold,
+          { color: shell.textSecondary },
+        ]}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+function DesignDevelopToggle({
+  value,
+  onChange,
+}: {
+  value: DetailMode;
+  onChange: (next: DetailMode) => void;
+}) {
+  const { shell } = useTheme();
+  const options: { key: DetailMode; label: string }[] = [
+    { key: "design", label: "Design" },
+    { key: "develop", label: "Develop" },
+  ];
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        gap: space["4"],
+        padding: space["4"],
+        borderRadius: radius.rounded,
+        backgroundColor: shell.sidebarBg,
+      }}
+    >
+      {options.map((opt) => {
+        const active = opt.key === value;
+        return (
+          <Pressable
+            key={opt.key}
+            onPress={() => onChange(opt.key)}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            style={({ pressed }) => ({
+              paddingHorizontal: space["32"],
+              paddingVertical: space["10"],
+              borderRadius: radius.rounded,
+              backgroundColor: active ? shell.previewIslandBg : "transparent",
+              opacity: pressed ? 0.88 : 1,
+            })}
+          >
+            <Text
+              style={[
+                textStyles.Body_B14_SemiBold,
+                {
+                  color: active
+                    ? colour["text-n-icon"].primary
+                    : shell.textTertiary,
+                },
+              ]}
+            >
+              {opt.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+function DevelopPanel({ repoUrl }: { repoUrl: string }) {
+  const { shell } = useTheme();
+  const open = () => {
+    if (Platform.OS === "web" && typeof window !== "undefined") {
+      window.open(repoUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    Linking.openURL(repoUrl).catch(() => {});
+  };
+  return (
+    <View>
+      <Text
+        style={[
+          textStyles.Heading_H24_Bold,
+          { color: shell.textPrimary, marginBottom: space["20"] },
+        ]}
+      >
+        Source
+      </Text>
+      <Pressable
+        onPress={open}
+        accessibilityRole="link"
+        accessibilityLabel={`Open ${repoUrl} on GitHub`}
+        // @ts-expect-error hover
+        style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => ({
+          flexDirection: "row",
+          alignItems: "center",
+          gap: space["16"],
+          padding: space["20"],
+          borderRadius: radius["16"],
+          borderWidth: 1,
+          borderColor: shell.border,
+          backgroundColor: hovered ? shell.sidebarRowHoverBg : "transparent",
+          opacity: pressed ? 0.88 : 1,
+          // @ts-expect-error rn-web passes CSS transition props through
+          transitionProperty: "background-color",
+          transitionDuration: "150ms",
+          transitionTimingFunction: "ease-out",
+        })}
+      >
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: radius.rounded,
+            backgroundColor: shell.sidebarBg,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Icon
+            name="system-link"
+            size={20}
+            color={colour["text-n-icon"].primary}
+          />
+        </View>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text
+            style={[
+              textStyles.Body_B16_SemiBold,
+              { color: shell.textPrimary },
+            ]}
+          >
+            View on GitHub
+          </Text>
+          <Text
+            numberOfLines={1}
+            style={[
+              textStyles.Body_B12_Regular,
+              { color: shell.textTertiary, marginTop: 2 },
+            ]}
+          >
+            {repoUrl}
+          </Text>
+        </View>
+        <Icon
+          name="system-arrow-up-right"
+          size={18}
+          color={colour["text-n-icon"].secondary}
+        />
+      </Pressable>
+    </View>
   );
 }

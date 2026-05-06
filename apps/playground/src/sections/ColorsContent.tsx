@@ -188,11 +188,11 @@ function SwatchCard({
         transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
       })}
     >
-      {/* Swatch tile — 4:3 aspect to keep proportions identical across breakpoints */}
+      {/* Swatch tile — fixed 100px tall, full cell width. */}
       <View
         style={{
           width: "100%",
-          aspectRatio: 4 / 3,
+          height: 100,
           borderRadius: radius["4"],
           backgroundColor: entry.hex,
           borderWidth: 1,

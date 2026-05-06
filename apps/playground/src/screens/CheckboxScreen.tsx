@@ -125,7 +125,9 @@ export function CheckboxScreen({ navigation }: Props) {
     <PageScaffold
       topNavActive="Components"
       title="checkbox"
-      subtitle="Selection control for multi-select lists, consent, and filter groups. Three sizes — H24, H20, H16."
+      subtitle="Selection control for multi-select lists, consent, and filter groups. Available in three sizes — H24, H20, and H16 — with selected, disabled, and disabled-selected states."
+      version="V0.1"
+      repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Checkbox.tsx"
       sidebar={componentsSidebar("Checkbox")}
       onSidebarSelect={(key) => {
         if (key === "all") navigation.navigate("Components" as never);

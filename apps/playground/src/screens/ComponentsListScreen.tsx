@@ -1,9 +1,10 @@
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { View, useWindowDimensions } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { colour, radius } from "@field-ds/tokens";
+import { radius } from "@field-ds/tokens";
 
 import { PageScaffold, type SidebarItem } from "../components/PageScaffold";
+import { HubCardShell } from "./FoundationsScreen";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Components">;
@@ -11,13 +12,14 @@ type Props = NativeStackScreenProps<RootStackParamList, "Components">;
 type ComponentEntry = {
   route: keyof RootStackParamList;
   name: string;
+  illustration: (props: { tone: string }) => React.ReactNode;
 };
 
 // Alphabetised by display name.
 const COMPONENTS: ComponentEntry[] = [
-  { route: "Accordion", name: "Accordion" },
-  { route: "BottomNav", name: "BottomNav" },
-  { route: "Checkbox", name: "Checkbox" },
+  { route: "Accordion", name: "Accordion", illustration: AccordionIllustration },
+  { route: "BottomNav", name: "BottomNav", illustration: BottomNavIllustration },
+  { route: "Checkbox", name: "Checkbox", illustration: CheckboxIllustration },
 ];
 
 export function ComponentsListScreen({ navigation }: Props) {
@@ -53,11 +55,12 @@ export function ComponentsListScreen({ navigation }: Props) {
         }}
       >
         {COMPONENTS.map((c) => (
-          <ComponentCard
+          <HubCardShell
             key={c.route}
-            entry={c}
+            label={c.name}
             cardsPerRow={cardsPerRow}
             onPress={() => navigation.navigate(c.route as never)}
+            renderIllustration={(tone) => <c.illustration tone={tone} />}
           />
         ))}
       </View>
@@ -65,53 +68,236 @@ export function ComponentsListScreen({ navigation }: Props) {
   );
 }
 
-function ComponentCard({
-  entry,
-  cardsPerRow,
-  onPress,
-}: {
-  entry: ComponentEntry;
-  cardsPerRow: number;
-  onPress: () => void;
-}) {
+// ─────────── Card illustrations (minimal, monochrome) ───────────
+
+const ILLO_W = 160;
+const ILLO_H = 96;
+
+function IlloFrame({ children }: { children: React.ReactNode }) {
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={entry.name}
-      // @ts-expect-error hover
-      style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => ({
-        flexBasis: `calc((100% - ${(cardsPerRow - 1) * 24}px) / ${cardsPerRow})` as never,
-        flexGrow: 0,
-        flexShrink: 0,
-        opacity: pressed ? 0.92 : 1,
-        transform: [{ translateY: hovered ? -2 : 0 }],
-        // @ts-expect-error rn-web passes CSS transition props through to the DOM
-        transitionProperty: "transform",
-        transitionDuration: "200ms",
-        transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-      })}
+    <View
+      style={{
+        width: ILLO_W,
+        height: ILLO_H,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
+      {children}
+    </View>
+  );
+}
+
+function AccordionIllustration({ tone }: { tone: string }) {
+  // Stack of 3 rows where the middle row is "expanded" — visualises
+  // disclosure.
+  return (
+    <IlloFrame>
+      <View style={{ width: 132, gap: 6 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            borderWidth: 2,
+            borderColor: tone,
+            borderRadius: radius["6"],
+          }}
+        >
+          <View
+            style={{ width: 56, height: 4, backgroundColor: tone, borderRadius: 2 }}
+          />
+          <View
+            style={{
+              width: 8,
+              height: 8,
+              backgroundColor: tone,
+              borderRadius: 9999,
+            }}
+          />
+        </View>
+        <View
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 10,
+            borderWidth: 2,
+            borderColor: tone,
+            borderRadius: radius["6"],
+            gap: 4,
+          }}
+        >
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <View
+              style={{ width: 56, height: 4, backgroundColor: tone, borderRadius: 2 }}
+            />
+            <View
+              style={{
+                width: 8,
+                height: 8,
+                backgroundColor: tone,
+                opacity: 0.6,
+                borderRadius: 9999,
+              }}
+            />
+          </View>
+          <View
+            style={{ width: 92, height: 3, backgroundColor: tone, opacity: 0.5 }}
+          />
+          <View
+            style={{ width: 70, height: 3, backgroundColor: tone, opacity: 0.5 }}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            borderWidth: 2,
+            borderColor: tone,
+            borderRadius: radius["6"],
+          }}
+        >
+          <View
+            style={{ width: 44, height: 4, backgroundColor: tone, borderRadius: 2 }}
+          />
+          <View
+            style={{
+              width: 8,
+              height: 8,
+              backgroundColor: tone,
+              borderRadius: 9999,
+            }}
+          />
+        </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function BottomNavIllustration({ tone }: { tone: string }) {
+  // Phone silhouette with a tab bar. Highlights the centre tab.
+  return (
+    <IlloFrame>
       <View
         style={{
-          aspectRatio: 1.5,
-          backgroundColor: colour.surface.tertiary,
-          borderRadius: radius["16"],
-        }}
-      />
-      <Text
-        numberOfLines={1}
-        style={{
-          marginTop: 12,
-          fontFamily: "Noontree-Bold",
-          fontSize: 18,
-          lineHeight: 24,
-          letterSpacing: -0.15,
-          color: colour["text-n-icon"].primary,
+          width: 70,
+          height: ILLO_H - 4,
+          borderWidth: 2,
+          borderColor: tone,
+          borderRadius: radius["8"],
+          padding: 6,
+          alignItems: "stretch",
+          gap: 4,
         }}
       >
-        {entry.name}
-      </Text>
-    </Pressable>
+        <View style={{ flex: 1 }} />
+        <View
+          style={{
+            height: 22,
+            borderTopWidth: 1,
+            borderTopColor: tone,
+            paddingTop: 5,
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{ width: 6, height: 6, backgroundColor: tone, opacity: 0.55 }}
+          />
+          <View
+            style={{
+              width: 6,
+              height: 6,
+              backgroundColor: tone,
+              borderRadius: 9999,
+            }}
+          />
+          <View
+            style={{ width: 6, height: 6, backgroundColor: tone, opacity: 0.55 }}
+          />
+        </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function CheckboxIllustration({ tone }: { tone: string }) {
+  // Three checkboxes — selected, unselected, indeterminate.
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 14,
+        }}
+      >
+        {/* Selected: filled with a tick mark made of two lines */}
+        <View
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: radius["4"],
+            backgroundColor: tone,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              width: 10,
+              height: 4,
+              backgroundColor: "rgba(255,255,255,0.92)",
+              transform: [{ rotate: "45deg" }, { translateX: 2 }],
+            }}
+          />
+          <View
+            style={{
+              width: 14,
+              height: 4,
+              backgroundColor: "rgba(255,255,255,0.92)",
+              transform: [{ rotate: "-45deg" }],
+              marginTop: -3,
+              marginLeft: 3,
+            }}
+          />
+        </View>
+        {/* Unselected */}
+        <View
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: radius["4"],
+            borderWidth: 2,
+            borderColor: tone,
+          }}
+        />
+        {/* Indeterminate */}
+        <View
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: radius["4"],
+            borderWidth: 2,
+            borderColor: tone,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              width: 14,
+              height: 3,
+              backgroundColor: tone,
+            }}
+          />
+        </View>
+      </View>
+    </IlloFrame>
   );
 }
