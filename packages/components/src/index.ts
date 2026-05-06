@@ -1,3 +1,4 @@
+export { Accordion, type AccordionProps } from "./Accordion";
 export { Checkbox, type CheckboxProps, type CheckboxSize } from "./Checkbox";
 export {
   BottomNav,

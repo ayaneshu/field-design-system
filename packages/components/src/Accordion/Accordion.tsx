@@ -91,6 +91,7 @@ export function Accordion({
     if (h > 0 && h !== bodyHeight) setBodyHeight(h);
   };
 
+  // Explicit dep arrays — Reanimated requires them on web without the Babel plugin.
   const wrapperStyle = useAnimatedStyle(() => {
     if (bodyHeight == null) {
       // First render before measurement — show or hide instantly per default.
@@ -105,11 +106,11 @@ export function Accordion({
       // during the second half. Keeps text fully readable while it slides.
       opacity: interpolate(progress.value, [0, 0.5, 1], [0, 1, 1], "clamp"),
     };
-  });
+  }, [progress, bodyHeight, defaultExpanded]);
 
   const chevronStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${progress.value * 180}deg` }],
-  }));
+  }), [progress]);
 
   const toggle = () => {
     const next = !expanded;

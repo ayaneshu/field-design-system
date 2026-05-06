@@ -11,7 +11,8 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Icon } from "@field-ds/icons";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
-import { Accordion } from "../components/Accordion";
+import { Accordion } from "@field-ds/components";
+
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar } from "../navigation/sidebars";
 import { useShell } from "../theme/ThemeContext";
