@@ -15,4 +15,7 @@ export type RootStackParamList = {
   Checkbox: undefined;
   BottomNav: undefined;
   Button: undefined;
+  RoundButton: undefined;
+  TextButton: undefined;
+  IconButton: undefined;
 };

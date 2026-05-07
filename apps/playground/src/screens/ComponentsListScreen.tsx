@@ -21,6 +21,21 @@ const COMPONENTS: ComponentEntry[] = [
   { route: "BottomNav", name: "BottomNav", illustration: BottomNavIllustration },
   { route: "Button", name: "Button", illustration: ButtonIllustration },
   { route: "Checkbox", name: "Checkbox", illustration: CheckboxIllustration },
+  {
+    route: "IconButton",
+    name: "Icon Button",
+    illustration: IconButtonIllustration,
+  },
+  {
+    route: "RoundButton",
+    name: "Round Button",
+    illustration: RoundButtonIllustration,
+  },
+  {
+    route: "TextButton",
+    name: "Text Button",
+    illustration: TextButtonIllustration,
+  },
 ];
 
 export function ComponentsListScreen({ navigation }: Props) {
@@ -304,11 +319,11 @@ function CheckboxIllustration({ tone }: { tone: string }) {
 }
 
 function ButtonIllustration({ tone }: { tone: string }) {
-  // Stack of three button silhouettes — filled, outline, pill — to evoke the
-  // primary / secondary / round-neutral trio.
+  // Pair of rectangular buttons — filled + outline — to evoke the rectangular
+  // Button family (primary + secondary).
   return (
     <IlloFrame>
-      <View style={{ gap: 8, alignItems: "center" }}>
+      <View style={{ gap: 10, alignItems: "center" }}>
         <View
           style={{
             width: 100,
@@ -326,13 +341,111 @@ function ButtonIllustration({ tone }: { tone: string }) {
             borderColor: tone,
           }}
         />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function RoundButtonIllustration({ tone }: { tone: string }) {
+  // Pill-shaped pair to evoke the M-NeutralRoundButton.
+  return (
+    <IlloFrame>
+      <View style={{ gap: 10, alignItems: "center" }}>
         <View
           style={{
-            width: 80,
-            height: 18,
+            width: 92,
+            height: 22,
+            borderRadius: 9999,
+            backgroundColor: tone,
+          }}
+        />
+        <View
+          style={{
+            width: 76,
+            height: 20,
             borderRadius: 9999,
             borderWidth: 2,
             borderColor: tone,
+          }}
+        />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function TextButtonIllustration({ tone }: { tone: string }) {
+  // Inline label + arrow chevron to evoke the M-TextButton family.
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <View
+          style={{
+            width: 60,
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: tone,
+          }}
+        />
+        <View
+          style={{
+            width: 0,
+            height: 0,
+            borderTopWidth: 6,
+            borderBottomWidth: 6,
+            borderLeftWidth: 8,
+            borderTopColor: "transparent",
+            borderBottomColor: "transparent",
+            borderLeftColor: tone,
+          }}
+        />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function IconButtonIllustration({ tone }: { tone: string }) {
+  // Trio of circular icon-only buttons to evoke the M-IconButton emphasis
+  // levels (default, ghost, action).
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <View
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 9999,
+            borderWidth: 2,
+            borderColor: tone,
+          }}
+        />
+        <View
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 9999,
+            backgroundColor: tone,
+          }}
+        />
+        <View
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 9999,
+            borderWidth: 2,
+            borderColor: tone,
+            opacity: 0.5,
           }}
         />
       </View>
