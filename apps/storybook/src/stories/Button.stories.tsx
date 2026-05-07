@@ -15,6 +15,7 @@ import {
   type TextButtonSize,
   type TextButtonTone,
 } from "@field-ds/components";
+import type { IconName } from "@field-ds/icons";
 import { colour, space, textStyles } from "@field-ds/tokens";
 
 const VARIANTS: ButtonVariant[] = [
@@ -25,6 +26,29 @@ const VARIANTS: ButtonVariant[] = [
 ];
 const SIZES: ButtonSize[] = ["H56", "H52", "H48", "H40", "H36", "H32"];
 
+// Curated icon set surfaced via the Storybook controls panel. Includes
+// `undefined` so the iconLeft/iconRight slots can be cleared from the UI.
+// Mirrors the playground picker so designers can drive the same buttons
+// the same way in both surfaces.
+const ICON_PICKER_OPTIONS: (IconName | undefined)[] = [
+  undefined,
+  "system-plus",
+  "system-arrow-right",
+  "system-arrow-left",
+  "system-arrow-up",
+  "system-arrow-down",
+  "system-chevron-right",
+  "system-chevron-left",
+  "system-search",
+  "system-edit",
+  "system-bag",
+  "system-heart",
+  "system-bin",
+  "system-info-circle",
+  "system-check-circle",
+  "system-message",
+];
+
 const meta = {
   title: "Components/Button",
   component: Button,
@@ -32,6 +56,16 @@ const meta = {
     variant: { control: "inline-radio", options: VARIANTS },
     size: { control: "inline-radio", options: SIZES },
     label: { control: "text" },
+    iconLeft: {
+      control: "select",
+      options: ICON_PICKER_OPTIONS,
+      description: "Glyph rendered before the label. Pick `—` to omit.",
+    },
+    iconRight: {
+      control: "select",
+      options: ICON_PICKER_OPTIONS,
+      description: "Glyph rendered after the label. Pick `—` to omit.",
+    },
     loading: { control: "boolean" },
     disabled: { control: "boolean" },
     fullWidth: { control: "boolean" },
@@ -40,6 +74,8 @@ const meta = {
     variant: "primary",
     size: "H56",
     label: "Continue",
+    iconLeft: undefined,
+    iconRight: undefined,
     loading: false,
     disabled: false,
     fullWidth: false,
@@ -48,7 +84,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "M-Button — rectangular text+icon CTA. Four variants (primary, secondary, secondary-neutral, neutral) × six heights × default / pressed / loader / disabled states. H32 is only valid on `variant=\"neutral\"`.",
+          "Rectangular text+icon CTA mapping to Figma's M-PrimaryButton, M-SecondaryButton, M-SecondaryNeutralButton, and M-NeutralButton. Four variants × six heights × default / pressed / loader / disabled states. H32 is only valid on `variant=\"neutral\"`.",
       },
     },
   },

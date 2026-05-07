@@ -1,6 +1,6 @@
 # Button
 
-Action controls for triggering primary, secondary, and supportive actions across noon flows. Maps to the Figma `M-Button/*` family — Primary, Secondary, Secondary-Neutral, Neutral, Round-Neutral, Text-Blue, Text-Neutral, and IconButton.
+Action controls for triggering primary, secondary, and supportive actions across noon flows. Maps to the Figma `M-PrimaryButton`, `M-SecondaryButton`, `M-SecondaryNeutralButton`, `M-NeutralButton`, `M-NeutralRoundButton`, `M-TextButtonBlue`, `M-TextButtonNeutral`, and `M-IconButton` families.
 
 ## Storybook
 
@@ -16,12 +16,12 @@ Then open the **Components / Button** group in the sidebar — covers `Button`, 
 
 ## Components
 
-| Component     | Figma                                | When to use                                                                 |
-| ------------- | ------------------------------------ | --------------------------------------------------------------------------- |
-| `Button`      | `M-Button/Primary`, `Secondary`, `Secondary-Neutral`, `Neutral` | Rectangular text+icon CTAs. Pick `variant` to set emphasis.            |
-| `RoundButton` | `M-Button/Round-Neutral-Button`      | Pill-shaped neutral CTA for toolbars, map chips, sticky headers.            |
-| `TextButton`  | `M-Button/Text-Blue`, `Text-Neutral` | Low-emphasis inline action ("View all", row-level "Edit").                  |
-| `IconButton`  | `M-IconButton`                       | Square circular icon-only button (back chevrons, close, overflow controls). |
+| Component     | Figma                                                          | When to use                                                                 |
+| ------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `Button`      | `M-PrimaryButton`, `M-SecondaryButton`, `M-SecondaryNeutralButton`, `M-NeutralButton` | Rectangular text+icon CTAs. Pick `variant` to set emphasis.   |
+| `RoundButton` | `M-NeutralRoundButton`                                          | Pill-shaped neutral CTA for toolbars, map chips, sticky headers.            |
+| `TextButton`  | `M-TextButtonBlue`, `M-TextButtonNeutral`                       | Low-emphasis inline action ("View all", row-level "Edit").                  |
+| `IconButton`  | `M-IconButton`                                                  | Square circular icon-only button (back chevrons, close, overflow controls). |
 
 ## Usage
 

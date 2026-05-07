@@ -24,13 +24,15 @@ const SELECT_DURATION = 260;
 
 // Figma: M-Bottomnav — primary bottom tab bar.
 //   • Highlight bar 4×43, top of each tab, action colour when active.
-//   • Icon 32×32 area; icon glyph size 24 (Field DS bottomnav icons are 24×24).
+//   • Icon 28×28 (Field DS bottomnav icons render at 28 via the 24×24
+//     viewBox; the wrapping View matches the icon size — no extra padding,
+//     so the glyph optical size matches Figma's M-Icon/Bottomnav-Icon/* frame).
 //   • Label B11 — Bold + action when active, Medium + tertiary when not.
 //   • Container padHorizontal 16; tabs flex 1 with center alignment.
 //   • Min 3, max 5 tabs (Apple/Material parity; below 3 reads as a row of buttons,
 //     above 5 the labels truncate).
-const ICON_AREA = space["32"];
-const ICON_SIZE = space["24"];
+const ICON_AREA = 28;
+const ICON_SIZE = 28;
 const HIGHLIGHT_HEIGHT = space["4"];
 const HIGHLIGHT_WIDTH = 43; // No matching token; explicit per the spec.
 const HIGHLIGHT_RADIUS = radius["2"];

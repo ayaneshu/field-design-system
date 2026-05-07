@@ -12,7 +12,7 @@ import {
 import { PRESS_TRANSITION, noFauxBold } from "./sizing";
 
 // Pill-shaped neutral CTA — white surface, neutral 1px border, fully rounded.
-// Maps to Figma M-Button/Round-Neutral-Button (1304:266). Two heights only.
+// Maps to Figma M-NeutralRoundButton (1304:266). Two heights only.
 export type RoundButtonSize = "H40" | "H36";
 
 type RoundSpec = {
@@ -60,7 +60,7 @@ export type RoundButtonProps = {
 };
 
 /**
- * M-Round-Neutral-Button — pill-shaped outline CTA. Same colour semantics as
+ * M-NeutralRoundButton — pill-shaped outline CTA. Same colour semantics as
  * `Button variant="secondary-neutral"` but with a fully rounded border. Use
  * for compact toolbar / map-chip / sticky header actions where a pill reads
  * better than a rectangular outline button.

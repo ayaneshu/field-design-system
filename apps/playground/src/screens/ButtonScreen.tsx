@@ -70,6 +70,33 @@ export function ButtonScreen({ navigation }: Props) {
   const [iconLeft, setIconLeft] = useState<IconName | null>(null);
   const [iconRight, setIconRight] = useState<IconName | null>(null);
 
+  // Per-section playground state — every button family gets its own pair
+  // of icon slots so designers can compose mid-flight without bouncing
+  // between sections.
+  const [roundSize, setRoundSize] = useState<RoundButtonSize>("H40");
+  const [roundIconLeft, setRoundIconLeft] = useState<IconName | null>(
+    "system-plus",
+  );
+  const [roundIconRight, setRoundIconRight] = useState<IconName | null>(null);
+  const [roundLoading, setRoundLoading] = useState(false);
+  const [roundDisabled, setRoundDisabled] = useState(false);
+
+  const [textTone, setTextTone] = useState<TextButtonTone>("blue");
+  const [textSize, setTextSize] = useState<TextButtonSize>("A14");
+  const [textIconLeft, setTextIconLeft] = useState<IconName | null>(null);
+  const [textIconRight, setTextIconRight] = useState<IconName | null>(
+    "system-arrow-right",
+  );
+  const [textDisabled, setTextDisabled] = useState(false);
+
+  const [iconBtnSize, setIconBtnSize] = useState<IconButtonSize>("H40");
+  const [iconBtnEmphasis, setIconBtnEmphasis] =
+    useState<IconButtonEmphasis>("default");
+  const [iconBtnGlyph, setIconBtnGlyph] = useState<IconName>(
+    "system-arrow-right",
+  );
+  const [iconBtnDisabled, setIconBtnDisabled] = useState(false);
+
   const playgroundPreview = (
     <PreviewSurface tall>
       <Button
@@ -139,7 +166,20 @@ export function ButtonScreen({ navigation }: Props) {
     </View>
   );
 
-  const roundPreview = (
+  const roundLivePreview = (
+    <PreviewSurface tall>
+      <RoundButton
+        label="Filter"
+        size={roundSize}
+        iconLeft={roundIconLeft ?? undefined}
+        iconRight={roundIconRight ?? undefined}
+        loading={roundLoading}
+        disabled={roundDisabled}
+      />
+    </PreviewSurface>
+  );
+
+  const roundStatesPreview = (
     <View style={{ gap: space["20"] }}>
       {ROUND_SIZES.map((s) => (
         <PreviewSurface key={s}>
@@ -162,7 +202,20 @@ export function ButtonScreen({ navigation }: Props) {
     </View>
   );
 
-  const textPreview = (
+  const textLivePreview = (
+    <PreviewSurface tall>
+      <TextButton
+        label="View all"
+        tone={textTone}
+        size={textSize}
+        iconLeft={textIconLeft ?? undefined}
+        iconRight={textIconRight ?? undefined}
+        disabled={textDisabled}
+      />
+    </PreviewSurface>
+  );
+
+  const textStatesPreview = (
     <View style={{ gap: space["20"] }}>
       {TEXT_TONES.map((tone) =>
         TEXT_SIZES.map((sz) => (
@@ -191,7 +244,19 @@ export function ButtonScreen({ navigation }: Props) {
     </View>
   );
 
-  const iconPreview = (
+  const iconLivePreview = (
+    <PreviewSurface tall>
+      <IconButton
+        icon={iconBtnGlyph}
+        accessibilityLabel={iconBtnGlyph}
+        size={iconBtnSize}
+        emphasis={iconBtnEmphasis}
+        disabled={iconBtnDisabled}
+      />
+    </PreviewSurface>
+  );
+
+  const iconStatesPreview = (
     <View style={{ gap: space["20"] }}>
       {ICON_SIZES.map((sz) => (
         <PreviewSurface key={sz}>
@@ -288,9 +353,125 @@ export function ButtonScreen({ navigation }: Props) {
 
       <DetailSection heading="Variants" preview={variantsPreview} />
       <DetailSection heading="Sizes" preview={sizesPreview} />
-      <DetailSection heading="Round neutral" preview={roundPreview} />
-      <DetailSection heading="Text buttons" preview={textPreview} />
-      <DetailSection heading="Icon buttons" preview={iconPreview} />
+
+      <DetailSection
+        heading="Round neutral · playground"
+        preview={roundLivePreview}
+      >
+        <PropList>
+          <PropRow>
+            <PropLabel>Size</PropLabel>
+            <SegmentedControl
+              options={ROUND_SIZES}
+              value={roundSize}
+              onChange={setRoundSize}
+            />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Icon left</PropLabel>
+            <IconPicker value={roundIconLeft} onChange={setRoundIconLeft} />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Icon right</PropLabel>
+            <IconPicker value={roundIconRight} onChange={setRoundIconRight} />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Loading</PropLabel>
+            <Toggle value={roundLoading} onValueChange={setRoundLoading} />
+          </PropRow>
+          <PropRow last>
+            <PropLabel>Disabled</PropLabel>
+            <Toggle value={roundDisabled} onValueChange={setRoundDisabled} />
+          </PropRow>
+        </PropList>
+      </DetailSection>
+      <DetailSection
+        heading="Round neutral · states"
+        preview={roundStatesPreview}
+      />
+
+      <DetailSection
+        heading="Text buttons · playground"
+        preview={textLivePreview}
+      >
+        <PropList>
+          <PropRow>
+            <PropLabel>Tone</PropLabel>
+            <SegmentedControl
+              options={TEXT_TONES}
+              value={textTone}
+              onChange={setTextTone}
+            />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Size</PropLabel>
+            <SegmentedControl
+              options={TEXT_SIZES}
+              value={textSize}
+              onChange={setTextSize}
+            />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Icon left</PropLabel>
+            <IconPicker value={textIconLeft} onChange={setTextIconLeft} />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Icon right</PropLabel>
+            <IconPicker value={textIconRight} onChange={setTextIconRight} />
+          </PropRow>
+          <PropRow last>
+            <PropLabel>Disabled</PropLabel>
+            <Toggle value={textDisabled} onValueChange={setTextDisabled} />
+          </PropRow>
+        </PropList>
+      </DetailSection>
+      <DetailSection
+        heading="Text buttons · states"
+        preview={textStatesPreview}
+      />
+
+      <DetailSection
+        heading="Icon buttons · playground"
+        preview={iconLivePreview}
+      >
+        <PropList>
+          <PropRow>
+            <PropLabel>Size</PropLabel>
+            <SegmentedControl
+              options={ICON_SIZES}
+              value={iconBtnSize}
+              onChange={setIconBtnSize}
+            />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Emphasis</PropLabel>
+            <SegmentedControl
+              options={ICON_EMPHASIS}
+              value={iconBtnEmphasis}
+              onChange={setIconBtnEmphasis}
+            />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Icon</PropLabel>
+            {/* IconButton requires a glyph — picker without a "None" option */}
+            <RequiredIconPicker
+              value={iconBtnGlyph}
+              onChange={setIconBtnGlyph}
+            />
+          </PropRow>
+          <PropRow last>
+            <PropLabel>Disabled</PropLabel>
+            <Toggle
+              value={iconBtnDisabled}
+              onValueChange={setIconBtnDisabled}
+            />
+          </PropRow>
+        </PropList>
+      </DetailSection>
+      <DetailSection
+        heading="Icon buttons · states"
+        preview={iconStatesPreview}
+      />
     </PageScaffold>
   );
 }
@@ -700,5 +881,140 @@ function DropdownRow({
         {label}
       </Text>
     </Pressable>
+  );
+}
+
+/**
+ * Icon-only variant of {@link IconPicker} — no "None" row, since IconButton
+ * always requires a glyph. Shares the same trigger + popup chrome as the
+ * nullable picker so the controls UI stays consistent.
+ */
+function RequiredIconPicker({
+  value,
+  onChange,
+}: {
+  value: IconName;
+  onChange: (next: IconName) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const select = (next: IconName) => {
+    setOpen(false);
+    onChange(next);
+  };
+
+  return (
+    <View style={{ position: "relative", minWidth: 220 }}>
+      <Pressable
+        onPress={() => setOpen((o) => !o)}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: open }}
+        accessibilityLabel={`Pick icon — current: ${value}`}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: space["8"],
+          paddingVertical: space["8"],
+          paddingHorizontal: space["12"],
+          borderRadius: radius["8"],
+          borderWidth: 1,
+          borderColor: open ? colour.border.action : colour.border.primary,
+          backgroundColor: colour.surface.primary,
+          justifyContent: "space-between",
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: space["8"],
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <View
+            style={{
+              width: 20,
+              height: 20,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Icon
+              name={value}
+              size={16}
+              color={colour["text-n-icon"].primary}
+            />
+          </View>
+          <Text
+            numberOfLines={1}
+            style={[
+              textStyles.Body_B12_SemiBold,
+              { color: colour["text-n-icon"].primary, flex: 1 },
+            ]}
+          >
+            {value}
+          </Text>
+        </View>
+        <Icon
+          name="system-chevron-down"
+          size={16}
+          color={colour["text-n-icon"].tertiary}
+        />
+      </Pressable>
+
+      {open ? (
+        <>
+          <Pressable
+            onPress={() => setOpen(false)}
+            accessibilityLabel="Close icon picker"
+            // @ts-expect-error — `position: "fixed"` is web-only; RN ignores it.
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 50,
+            }}
+          />
+          <View
+            style={{
+              position: "absolute",
+              top: "100%",
+              right: 0,
+              marginTop: space["6"],
+              width: 280,
+              maxHeight: 360,
+              backgroundColor: colour.surface.primary,
+              borderRadius: radius["12"],
+              borderWidth: 1,
+              borderColor: colour.border.primary,
+              paddingVertical: space["4"],
+              zIndex: 51,
+              shadowColor: "#000",
+              shadowOpacity: 0.08,
+              shadowRadius: 16,
+              shadowOffset: { width: 0, height: 8 },
+            }}
+          >
+            <ScrollView
+              style={{ maxHeight: 352 }}
+              showsVerticalScrollIndicator
+            >
+              {ICON_OPTIONS.map((name) => (
+                <DropdownRow
+                  key={name}
+                  iconName={name}
+                  label={name}
+                  active={value === name}
+                  onPress={() => select(name)}
+                />
+              ))}
+            </ScrollView>
+          </View>
+        </>
+      ) : null}
+    </View>
   );
 }
