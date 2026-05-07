@@ -11,7 +11,7 @@ import {
 
 import { PRESS_TRANSITION, noFauxBold } from "./sizing";
 
-// Maps to Figma M-Button/Text-Blue (1363:208) and M-Button/Text-Neutral (1363:245).
+// Maps to Figma M-TextButtonBlue (1363:208) and M-TextButtonNeutral (1363:245).
 // Two sizes per Figma:
 //   A14 — pairs with H48/H44 filled buttons.
 //   A12 — pairs with H36 filled buttons.
@@ -75,10 +75,10 @@ export type TextButtonProps = {
 };
 
 /**
- * M-Button/Text — low-emphasis CTA. Transparent surface with optional left/
- * right icons, picking up a subtle tint on press. Use for inline supportive
- * actions ("View all", row-level "Edit", toolbar links) — never as the only
- * action on a screen.
+ * M-TextButtonBlue / M-TextButtonNeutral — low-emphasis CTA. Transparent
+ * surface with optional left/right icons, picking up a subtle tint on press.
+ * Use for inline supportive actions ("View all", row-level "Edit", toolbar
+ * links) — never as the only action on a screen.
  *
  *   <TextButton label="View all" />
  *   <TextButton label="Edit" tone="neutral" iconLeft="system-plus" size="A12" />

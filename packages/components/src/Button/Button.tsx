@@ -10,11 +10,11 @@ import {
   type ButtonSize,
 } from "./sizing";
 
-// Maps to the four rectangular families in Figma:
-//   primary           → M-Button/Primary-Button       (filled blue)
-//   secondary         → M-Button/Secondary-Button     (white + blue outline)
-//   secondary-neutral → M-Button/Secondary-Neutral    (white + neutral outline)
-//   neutral           → M-Button/Neutral-Button       (filled near-black)
+// Maps to the four rectangular families in Figma (Button page, node 178:2):
+//   primary           → M-PrimaryButton          (filled blue)
+//   secondary         → M-SecondaryButton        (white + blue outline)
+//   secondary-neutral → M-SecondaryNeutralButton (white + neutral outline)
+//   neutral           → M-NeutralButton          (filled near-black)
 export type ButtonVariant =
   | "primary"
   | "secondary"
@@ -93,9 +93,9 @@ export type ButtonProps = {
 };
 
 /**
- * M-Button — rectangular text+icon button. Maps to Figma's M-Button family
- * (Primary, Secondary, Secondary-Neutral, Neutral). Heights, paddings and
- * type sizes are token-driven via {@link BUTTON_SIZE}.
+ * Rectangular text+icon button. Maps to Figma's M-PrimaryButton,
+ * M-SecondaryButton, M-SecondaryNeutralButton, and M-NeutralButton.
+ * Heights, paddings and type sizes are token-driven via {@link BUTTON_SIZE}.
  *
  *   <Button label="Continue" variant="primary" />
  *   <Button label="Cancel" variant="secondary" iconLeft="system-arrow-right" />
