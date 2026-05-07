@@ -12,6 +12,7 @@ export function componentsSidebar(activeKey: string): SidebarItem[] {
     { key: "all", label: "Components", dividerAfter: true },
     { key: "Accordion", label: "Accordion", active: activeKey === "Accordion" },
     { key: "BottomNav", label: "BottomNav", active: activeKey === "BottomNav" },
+    { key: "Button", label: "Button", active: activeKey === "Button" },
     { key: "Checkbox", label: "Checkbox", active: activeKey === "Checkbox" },
   ];
 }

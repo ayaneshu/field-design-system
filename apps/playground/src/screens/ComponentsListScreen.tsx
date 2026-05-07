@@ -19,6 +19,7 @@ type ComponentEntry = {
 const COMPONENTS: ComponentEntry[] = [
   { route: "Accordion", name: "Accordion", illustration: AccordionIllustration },
   { route: "BottomNav", name: "BottomNav", illustration: BottomNavIllustration },
+  { route: "Button", name: "Button", illustration: ButtonIllustration },
   { route: "Checkbox", name: "Checkbox", illustration: CheckboxIllustration },
 ];
 
@@ -297,6 +298,43 @@ function CheckboxIllustration({ tone }: { tone: string }) {
             }}
           />
         </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function ButtonIllustration({ tone }: { tone: string }) {
+  // Stack of three button silhouettes — filled, outline, pill — to evoke the
+  // primary / secondary / round-neutral trio.
+  return (
+    <IlloFrame>
+      <View style={{ gap: 8, alignItems: "center" }}>
+        <View
+          style={{
+            width: 100,
+            height: 22,
+            borderRadius: radius["6"],
+            backgroundColor: tone,
+          }}
+        />
+        <View
+          style={{
+            width: 100,
+            height: 22,
+            borderRadius: radius["6"],
+            borderWidth: 2,
+            borderColor: tone,
+          }}
+        />
+        <View
+          style={{
+            width: 80,
+            height: 18,
+            borderRadius: 9999,
+            borderWidth: 2,
+            borderColor: tone,
+          }}
+        />
       </View>
     </IlloFrame>
   );

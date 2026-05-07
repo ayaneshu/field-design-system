@@ -14,4 +14,5 @@ export type RootStackParamList = {
   Accordion: undefined;
   Checkbox: undefined;
   BottomNav: undefined;
+  Button: undefined;
 };
