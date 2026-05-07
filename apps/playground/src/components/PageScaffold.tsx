@@ -233,10 +233,18 @@ export function DetailSection({
   const left = (
     <View style={{ flex: split ? 1 : undefined, minWidth: 0 }}>
       <Text
-        style={[
-          textStyles.Heading_H24_Bold,
-          { color: shell.textPrimary },
-        ]}
+        // SemiBold (600) over the H24 size — Heading_H24_Bold reads too
+        // heavy as a section divider next to the prominent title above. The
+        // numeric values mirror Heading_H24_Bold so leading + tracking stay
+        // in sync; we override the family + weight to drop a notch.
+        style={{
+          fontFamily: "Noontree-SemiBold",
+          fontWeight: "400",
+          fontSize: 24,
+          lineHeight: 32,
+          letterSpacing: -0.25,
+          color: shell.textPrimary,
+        }}
       >
         {heading}
       </Text>

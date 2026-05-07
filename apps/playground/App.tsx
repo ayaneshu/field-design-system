@@ -16,6 +16,7 @@ import { ComponentsListScreen } from "./src/screens/ComponentsListScreen";
 import { PatternsScreen } from "./src/screens/PatternsScreen";
 import { IllustrationsScreen } from "./src/screens/IllustrationsScreen";
 import { AccordionScreen } from "./src/screens/AccordionScreen";
+import { ButtonScreen } from "./src/screens/ButtonScreen";
 import { CheckboxScreen } from "./src/screens/CheckboxScreen";
 import { BottomNavScreen } from "./src/screens/BottomNavScreen";
 import type { RootStackParamList } from "./src/navigation/types";
@@ -75,6 +76,7 @@ function ThemedNavigationShell() {
         <RootStack.Screen name="Patterns" component={PatternsScreen} />
         <RootStack.Screen name="Illustrations" component={IllustrationsScreen} />
         <RootStack.Screen name="Accordion" component={AccordionScreen} />
+        <RootStack.Screen name="Button" component={ButtonScreen} />
         <RootStack.Screen name="Checkbox" component={CheckboxScreen} />
         <RootStack.Screen name="BottomNav" component={BottomNavScreen} />
       </RootStack.Navigator>
