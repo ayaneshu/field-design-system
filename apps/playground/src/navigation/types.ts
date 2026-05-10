@@ -27,4 +27,10 @@ export type RootStackParamList = {
   InputText: undefined;
   InputTextarea: undefined;
   ListItem: undefined;
+  PageHeader: undefined;
+  Radio: undefined;
+  RatingInput: undefined;
+  SearchBar: undefined;
+  Switch: undefined;
+  Toggle: undefined;
 };

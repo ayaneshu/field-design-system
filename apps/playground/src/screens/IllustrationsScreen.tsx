@@ -9,6 +9,16 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+
+// Column count for the illustration grid — tuned so cards stay ~200–240px wide
+// at every breakpoint, matching the swatch grid on the colours page.
+function illustrationGridColumns(width: number): number {
+  if (width >= 1600) return 6;
+  if (width >= 1280) return 5;
+  if (width >= 960) return 4;
+  if (width >= 720) return 3;
+  return 2;
+}
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Icon } from "@field-ds/icons";
@@ -33,13 +43,23 @@ export function IllustrationsScreen({ navigation }: Props) {
   const { toast, copy } = useCopy();
 
   // Retain the L0 Foundations rail and slot the Library / Playground sub-tabs
-  // *under* "Illustrations" as indented L1 entries. "Illustrations" itself
-  // stays highlighted as the active L0 row. L0 and L1 each sorted A–Z.
+  // *under* "Illustrations" as indented L1 entries. "Illustrations" is now a
+  // collapsible parent — clicking the row toggles its chevron and shows /
+  // hides Library and Playground beneath it (the shared Sidebar component
+  // handles the expand/collapse + chevron). L0 and L1 each sorted A–Z.
   const sidebar: SidebarItem[] = [
     { key: "all", label: "Foundations", dividerAfter: true },
     { key: "colors", label: "Colours" },
     { key: "icons", label: "Icons" },
-    { key: "illustrations", label: "Illustrations", active: true },
+    {
+      key: "illustrations",
+      label: "Illustrations",
+      collapsible: true,
+      // Mark active so the parent row keeps the highlighted state while we
+      // sit on this page; the child rows still drive their own active state
+      // via the `tab` prop below.
+      active: true,
+    },
     { key: "library", label: "Library", indent: true, active: tab === "library" },
     { key: "playground", label: "Playground", indent: true, active: tab === "playground" },
     { key: "radius", label: "Radius" },
@@ -123,6 +143,8 @@ function Library({
 }: {
   copy: (text: string, label?: string) => void;
 }) {
+  const { width: vw } = useWindowDimensions();
+  const cols = illustrationGridColumns(vw);
   const [brand, setBrand] = useState<IllustrationBrand>("base");
   const [hue, setHue] = useState(0); // -180 .. 180
   const [sat, setSat] = useState(100); // 0 .. 200
@@ -193,16 +215,16 @@ function Library({
         ))}
       </View>
 
-      {/* HSL controls */}
+      {/* HSB controls */}
       <View
         style={{
-          padding: space["16"],
+          padding: space["20"],
           borderRadius: radius["16"],
           backgroundColor: colour.surface.secondary,
           borderWidth: 1,
           borderColor: colour.border.subtle,
           marginBottom: space["20"],
-          gap: space["12"],
+          gap: space["16"],
         }}
       >
         <View
@@ -230,16 +252,27 @@ function Library({
               setSat(100);
               setBright(100);
             }}
-            style={({ pressed }) => ({
+            // @ts-expect-error — hover is web-only
+            style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => ({
+              flexDirection: "row",
+              alignItems: "center",
+              gap: space["6"],
               paddingHorizontal: space["10"],
-              paddingVertical: space["4"],
+              paddingVertical: space["6"],
               borderRadius: radius.rounded,
-              backgroundColor: colour.surface.primary,
+              backgroundColor: hovered
+                ? colour.surface.tertiary
+                : colour.surface.primary,
               borderWidth: 1,
               borderColor: colour.border.subtle,
               opacity: pressed ? 0.85 : 1,
             })}
           >
+            <Icon
+              name="system-refresh"
+              size={12}
+              color={colour["text-n-icon"].primary}
+            />
             <Text
               style={[
                 textStyles.Body_B11_SemiBold,
@@ -250,16 +283,18 @@ function Library({
             </Text>
           </Pressable>
         </View>
-        <Slider label="Hue" min={-180} max={180} value={hue} onChange={setHue} suffix="°" />
-        <Slider label="Saturation" min={0} max={200} value={sat} onChange={setSat} suffix="%" />
-        <Slider
-          label="Brightness"
-          min={50}
-          max={150}
-          value={bright}
-          onChange={setBright}
-          suffix="%"
-        />
+        <View style={{ gap: space["14"] }}>
+          <Slider label="Hue" min={-180} max={180} value={hue} onChange={setHue} suffix="°" />
+          <Slider label="Saturation" min={0} max={200} value={sat} onChange={setSat} suffix="%" />
+          <Slider
+            label="Brightness"
+            min={50}
+            max={150}
+            value={bright}
+            onChange={setBright}
+            suffix="%"
+          />
+        </View>
       </View>
 
       {/* Search + count */}
@@ -318,24 +353,117 @@ function Library({
       </View>
 
       {/* Grid */}
-      <View
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: space["12"],
-        }}
-      >
-        {list.map((il) => (
-          <IllustrationCard
-            key={il.id}
-            illustration={il}
-            filterStyle={filterStyle}
-            onCopy={copy}
-          />
-        ))}
-      </View>
+      {Platform.OS === "web"
+        ? React.createElement(
+            "div",
+            {
+              style: {
+                display: "grid",
+                gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                gap: 16,
+              },
+            },
+            list.map((il) =>
+              React.createElement(IllustrationCard, {
+                key: il.id,
+                illustration: il,
+                filterStyle,
+                onCopy: copy,
+              }),
+            ),
+          )
+        : (
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: space["16"],
+            }}
+          >
+            {list.map((il) => (
+              <IllustrationCard
+                key={il.id}
+                illustration={il}
+                filterStyle={filterStyle}
+                onCopy={copy}
+              />
+            ))}
+          </View>
+        )}
     </View>
   );
+}
+
+// Inject custom range-input styling once for the whole module. Using a tagged
+// className lets us style the track + thumb consistently across browsers — the
+// default `accentColor` only paints the filled portion and ignores the thumb.
+const SLIDER_CSS = `
+.fds-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+}
+.fds-slider:focus { outline: none; }
+.fds-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--fds-slider-fill, #1d2539);
+}
+.fds-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(29, 37, 57, 0.12);
+}
+.fds-slider::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: #1d2539;
+}
+.fds-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 2px solid #1d2539;
+  margin-top: -6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18), 0 0 0 0 rgba(29, 37, 57, 0.0);
+  transition: box-shadow 120ms ease, transform 120ms ease;
+}
+.fds-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 2px solid #1d2539;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  transition: box-shadow 120ms ease, transform 120ms ease;
+}
+.fds-slider:hover::-webkit-slider-thumb {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 6px rgba(29, 37, 57, 0.08);
+}
+.fds-slider:hover::-moz-range-thumb {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 6px rgba(29, 37, 57, 0.08);
+}
+.fds-slider:active::-webkit-slider-thumb { transform: scale(1.05); }
+.fds-slider:active::-moz-range-thumb { transform: scale(1.05); }
+`;
+
+let sliderStylesInjected = false;
+function ensureSliderStyles() {
+  if (Platform.OS !== "web" || sliderStylesInjected) return;
+  if (typeof document === "undefined") return;
+  const tag = document.createElement("style");
+  tag.setAttribute("data-fds-slider", "");
+  tag.appendChild(document.createTextNode(SLIDER_CSS));
+  document.head.appendChild(tag);
+  sliderStylesInjected = true;
 }
 
 function Slider({
@@ -353,13 +481,19 @@ function Slider({
   onChange: (v: number) => void;
   suffix?: string;
 }) {
+  ensureSliderStyles();
+  // Pre-compute the % fill so we can paint a gradient on the WebKit track —
+  // -moz-range-progress handles this natively in Firefox.
+  const pct = ((value - min) / (max - min)) * 100;
+  const fill = `linear-gradient(to right, #1d2539 0%, #1d2539 ${pct}%, rgba(29, 37, 57, 0.12) ${pct}%, rgba(29, 37, 57, 0.12) 100%)`;
+
   const labelEl = (
     <View
       style={{
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 6,
+        marginBottom: 8,
       }}
     >
       <Text
@@ -376,6 +510,13 @@ function Slider({
           {
             color: colour["text-n-icon"].primary,
             fontVariant: ["tabular-nums"],
+            paddingHorizontal: space["8"],
+            paddingVertical: 2,
+            borderRadius: radius.rounded,
+            backgroundColor: colour.surface.primary,
+            borderWidth: 1,
+            borderColor: colour.border.subtle,
+            overflow: "hidden",
           },
         ]}
       >
@@ -394,17 +535,18 @@ function Slider({
           min,
           max,
           value,
+          className: "fds-slider",
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
             onChange(Number(e.target.value)),
           style: {
-            width: "100%",
-            accentColor: "#1d2539",
+            // CSS custom prop drives the WebKit track gradient.
+            ["--fds-slider-fill" as never]: fill,
           },
         })}
       </View>
     );
   }
-  // Native fallback: simple text — drag UX would need react-native-community/slider.
+  // Native fallback — shows the static track; would need react-native-community/slider for drag.
   return (
     <View>
       {labelEl}
@@ -414,7 +556,16 @@ function Slider({
           borderRadius: 3,
           backgroundColor: colour.surface.muted,
         }}
-      />
+      >
+        <View
+          style={{
+            width: `${pct}%`,
+            height: "100%",
+            borderRadius: 3,
+            backgroundColor: colour["text-n-icon"].primary,
+          }}
+        />
+      </View>
     </View>
   );
 }
@@ -435,9 +586,12 @@ function IllustrationCard({
       accessibilityLabel={`Copy SVG ${illustration.name}`}
       // @ts-expect-error hover
       style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => ({
+        // On web the card sits inside a CSS grid cell, so it should fill the
+        // cell. On native we fall back to flex wrap with a sensible basis.
         flexGrow: 1,
-        flexBasis: 200,
-        maxWidth: 240,
+        flexBasis: Platform.OS === "web" ? 0 : 200,
+        width: Platform.OS === "web" ? "100%" : undefined,
+        minWidth: 0,
         borderRadius: radius["16"],
         backgroundColor: colour.surface.primary,
         borderWidth: 1,
@@ -445,6 +599,11 @@ function IllustrationCard({
         overflow: "hidden",
         opacity: pressed ? 0.92 : 1,
         transform: [{ translateY: hovered ? -2 : 0 }],
+        transitionProperty: "border-color, transform, box-shadow",
+        transitionDuration: "160ms",
+        boxShadow: hovered
+          ? "0 6px 16px rgba(29, 37, 57, 0.08)"
+          : "0 0 0 rgba(0,0,0,0)",
       })}
     >
       <View

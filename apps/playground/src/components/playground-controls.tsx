@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
 
+import { Toggle as FieldToggle } from "@field-ds/components";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { useShell } from "../theme/ThemeContext";
@@ -33,7 +34,9 @@ export function PreviewSurface({
 }
 
 /** Small uppercase caption used to title states / size buckets inside a
- *  PreviewSurface. */
+ *  PreviewSurface. PreviewSurface stays light-only (it hosts M-Components),
+ *  so this label stays anchored to the light-mode tertiary token rather than
+ *  flipping with the shell theme. */
 export function SectionLabel({ children }: { children: ReactNode }) {
   return (
     <Text
@@ -101,32 +104,7 @@ export function Toggle({
   value: boolean;
   onValueChange: (v: boolean) => void;
 }) {
-  return (
-    <Pressable
-      onPress={() => onValueChange(!value)}
-      style={{
-        paddingVertical: space["6"],
-        paddingHorizontal: space["12"],
-        borderRadius: radius.rounded,
-        backgroundColor: value
-          ? colour.surface["action-extrabold"]
-          : colour.surface.muted,
-      }}
-    >
-      <Text
-        style={[
-          textStyles.Body_B12_SemiBold,
-          {
-            color: value
-              ? colour["text-n-icon"]["on-surface-bold"]
-              : colour["text-n-icon"].secondary,
-          },
-        ]}
-      >
-        {value ? "On" : "Off"}
-      </Text>
-    </Pressable>
-  );
+  return <FieldToggle on={value} onChange={onValueChange} size="H20" />;
 }
 
 export function SegmentedControl<T extends string>({
@@ -138,13 +116,14 @@ export function SegmentedControl<T extends string>({
   value: T;
   onChange: (next: T) => void;
 }) {
+  const shell = useShell();
   return (
     <View
       style={{
         flexDirection: "row",
         flexWrap: "wrap",
         gap: 2,
-        backgroundColor: colour.surface.muted,
+        backgroundColor: shell.sidebarBg,
         borderRadius: radius.rounded,
         padding: 2,
       }}
@@ -160,7 +139,7 @@ export function SegmentedControl<T extends string>({
               paddingHorizontal: space["12"],
               borderRadius: radius.rounded,
               backgroundColor: active
-                ? colour.surface.primary
+                ? shell.sidebarRowActiveBg
                 : "transparent",
             }}
           >
@@ -168,9 +147,7 @@ export function SegmentedControl<T extends string>({
               style={[
                 textStyles.Body_B12_SemiBold,
                 {
-                  color: active
-                    ? colour["text-n-icon"].primary
-                    : colour["text-n-icon"].tertiary,
+                  color: active ? shell.textPrimary : shell.textTertiary,
                 },
               ]}
             >

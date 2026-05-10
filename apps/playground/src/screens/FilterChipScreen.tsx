@@ -1,0 +1,450 @@
+import { useState, type ReactNode } from "react";
+import { Image, Pressable, Text, View } from "react-native";
+import Svg, { Circle, Path } from "react-native-svg";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+
+import {
+  FilterChip,
+  Toggle as FieldToggle,
+  type FilterChipContent,
+} from "@field-ds/components";
+import type { IconName } from "@field-ds/icons";
+import { colour, radius, space, textStyles } from "@field-ds/tokens";
+
+import { DetailSection, PageScaffold } from "../components/PageScaffold";
+import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import { useShell } from "../theme/ThemeContext";
+import type { RootStackParamList } from "../navigation/types";
+
+type Props = NativeStackScreenProps<RootStackParamList, "FilterChip">;
+
+const CONTENTS: FilterChipContent[] = ["label", "slot"];
+
+// Curated icon picker — small enough to fit in a row of swatches but covers
+// the chips designers actually reach for.
+const ICONS: IconName[] = [
+  "system-preferences",
+  "system-sort",
+  "system-search",
+  "system-heart",
+  "system-bag",
+];
+
+export function FilterChipScreen({ navigation }: Props) {
+  const [content, setContent] = useState<FilterChipContent>("label");
+  const [label, setLabel] = useState("Filter");
+  const [showLeft, setShowLeft] = useState(true);
+  const [showRight, setShowRight] = useState(true);
+  const [iconLeft, setIconLeft] = useState<IconName>("system-preferences");
+  const [added, setAdded] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+
+  // Interactive demo state.
+  const [activeCount, setActiveCount] = useState(4);
+
+  const playgroundPreview = (
+    <PreviewSurface tall>
+      <FilterChip
+        content={content}
+        label={label}
+        count={`(${activeCount || 1})`}
+        showIconLeft={showLeft}
+        showIconRight={showRight}
+        iconLeft={iconLeft}
+        added={added}
+        disabled={disabled}
+        onPress={() => {}}
+        onClear={() => {}}
+      >
+        {content === "slot" ? <SlotDot /> : null}
+      </FilterChip>
+    </PreviewSurface>
+  );
+
+  const statesPreview = (
+    <View style={{ gap: space["20"] }}>
+      <PreviewSurface>
+        <SectionLabel>Label</SectionLabel>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: space["12"],
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <StateCell label="Default">
+            <FilterChip label="Filter" />
+          </StateCell>
+          <StateCell label="Disabled">
+            <FilterChip label="Filter" disabled />
+          </StateCell>
+          <StateCell label="Added">
+            <FilterChip label="Filter" count="(4)" added />
+          </StateCell>
+          <StateCell label="No right icon">
+            <FilterChip label="Filter" showIconRight={false} />
+          </StateCell>
+          <StateCell label="No left icon">
+            <FilterChip label="Filter" showIconLeft={false} />
+          </StateCell>
+        </View>
+      </PreviewSurface>
+
+      <PreviewSurface>
+        <SectionLabel>Slot</SectionLabel>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: space["12"],
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <StateCell label="Default">
+            <FilterChip content="slot">
+              <SlotDot />
+            </FilterChip>
+          </StateCell>
+          <StateCell label="Disabled">
+            <FilterChip content="slot" disabled>
+              <SlotDot />
+            </FilterChip>
+          </StateCell>
+          <StateCell label="Added">
+            <FilterChip content="slot" added>
+              <SlotDot />
+            </FilterChip>
+          </StateCell>
+        </View>
+      </PreviewSurface>
+    </View>
+  );
+
+  const slotContentPreview = (
+    <PreviewSurface>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: space["12"],
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <StateCell label="Image">
+          <FilterChip content="slot">
+            <Image
+              source={{
+                uri: "https://placehold.co/40x40/0f7eff/ffffff?text=N",
+              }}
+              style={{ width: 20, height: 20, borderRadius: 4 }}
+            />
+          </FilterChip>
+        </StateCell>
+        <StateCell label="SVG">
+          <FilterChip content="slot">
+            <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+              <Circle cx="12" cy="12" r="9" fill={colour.surface["action-bold"]} />
+              <Path
+                d="M8 12.5l2.5 2.5L16 9.5"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </Svg>
+          </FilterChip>
+        </StateCell>
+        <StateCell label="Custom node">
+          <FilterChip content="slot">
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 4,
+                backgroundColor: colour.surface["yellow-bold"],
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={[
+                  textStyles.Body_B11_SemiBold,
+                  { color: colour["text-n-icon"].primary, fontSize: 10 },
+                ]}
+              >
+                ★
+              </Text>
+            </View>
+          </FilterChip>
+        </StateCell>
+      </View>
+    </PreviewSurface>
+  );
+
+  const interactivePreview = (
+    <PreviewSurface>
+      <View style={{ gap: space["12"], alignItems: "flex-start" }}>
+        <FilterChip
+          label="Filter"
+          count={`(${activeCount})`}
+          added={activeCount > 0}
+          onPress={() => setActiveCount((c) => c + 1)}
+          onClear={() => setActiveCount(0)}
+        />
+        <Text
+          style={[
+            textStyles.Body_B12_Medium,
+            { color: colour["text-n-icon"].tertiary },
+          ]}
+        >
+          Tap the chip to add a filter, the cross to clear all.
+        </Text>
+      </View>
+    </PreviewSurface>
+  );
+
+  return (
+    <PageScaffold
+      topNavActive="Components"
+      title="filter chip"
+      subtitle="Height-36 filter / sort chip. Two content modes — label and slot — with default, disabled, and added states. The slot accepts any node: image, SVG, brand mark, custom view."
+      version="V0.1"
+      repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/FilterChip/FilterChip.tsx"
+      sidebar={componentsSidebar("FilterChip")}
+      onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
+    >
+      <DetailSection
+        heading="Playground"
+        preview={playgroundPreview}
+        spacingTop={0}
+      >
+        <PropList>
+          <PropRow>
+            <PropLabel>Content</PropLabel>
+            <SegmentedControl
+              options={CONTENTS}
+              value={content}
+              onChange={setContent}
+            />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Label</PropLabel>
+            <SegmentedControl
+              options={["Filter", "Sort", "Category"] as const}
+              value={label as "Filter" | "Sort" | "Category"}
+              onChange={setLabel}
+            />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Left icon</PropLabel>
+            <Toggle value={showLeft} onValueChange={setShowLeft} />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Right icon</PropLabel>
+            <Toggle value={showRight} onValueChange={setShowRight} />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Glyph</PropLabel>
+            <SegmentedControl
+              options={ICONS}
+              value={iconLeft}
+              onChange={setIconLeft}
+            />
+          </PropRow>
+          <PropRow>
+            <PropLabel>Added</PropLabel>
+            <Toggle value={added} onValueChange={setAdded} />
+          </PropRow>
+          <PropRow last>
+            <PropLabel>Disabled</PropLabel>
+            <Toggle value={disabled} onValueChange={setDisabled} />
+          </PropRow>
+        </PropList>
+      </DetailSection>
+
+      <DetailSection heading="States" preview={statesPreview} />
+
+      <DetailSection heading="Slot content" preview={slotContentPreview} />
+
+      <DetailSection heading="Interactive" preview={interactivePreview} />
+    </PageScaffold>
+  );
+}
+
+// ─────────── Local building blocks ───────────
+
+function PreviewSurface({
+  children,
+  tall,
+}: {
+  children: ReactNode;
+  tall?: boolean;
+}) {
+  return (
+    <View
+      style={{
+        backgroundColor: colour.surface.tertiary,
+        borderRadius: radius["12"],
+        padding: space["20"],
+        justifyContent: "center",
+        alignItems: tall ? "center" : undefined,
+        minHeight: tall ? 320 : undefined,
+      }}
+    >
+      {children}
+    </View>
+  );
+}
+
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <Text
+      style={[
+        textStyles.Body_B11_SemiBold,
+        {
+          color: colour["text-n-icon"].tertiary,
+          textTransform: "uppercase",
+          letterSpacing: 0.4,
+          marginBottom: space["12"],
+        },
+      ]}
+    >
+      {children}
+    </Text>
+  );
+}
+
+function StateCell({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <View style={{ alignItems: "center", gap: space["8"] }}>
+      {children}
+      <Text
+        style={[
+          textStyles.Body_B11_Medium,
+          { color: colour["text-n-icon"].tertiary, textAlign: "center" },
+        ]}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+function SlotDot() {
+  return (
+    <View
+      style={{
+        width: 14,
+        height: 14,
+        borderRadius: 7,
+        backgroundColor: colour.surface["action-bold"],
+      }}
+    />
+  );
+}
+
+function PropList({ children }: { children: ReactNode }) {
+  return <View>{children}</View>;
+}
+
+function PropRow({
+  children,
+  last,
+}: {
+  children: ReactNode;
+  last?: boolean;
+}) {
+  const shell = useShell();
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: space["12"],
+        paddingVertical: space["16"],
+        borderBottomWidth: last ? 0 : 1,
+        borderBottomColor: shell.border,
+      }}
+    >
+      {children}
+    </View>
+  );
+}
+
+function PropLabel({ children }: { children: ReactNode }) {
+  const shell = useShell();
+  return (
+    <Text
+      style={[
+        textStyles.Body_B16_Medium,
+        { color: shell.textPrimary, minWidth: 96 },
+      ]}
+    >
+      {children}
+    </Text>
+  );
+}
+
+function Toggle({
+  value,
+  onValueChange,
+}: {
+  value: boolean;
+  onValueChange: (v: boolean) => void;
+}) {
+  return <FieldToggle on={value} onChange={onValueChange} size="H20" />;
+}
+
+function SegmentedControl<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: readonly T[];
+  value: T;
+  onChange: (next: T) => void;
+}) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        backgroundColor: colour.surface.muted,
+        borderRadius: radius.rounded,
+        padding: 2,
+      }}
+    >
+      {options.map((opt) => {
+        const active = opt === value;
+        return (
+          <Pressable
+            key={opt}
+            onPress={() => onChange(opt)}
+            style={{
+              paddingVertical: space["6"],
+              paddingHorizontal: space["12"],
+              borderRadius: radius.rounded,
+              backgroundColor: active
+                ? colour.surface.primary
+                : "transparent",
+            }}
+          >
+            <Text
+              style={[
+                textStyles.Body_B12_SemiBold,
+                {
+                  color: active
+                    ? colour["text-n-icon"].primary
+                    : colour["text-n-icon"].tertiary,
+                },
+              ]}
+            >
+              {opt}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}

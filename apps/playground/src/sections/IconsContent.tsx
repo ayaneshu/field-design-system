@@ -7,14 +7,126 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 import { ViewToggle, type ViewMode } from "../components/ViewToggle";
 import { useShell } from "../theme/ThemeContext";
 
-type CopyMode = "name" | "svg";
-
 function buildSvgMarkup(name: IconName): string {
   const paths = (iconPaths[name] ?? []) as readonly string[];
   const pathEls = paths
     .map((d) => `  <path fill="currentColor" d="${d}"/>`)
     .join("\n");
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" aria-label="${name}">\n${pathEls}\n</svg>`;
+}
+
+// Keyword aliases — common synonyms users might search for that don't appear
+// in the canonical icon name. Each token maps to extra keywords appended to
+// that icon's search corpus.
+const KEYWORD_ALIASES: Record<string, string[]> = {
+  bin: ["trash", "delete", "remove", "garbage"],
+  cart: ["shopping", "basket"],
+  bag: ["shopping", "purse", "tote"],
+  copy: ["duplicate", "clone"],
+  edit: ["pencil", "write", "modify", "compose"],
+  search: ["magnifier", "find", "lookup", "magnifying"],
+  cross: ["close", "x", "dismiss", "cancel"],
+  check: ["tick", "done", "success", "confirm", "ok"],
+  chevron: ["arrow", "expand", "collapse"],
+  caret: ["arrow", "triangle"],
+  preferences: ["settings", "gear", "cog", "options"],
+  notification: ["bell", "alert", "alarm"],
+  message: ["chat", "sms", "comment"],
+  messages: ["chat", "comments", "conversation"],
+  handset: ["phone", "call", "telephone"],
+  call: ["phone", "telephone", "ring"],
+  mic: ["microphone", "voice", "audio", "record"],
+  volume: ["sound", "audio", "speaker"],
+  camera: ["photo", "picture", "image"],
+  video: ["film", "movie", "recording", "play"],
+  gift: ["present", "reward"],
+  heart: ["love", "favorite", "favourite", "like", "wishlist"],
+  thumbs: ["like", "vote", "feedback"],
+  user: ["person", "profile", "account", "avatar", "people"],
+  profile: ["user", "account", "avatar", "person"],
+  partners: ["users", "team", "people", "group"],
+  world: ["globe", "earth", "internet", "web", "international"],
+  country: ["flag", "nation", "region"],
+  language: ["translate", "locale", "globe"],
+  home: ["house"],
+  shop: ["store", "market", "shopping"],
+  thunder: ["lightning", "fast", "bolt", "flash", "express"],
+  flash: ["thunder", "lightning", "fast", "express"],
+  flame: ["fire", "hot", "popular", "trending"],
+  discount: ["sale", "offer", "deal", "promo"],
+  coupon: ["voucher", "discount", "promo"],
+  truck: ["delivery", "shipping", "transport"],
+  delivery: ["shipment", "package", "parcel", "ship"],
+  locker: ["safe", "storage"],
+  lock: ["padlock", "secure", "private", "locked"],
+  unlock: ["open", "access", "unlocked"],
+  shield: ["security", "protect", "guard", "safe"],
+  info: ["information", "help", "details"],
+  help: ["question", "support", "faq"],
+  warning: ["alert", "caution", "danger", "error"],
+  star: ["favorite", "favourite", "rating", "bookmark"],
+  invoice: ["receipt", "bill"],
+  direction: ["compass", "navigation", "navigate"],
+  location: ["pin", "map", "place", "marker", "gps"],
+  pin: ["location", "marker", "place"],
+  crosshair: ["target", "focus", "aim"],
+  power: ["on", "off", "shutdown", "toggle"],
+  download: ["save", "import"],
+  upload: ["export", "send"],
+  refresh: ["reload", "sync", "update"],
+  sort: ["order", "filter"],
+  mobile: ["phone", "smartphone", "device"],
+  mobiles: ["phones", "smartphones", "devices"],
+  briefcase: ["work", "business", "job", "office"],
+  graduation: ["education", "school", "university", "college", "study"],
+  measurement: ["ruler", "measure", "size"],
+  ruler: ["measurement", "measure"],
+  medal: ["award", "badge", "achievement"],
+  water: ["drop", "liquid"],
+  combo: ["bundle", "set", "pack"],
+  forward: ["next", "skip"],
+  previous: ["back", "prev"],
+  play: ["start", "video"],
+  pause: ["stop", "hold"],
+  live: ["broadcast", "streaming", "stream"],
+  contact: ["phonebook", "address"],
+  notepad: ["note", "document", "memo", "list"],
+  hourglass: ["timer", "time", "wait", "loading"],
+  clock: ["time", "watch", "schedule"],
+  calendar: ["schedule", "date", "event"],
+  minus: ["subtract", "less", "remove"],
+  plus: ["add", "more", "new"],
+  payment: ["card", "credit", "debit", "checkout"],
+  bank: ["financial", "finance"],
+  wallet: ["money", "balance"],
+  cash: ["money", "currency"],
+  currency: ["money", "cash", "bills"],
+  scan: ["qr", "barcode"],
+  link: ["url", "hyperlink", "chain"],
+  sign: ["login", "logout", "auth"],
+  door: ["entrance", "exit"],
+  category: ["categories", "tag", "section"],
+  rewind: ["back", "undo", "previous"],
+  return: ["back", "undo", "refund"],
+  toys: ["games", "play", "kids"],
+  installation: ["install", "setup"],
+  verified: ["verify", "trusted", "approved"],
+  noon: ["brand"],
+  filled: ["fill", "solid"],
+  // Short symbol aliases
+  question: ["help", "ask", "faq"],
+  exclaimation: ["alert", "warning"],
+  three: ["dots", "more", "menu"],
+  menu: ["dots", "more", "hamburger"],
+  vetricle: ["vertical", "menu", "more"],
+  vertical: ["menu", "more"],
+  horizontal: ["menu", "more"],
+};
+
+function buildCorpus(name: IconName): string {
+  const tokens = name.split("-").filter((t) => t !== "system" && t !== "bottomnav");
+  const aliases = tokens.flatMap((t) => KEYWORD_ALIASES[t] ?? []);
+  return [name, ...tokens, ...aliases].join(" ").toLowerCase();
 }
 
 export function IconsContent({
@@ -24,22 +136,25 @@ export function IconsContent({
 }) {
   const [view, setView] = useState<ViewMode>("grid");
   const [query, setQuery] = useState("");
-  const [copyMode, setCopyMode] = useState<CopyMode>("svg");
 
   const shell = useShell();
+
+  const searchIndex = useMemo(
+    () => iconNames.map((name) => ({ name, corpus: buildCorpus(name) })),
+    [],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return iconNames;
-    return iconNames.filter((n) => n.includes(q));
-  }, [query]);
+    const terms = q.split(/\s+/).filter(Boolean);
+    return searchIndex
+      .filter(({ corpus }) => terms.every((t) => corpus.includes(t)))
+      .map(({ name }) => name);
+  }, [query, searchIndex]);
 
   const handleCopy = (n: IconName) => {
-    if (copyMode === "name") {
-      copy(n, `name · ${n}`);
-    } else {
-      copy(buildSvgMarkup(n), `svg · ${n}`);
-    }
+    copy(buildSvgMarkup(n), `svg · ${n}`);
   };
 
   return (
@@ -73,7 +188,7 @@ export function IconsContent({
           <TextInput
             value={query}
             onChangeText={setQuery}
-            placeholder="Search icons…"
+            placeholder="Search icons by name or keyword (e.g. trash, settings, phone)…"
             placeholderTextColor={colour["text-n-icon"].muted}
             // @ts-expect-error — outlineStyle is web-only
             style={[
@@ -87,7 +202,6 @@ export function IconsContent({
             ]}
           />
         </View>
-        <CopyModeToggle value={copyMode} onChange={setCopyMode} />
         <ViewToggle value={view} onChange={setView} />
       </View>
 
@@ -103,77 +217,14 @@ export function IconsContent({
           },
         ]}
       >
-        {filtered.length} {filtered.length === 1 ? "match" : "matches"} · copying{" "}
-        {copyMode === "svg" ? "SVG" : "name"}
+        {filtered.length} {filtered.length === 1 ? "match" : "matches"} · click to copy SVG
       </Text>
 
       {view === "grid" ? (
         <GridView icons={filtered} onCopy={handleCopy} />
       ) : (
-        <ListView icons={filtered} onCopy={handleCopy} copyMode={copyMode} />
+        <ListView icons={filtered} onCopy={handleCopy} />
       )}
-    </View>
-  );
-}
-
-function CopyModeToggle({
-  value,
-  onChange,
-}: {
-  value: CopyMode;
-  onChange: (v: CopyMode) => void;
-}) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        backgroundColor: colour.surface.secondary,
-        borderRadius: radius.rounded,
-        padding: space["2"],
-      }}
-    >
-      {(["svg", "name"] as const).map((v) => {
-        const active = v === value;
-        return (
-          <Pressable
-            key={v}
-            onPress={() => onChange(v)}
-            accessibilityRole="button"
-            accessibilityState={active ? { selected: true } : {}}
-            style={({ pressed }) => ({
-              paddingHorizontal: space["12"],
-              paddingVertical: space["6"],
-              borderRadius: radius.rounded,
-              backgroundColor: active ? colour.surface.primary : "transparent",
-              opacity: pressed ? 0.85 : 1,
-              ...(active
-                ? {
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.06,
-                    shadowRadius: 3,
-                    elevation: 1,
-                  }
-                : null),
-            })}
-          >
-            <Text
-              style={[
-                textStyles.Body_B12_SemiBold,
-                {
-                  color: active
-                    ? colour["text-n-icon"].primary
-                    : colour["text-n-icon"].tertiary,
-                  textTransform: "uppercase",
-                  letterSpacing: 0.6,
-                },
-              ]}
-            >
-              {v === "svg" ? "SVG" : "Name"}
-            </Text>
-          </Pressable>
-        );
-      })}
     </View>
   );
 }
@@ -244,11 +295,9 @@ function GridView({
 function ListView({
   icons,
   onCopy,
-  copyMode,
 }: {
   icons: IconName[];
   onCopy: (n: IconName) => void;
-  copyMode: CopyMode;
 }) {
   return (
     <View
@@ -308,7 +357,7 @@ function ListView({
               },
             ]}
           >
-            copy {copyMode}
+            copy svg
           </Text>
         </Pressable>
       ))}

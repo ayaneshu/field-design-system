@@ -2,7 +2,12 @@ import { useState, type ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { Checkbox, type CheckboxSize } from "@field-ds/components";
+import {
+  Checkbox,
+  Switch as FieldSwitch,
+  Toggle as FieldToggle,
+  type CheckboxSize,
+} from "@field-ds/components";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
@@ -147,7 +152,13 @@ export function CheckboxScreen({ navigation }: Props) {
           </PropRow>
           <PropRow last>
             <PropLabel>Size</PropLabel>
-            <SegmentedControl options={SIZES} value={size} onChange={setSize} />
+            <View style={{ minWidth: 240 }}>
+              <FieldSwitch<CheckboxSize>
+                options={SIZES.map((s) => ({ value: s, label: s }))}
+                value={size}
+                onChange={setSize}
+              />
+            </View>
           </PropRow>
         </PropList>
       </DetailSection>
@@ -250,82 +261,6 @@ function Toggle({
   value: boolean;
   onValueChange: (v: boolean) => void;
 }) {
-  return (
-    <Pressable
-      onPress={() => onValueChange(!value)}
-      style={{
-        paddingVertical: space["6"],
-        paddingHorizontal: space["12"],
-        borderRadius: radius.rounded,
-        backgroundColor: value
-          ? colour.surface["action-extrabold"]
-          : colour.surface.muted,
-      }}
-    >
-      <Text
-        style={[
-          textStyles.Body_B12_SemiBold,
-          {
-            color: value
-              ? colour["text-n-icon"]["on-surface-bold"]
-              : colour["text-n-icon"].secondary,
-          },
-        ]}
-      >
-        {value ? "On" : "Off"}
-      </Text>
-    </Pressable>
-  );
+  return <FieldToggle on={value} onChange={onValueChange} size="H20" />;
 }
 
-function SegmentedControl<T extends string>({
-  options,
-  value,
-  onChange,
-}: {
-  options: readonly T[];
-  value: T;
-  onChange: (next: T) => void;
-}) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        backgroundColor: colour.surface.muted,
-        borderRadius: radius.rounded,
-        padding: 2,
-      }}
-    >
-      {options.map((opt) => {
-        const active = opt === value;
-        return (
-          <Pressable
-            key={opt}
-            onPress={() => onChange(opt)}
-            style={{
-              paddingVertical: space["6"],
-              paddingHorizontal: space["12"],
-              borderRadius: radius.rounded,
-              backgroundColor: active
-                ? colour.surface.primary
-                : "transparent",
-            }}
-          >
-            <Text
-              style={[
-                textStyles.Body_B12_SemiBold,
-                {
-                  color: active
-                    ? colour["text-n-icon"].primary
-                    : colour["text-n-icon"].tertiary,
-                },
-              ]}
-            >
-              {opt}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}

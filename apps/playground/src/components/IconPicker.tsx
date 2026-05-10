@@ -1,8 +1,18 @@
-import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useId, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 import { Icon, type IconName } from "@field-ds/icons";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
+
+import { useDropdownRegistry } from "./dropdown-registry";
+import { useShell } from "../theme/ThemeContext";
 
 /**
  * Curated system-icon set for every button playground picker. Covers the
@@ -27,19 +37,224 @@ export const ICON_OPTIONS: IconName[] = [
   "system-message",
 ];
 
+type Rect = { top: number; left: number; width: number; height: number };
+
+function useTriggerRect(triggerRef: React.MutableRefObject<View | null>, isOpen: boolean) {
+  const [rect, setRect] = useState<Rect | null>(null);
+
+  useLayoutEffect(() => {
+    if (!isOpen || Platform.OS !== "web") {
+      setRect(null);
+      return;
+    }
+    let cancelled = false;
+    let frame = 0;
+    let last: Rect | null = null;
+    const tick = () => {
+      if (cancelled) return;
+      const node = triggerRef.current as unknown as HTMLElement | null;
+      if (node && typeof node.getBoundingClientRect === "function") {
+        const r = node.getBoundingClientRect();
+        const next: Rect = {
+          top: r.top,
+          left: r.left,
+          width: r.width,
+          height: r.height,
+        };
+        if (
+          !last ||
+          last.top !== next.top ||
+          last.left !== next.left ||
+          last.width !== next.width ||
+          last.height !== next.height
+        ) {
+          last = next;
+          setRect(next);
+        }
+      }
+      frame = window.requestAnimationFrame(tick);
+    };
+    tick();
+    return () => {
+      cancelled = true;
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [isOpen, triggerRef]);
+
+  return rect;
+}
+
+function PickerTrigger({
+  value,
+  open,
+  triggerRef,
+  onPress,
+  ariaLabel,
+}: {
+  value: IconName | null;
+  open: boolean;
+  triggerRef: React.MutableRefObject<View | null>;
+  onPress: () => void;
+  ariaLabel: string;
+}) {
+  const shell = useShell();
+  const label = value ?? "None";
+  return (
+    <Pressable
+      ref={triggerRef as never}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ expanded: open }}
+      accessibilityLabel={ariaLabel}
+      // @ts-expect-error hovered is web-only
+      style={({ hovered }: { hovered?: boolean }) => ({
+        flexDirection: "row",
+        alignItems: "center",
+        gap: space["8"],
+        paddingVertical: space["8"],
+        paddingHorizontal: space["12"],
+        borderRadius: radius["8"],
+        borderWidth: 1,
+        borderColor: open
+          ? colour.border.action
+          : hovered
+            ? colour.border.medium
+            : shell.border,
+        backgroundColor: colour.surface.primary,
+        justifyContent: "space-between",
+      })}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: space["8"],
+          flex: 1,
+          minWidth: 0,
+        }}
+      >
+        <View
+          style={{
+            width: 20,
+            height: 20,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {value ? (
+            <Icon name={value} size={16} color={shell.textPrimary} />
+          ) : (
+            <View
+              style={{
+                width: 12,
+                height: 1,
+                backgroundColor: shell.textTertiary,
+              }}
+            />
+          )}
+        </View>
+        <Text
+          numberOfLines={1}
+          style={[
+            textStyles.Body_B12_SemiBold,
+            { color: shell.textPrimary, flex: 1 },
+          ]}
+        >
+          {label}
+        </Text>
+      </View>
+      <Icon
+        name="system-chevron-down"
+        size={16}
+        color={shell.textTertiary}
+      />
+    </Pressable>
+  );
+}
+
+function FloatingMenu({
+  rect,
+  open,
+  onClose,
+  children,
+}: {
+  rect: Rect | null;
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  const shell = useShell();
+  if (!open || Platform.OS !== "web" || !rect) return null;
+  if (typeof document === "undefined") return null;
+
+  const MENU_WIDTH = 280;
+  const viewportW = window.innerWidth;
+  const viewportH = window.innerHeight;
+  const left =
+    rect.left + MENU_WIDTH <= viewportW - 8
+      ? rect.left
+      : Math.max(8, viewportW - MENU_WIDTH - 8);
+  const spaceBelow = viewportH - (rect.top + rect.height);
+  const spaceAbove = rect.top;
+  const flipUp = spaceBelow < 220 && spaceAbove > spaceBelow;
+  const top = flipUp ? Math.max(8, rect.top - 6) : rect.top + rect.height + 6;
+  const transform = flipUp ? "translateY(-100%)" : undefined;
+  const transformOrigin = flipUp ? "bottom left" : "top left";
+  const maxHeight = Math.min(
+    360,
+    flipUp ? spaceAbove - 16 : spaceBelow - 16,
+  );
+
+  return createPortal(
+    <>
+      <Pressable
+        onPress={onClose}
+        accessibilityLabel="Close icon picker"
+        // @ts-expect-error — `position: "fixed"` is web-only; RN ignores it.
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 2147483646,
+        }}
+      />
+      <View
+        // @ts-expect-error — fixed positioning + transform are web-only.
+        style={{
+          position: "fixed",
+          top,
+          left,
+          width: MENU_WIDTH,
+          maxHeight,
+          backgroundColor: colour.surface.primary,
+          borderRadius: radius["12"],
+          borderWidth: 1,
+          borderColor: shell.border,
+          paddingVertical: space["4"],
+          zIndex: 2147483647,
+          shadowColor: "#000",
+          shadowOpacity: 0.12,
+          shadowRadius: 24,
+          shadowOffset: { width: 0, height: 8 },
+          transform,
+          transformOrigin,
+        }}
+      >
+        <ScrollView style={{ maxHeight }} showsVerticalScrollIndicator>
+          {children}
+        </ScrollView>
+      </View>
+    </>,
+    document.body,
+  );
+}
+
 /**
  * Icon dropdown — a select-style trigger that shows the current icon glyph +
- * its slug, opens a floating menu where each row pairs the icon preview with
- * its name. "None" sits at the top to clear the selection.
- *
- * Built with absolute positioning instead of RN's Modal — the Modal route
- * had close-on-select issues on RN-Web (the row's setOpen race with the
- * parent re-render kept the modal mounted). A fixed-position click-away
- * backdrop handles outside dismissal cleanly.
- *
- * The trigger View raises its zIndex while open so the menu paints above
- * sibling DetailSection rows and any later content with its own implicit
- * stacking context (e.g. ScrollView's transform layer on rn-web).
+ * its slug, opens a portaled floating menu where each row pairs the icon
+ * preview with its name. "None" sits at the top to clear the selection.
  */
 export function IconPicker({
   value,
@@ -48,149 +263,42 @@ export function IconPicker({
   value: IconName | null;
   onChange: (next: IconName | null) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const id = useId();
+  const { isOpen, toggle, close } = useDropdownRegistry(id);
+  const triggerRef = useRef<View | null>(null);
+  const rect = useTriggerRect(triggerRef, isOpen);
   const label = value ?? "None";
 
-  // Single handler for row taps so closing happens in the same React batch
-  // as the value change. Avoids "menu stays open after select" races.
   const select = (next: IconName | null) => {
-    setOpen(false);
+    close();
     onChange(next);
   };
 
   return (
-    <View
-      style={{
-        position: "relative",
-        minWidth: 220,
-        zIndex: open ? 1000 : ("auto" as unknown as number),
-      }}
-    >
-      <Pressable
-        onPress={() => setOpen((o) => !o)}
-        accessibilityRole="button"
-        accessibilityState={{ expanded: open }}
-        accessibilityLabel={`Pick icon — current: ${label}`}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: space["8"],
-          paddingVertical: space["8"],
-          paddingHorizontal: space["12"],
-          borderRadius: radius["8"],
-          borderWidth: 1,
-          borderColor: open ? colour.border.action : colour.border.primary,
-          backgroundColor: colour.surface.primary,
-          justifyContent: "space-between",
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: space["8"],
-            flex: 1,
-            minWidth: 0,
-          }}
-        >
-          <View
-            style={{
-              width: 20,
-              height: 20,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {value ? (
-              <Icon
-                name={value}
-                size={16}
-                color={colour["text-n-icon"].primary}
-              />
-            ) : (
-              <View
-                style={{
-                  width: 12,
-                  height: 1,
-                  backgroundColor: colour["text-n-icon"].tertiary,
-                }}
-              />
-            )}
-          </View>
-          <Text
-            numberOfLines={1}
-            style={[
-              textStyles.Body_B12_SemiBold,
-              { color: colour["text-n-icon"].primary, flex: 1 },
-            ]}
-          >
-            {label}
-          </Text>
-        </View>
-        <Icon
-          name="system-chevron-down"
-          size={16}
-          color={colour["text-n-icon"].tertiary}
+    <View style={{ minWidth: 220 }}>
+      <PickerTrigger
+        value={value}
+        open={isOpen}
+        triggerRef={triggerRef}
+        onPress={toggle}
+        ariaLabel={`Pick icon — current: ${label}`}
+      />
+      <FloatingMenu rect={rect} open={isOpen} onClose={close}>
+        <DropdownRow
+          label="None"
+          active={value === null}
+          onPress={() => select(null)}
         />
-      </Pressable>
-
-      {open ? (
-        <>
-          <Pressable
-            onPress={() => setOpen(false)}
-            accessibilityLabel="Close icon picker"
-            // @ts-expect-error — `position: "fixed"` is web-only; RN ignores it.
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 9998,
-            }}
+        {ICON_OPTIONS.map((name) => (
+          <DropdownRow
+            key={name}
+            iconName={name}
+            label={name}
+            active={value === name}
+            onPress={() => select(name)}
           />
-          <View
-            style={{
-              position: "absolute",
-              top: "100%",
-              right: 0,
-              marginTop: space["6"],
-              width: 280,
-              maxHeight: 360,
-              backgroundColor: colour.surface.primary,
-              borderRadius: radius["12"],
-              borderWidth: 1,
-              borderColor: colour.border.primary,
-              paddingVertical: space["4"],
-              zIndex: 9999,
-              shadowColor: "#000",
-              shadowOpacity: 0.08,
-              shadowRadius: 16,
-              shadowOffset: { width: 0, height: 8 },
-            }}
-          >
-            <ScrollView
-              style={{ maxHeight: 352 }}
-              showsVerticalScrollIndicator
-            >
-              <DropdownRow
-                label="None"
-                active={value === null}
-                onPress={() => select(null)}
-              />
-              {ICON_OPTIONS.map((name) => (
-                <DropdownRow
-                  key={name}
-                  iconName={name}
-                  label={name}
-                  active={value === name}
-                  onPress={() => select(name)}
-                />
-              ))}
-            </ScrollView>
-          </View>
-        </>
-      ) : null}
+        ))}
+      </FloatingMenu>
     </View>
   );
 }
@@ -207,131 +315,36 @@ export function RequiredIconPicker({
   value: IconName;
   onChange: (next: IconName) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const id = useId();
+  const { isOpen, toggle, close } = useDropdownRegistry(id);
+  const triggerRef = useRef<View | null>(null);
+  const rect = useTriggerRect(triggerRef, isOpen);
 
   const select = (next: IconName) => {
-    setOpen(false);
+    close();
     onChange(next);
   };
 
   return (
-    <View
-      style={{
-        position: "relative",
-        minWidth: 220,
-        zIndex: open ? 1000 : ("auto" as unknown as number),
-      }}
-    >
-      <Pressable
-        onPress={() => setOpen((o) => !o)}
-        accessibilityRole="button"
-        accessibilityState={{ expanded: open }}
-        accessibilityLabel={`Pick icon — current: ${value}`}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: space["8"],
-          paddingVertical: space["8"],
-          paddingHorizontal: space["12"],
-          borderRadius: radius["8"],
-          borderWidth: 1,
-          borderColor: open ? colour.border.action : colour.border.primary,
-          backgroundColor: colour.surface.primary,
-          justifyContent: "space-between",
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: space["8"],
-            flex: 1,
-            minWidth: 0,
-          }}
-        >
-          <View
-            style={{
-              width: 20,
-              height: 20,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Icon
-              name={value}
-              size={16}
-              color={colour["text-n-icon"].primary}
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={[
-              textStyles.Body_B12_SemiBold,
-              { color: colour["text-n-icon"].primary, flex: 1 },
-            ]}
-          >
-            {value}
-          </Text>
-        </View>
-        <Icon
-          name="system-chevron-down"
-          size={16}
-          color={colour["text-n-icon"].tertiary}
-        />
-      </Pressable>
-
-      {open ? (
-        <>
-          <Pressable
-            onPress={() => setOpen(false)}
-            accessibilityLabel="Close icon picker"
-            // @ts-expect-error — `position: "fixed"` is web-only; RN ignores it.
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 9998,
-            }}
+    <View style={{ minWidth: 220 }}>
+      <PickerTrigger
+        value={value}
+        open={isOpen}
+        triggerRef={triggerRef}
+        onPress={toggle}
+        ariaLabel={`Pick icon — current: ${value}`}
+      />
+      <FloatingMenu rect={rect} open={isOpen} onClose={close}>
+        {ICON_OPTIONS.map((name) => (
+          <DropdownRow
+            key={name}
+            iconName={name}
+            label={name}
+            active={value === name}
+            onPress={() => select(name)}
           />
-          <View
-            style={{
-              position: "absolute",
-              top: "100%",
-              right: 0,
-              marginTop: space["6"],
-              width: 280,
-              maxHeight: 360,
-              backgroundColor: colour.surface.primary,
-              borderRadius: radius["12"],
-              borderWidth: 1,
-              borderColor: colour.border.primary,
-              paddingVertical: space["4"],
-              zIndex: 9999,
-              shadowColor: "#000",
-              shadowOpacity: 0.08,
-              shadowRadius: 16,
-              shadowOffset: { width: 0, height: 8 },
-            }}
-          >
-            <ScrollView
-              style={{ maxHeight: 352 }}
-              showsVerticalScrollIndicator
-            >
-              {ICON_OPTIONS.map((name) => (
-                <DropdownRow
-                  key={name}
-                  iconName={name}
-                  label={name}
-                  active={value === name}
-                  onPress={() => select(name)}
-                />
-              ))}
-            </ScrollView>
-          </View>
-        </>
-      ) : null}
+        ))}
+      </FloatingMenu>
     </View>
   );
 }
@@ -347,12 +360,14 @@ function DropdownRow({
   active: boolean;
   onPress: () => void;
 }) {
+  const shell = useShell();
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="menuitem"
       accessibilityState={{ selected: active }}
-      style={({ pressed }) => ({
+      // @ts-expect-error hovered is web-only and provided by RN-Web Pressable
+      style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => ({
         flexDirection: "row",
         alignItems: "center",
         gap: space["12"],
@@ -361,8 +376,10 @@ function DropdownRow({
         backgroundColor: active
           ? colour.surface["action-subtle"]
           : pressed
-            ? colour.surface.secondary
-            : "transparent",
+            ? colour.surface.muted
+            : hovered
+              ? colour.surface.secondary
+              : "transparent",
       })}
     >
       <View
@@ -378,19 +395,15 @@ function DropdownRow({
             name={iconName}
             size={20}
             color={
-              active
-                ? colour["text-n-icon"].action
-                : colour["text-n-icon"].primary
+              active ? colour["text-n-icon"].action : shell.textPrimary
             }
           />
         ) : (
-          // "None" placeholder — a neutral dash glyph in the icon slot so the
-          // text alignment matches every other row.
           <View
             style={{
               width: 12,
               height: 1.5,
-              backgroundColor: colour["text-n-icon"].tertiary,
+              backgroundColor: shell.textTertiary,
             }}
           />
         )}
@@ -400,9 +413,7 @@ function DropdownRow({
         style={[
           textStyles.Body_B14_Medium,
           {
-            color: active
-              ? colour["text-n-icon"].action
-              : colour["text-n-icon"].primary,
+            color: active ? colour["text-n-icon"].action : shell.textPrimary,
             flex: 1,
           },
         ]}

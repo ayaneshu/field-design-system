@@ -56,6 +56,11 @@ const COMPONENTS: ComponentEntry[] = [
     illustration: ListItemIllustration,
   },
   {
+    route: "PageHeader",
+    name: "Page Header",
+    illustration: PageHeaderIllustration,
+  },
+  {
     route: "NeutralButton",
     name: "Neutral Button",
     illustration: NeutralButtonIllustration,
@@ -66,9 +71,24 @@ const COMPONENTS: ComponentEntry[] = [
     illustration: PrimaryButtonIllustration,
   },
   {
+    route: "Radio",
+    name: "Radio",
+    illustration: RadioIllustration,
+  },
+  {
+    route: "RatingInput",
+    name: "Rating Input",
+    illustration: RatingInputIllustration,
+  },
+  {
     route: "RoundButton",
     name: "Round Button",
     illustration: RoundButtonIllustration,
+  },
+  {
+    route: "SearchBar",
+    name: "Search Bar",
+    illustration: SearchBarIllustration,
   },
   {
     route: "SecondaryButton",
@@ -81,11 +101,83 @@ const COMPONENTS: ComponentEntry[] = [
     illustration: SecondaryNeutralButtonIllustration,
   },
   {
+    route: "Switch",
+    name: "Switch",
+    illustration: SwitchIllustration,
+  },
+  {
     route: "TextButton",
     name: "Text Button",
     illustration: TextButtonIllustration,
   },
+  {
+    route: "Toggle",
+    name: "Toggle",
+    illustration: ToggleIllustration,
+  },
 ];
+
+function ToggleIllustration({ tone }: { tone: string }) {
+  // Pill track with a white thumb pushed to the right — mirrors the M-Toggle
+  // ON state at H24 proportions (track 42×24, thumb 20, padding 2).
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          width: 84,
+          height: 48,
+          borderRadius: 9999,
+          backgroundColor: tone,
+          padding: 4,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        }}
+      >
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 9999,
+            backgroundColor: "rgba(255,255,255,0.96)",
+          }}
+        />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function SwitchIllustration({ tone }: { tone: string }) {
+  // Pill-shaped 3-slot segmented control with the middle slot active to evoke
+  // the M-Switch — track in a softer fill, active thumb in white.
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: 132,
+          height: 28,
+          borderRadius: 9999,
+          backgroundColor: tone,
+          opacity: 0.9,
+          padding: 3,
+        }}
+      >
+        <View style={{ flex: 1 }} />
+        <View
+          style={{
+            flex: 1,
+            height: 22,
+            borderRadius: 9999,
+            backgroundColor: "rgba(255,255,255,0.92)",
+          }}
+        />
+        <View style={{ flex: 1 }} />
+      </View>
+    </IlloFrame>
+  );
+}
 
 export function ComponentsListScreen({ navigation }: Props) {
   // Reuse the shared sidebar so the Button group + indented children stay
@@ -290,6 +382,76 @@ function BottomNavIllustration({ tone }: { tone: string }) {
   );
 }
 
+function RadioIllustration({ tone }: { tone: string }) {
+  // Three radios — selected (filled disc with a white check cutout, matching
+  // the Figma M-Radio selected variant), unselected (outline), disabled
+  // (softer outline). Check is approximated with two rotated bars since the
+  // illustrations layer doesn't pull in react-native-svg.
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 14,
+        }}
+      >
+        {/* Selected — filled disc with a white tick. */}
+        <View
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 9999,
+            backgroundColor: tone,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              width: 8,
+              height: 3,
+              backgroundColor: "rgba(255,255,255,0.96)",
+              transform: [{ rotate: "45deg" }, { translateX: 2 }],
+            }}
+          />
+          <View
+            style={{
+              width: 12,
+              height: 3,
+              backgroundColor: "rgba(255,255,255,0.96)",
+              transform: [{ rotate: "-45deg" }],
+              marginTop: -2,
+              marginLeft: 2,
+            }}
+          />
+        </View>
+        {/* Unselected — hairline outline. */}
+        <View
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 9999,
+            borderWidth: 2,
+            borderColor: tone,
+          }}
+        />
+        {/* Disabled — softer outline. */}
+        <View
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 9999,
+            borderWidth: 2,
+            borderColor: tone,
+            opacity: 0.45,
+          }}
+        />
+      </View>
+    </IlloFrame>
+  );
+}
+
 function CheckboxIllustration({ tone }: { tone: string }) {
   // Three checkboxes — selected, unselected, indeterminate.
   return (
@@ -412,6 +574,50 @@ function DividerIllustration({ tone }: { tone: string }) {
             borderRadius: 2,
             backgroundColor: tone,
             opacity: 0.7,
+          }}
+        />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function PageHeaderIllustration({ tone }: { tone: string }) {
+  // A header bar — left circle (back), center bar (title), right circle (action).
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          width: 132,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <View
+          style={{
+            width: 18,
+            height: 18,
+            borderRadius: 9,
+            borderWidth: 1.5,
+            borderColor: tone,
+          }}
+        />
+        <View
+          style={{
+            flex: 1,
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: tone,
+            opacity: 0.7,
+          }}
+        />
+        <View
+          style={{
+            width: 18,
+            height: 18,
+            borderRadius: 9,
+            borderWidth: 1.5,
+            borderColor: tone,
           }}
         />
       </View>
@@ -647,6 +853,64 @@ function FilterChipIllustration({ tone }: { tone: string }) {
   );
 }
 
+function SearchBarIllustration({ tone }: { tone: string }) {
+  // Pill-rounded outlined field with a magnifying-glass dot-on-stick on the
+  // left and a placeholder line — evokes the M-SearchBar at rest.
+  return (
+    <IlloFrame>
+      <View style={{ width: 132 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            paddingHorizontal: 10,
+            paddingVertical: 10,
+            borderWidth: 2,
+            borderColor: tone,
+            borderRadius: radius["12"],
+          }}
+        >
+          <View style={{ position: "relative", width: 12, height: 12 }}>
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: 8,
+                height: 8,
+                borderWidth: 2,
+                borderColor: tone,
+                borderRadius: 9999,
+              }}
+            />
+            <View
+              style={{
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+                width: 5,
+                height: 2,
+                backgroundColor: tone,
+                transform: [{ rotate: "45deg" }],
+              }}
+            />
+          </View>
+          <View
+            style={{
+              flex: 1,
+              height: 4,
+              backgroundColor: tone,
+              opacity: 0.55,
+              borderRadius: 2,
+            }}
+          />
+        </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
 function InputTextIllustration({ tone }: { tone: string }) {
   // Label tag + outlined field with a blinking caret to evoke a single-line
   // input.
@@ -825,6 +1089,46 @@ function InfoBannerIllustration({ tone }: { tone: string }) {
             style={{ width: 64, height: 4, backgroundColor: tone, borderRadius: 2 }}
           />
         </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function RatingInputIllustration({ tone }: { tone: string }) {
+  // Five star glyphs — first three filled, last two outlined — to evoke the
+  // 3-of-5 rating shape. Stars approximated with a CSS-art trick: a square
+  // rotated 45deg with two pseudo-points; in RN we cheat with a small
+  // rounded square tilted plus two diagonal slashes.
+  const Star = ({ filled }: { filled: boolean }) => (
+    <View
+      style={{
+        width: 14,
+        height: 14,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <View
+        style={{
+          width: 10,
+          height: 10,
+          backgroundColor: filled ? tone : "transparent",
+          borderWidth: filled ? 0 : 2,
+          borderColor: tone,
+          borderRadius: 2,
+          transform: [{ rotate: "45deg" }],
+        }}
+      />
+    </View>
+  );
+  return (
+    <IlloFrame>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+        <Star filled />
+        <Star filled />
+        <Star filled />
+        <Star filled={false} />
+        <Star filled={false} />
       </View>
     </IlloFrame>
   );

@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import { Icon } from "@field-ds/icons";
+import { Switch as FieldSwitch } from "@field-ds/components";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { TopHeader } from "./TopHeader";
@@ -596,52 +597,18 @@ function DesignDevelopToggle({
   value: DetailMode;
   onChange: (next: DetailMode) => void;
 }) {
-  const { shell } = useTheme();
-  const options: { key: DetailMode; label: string }[] = [
-    { key: "design", label: "Design" },
-    { key: "develop", label: "Develop" },
-  ];
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        gap: space["4"],
-        padding: space["4"],
-        borderRadius: radius.rounded,
-        backgroundColor: shell.sidebarBg,
-      }}
-    >
-      {options.map((opt) => {
-        const active = opt.key === value;
-        return (
-          <Pressable
-            key={opt.key}
-            onPress={() => onChange(opt.key)}
-            accessibilityRole="button"
-            accessibilityState={{ selected: active }}
-            style={({ pressed }) => ({
-              paddingHorizontal: space["32"],
-              paddingVertical: space["10"],
-              borderRadius: radius.rounded,
-              backgroundColor: active ? shell.previewIslandBg : "transparent",
-              opacity: pressed ? 0.88 : 1,
-            })}
-          >
-            <Text
-              style={[
-                textStyles.Body_B14_SemiBold,
-                {
-                  color: active
-                    ? colour["text-n-icon"].primary
-                    : shell.textTertiary,
-                },
-              ]}
-            >
-              {opt.label}
-            </Text>
-          </Pressable>
-        );
-      })}
+    <View style={{ width: 220 }}>
+      <FieldSwitch<DetailMode>
+        size="H48"
+        options={[
+          { value: "design", label: "Design" },
+          { value: "develop", label: "Develop" },
+        ]}
+        value={value}
+        onChange={onChange}
+        accessibilityLabel="Switch between design and develop view"
+      />
     </View>
   );
 }

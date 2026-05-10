@@ -138,6 +138,11 @@ export function TypographyContent({
   );
   const [activeFamily, setActiveFamily] = useState<FamilyFilter>("All");
   const [selectedGlyph, setSelectedGlyph] = useState<string>("C");
+  // Hovered glyph drives the preview while the cursor is over a cell; falls
+  // back to `selectedGlyph` once the cursor leaves so the preview never goes
+  // blank.
+  const [hoveredGlyph, setHoveredGlyph] = useState<string | null>(null);
+  const previewGlyph = hoveredGlyph ?? selectedGlyph;
   const shell = useShell();
 
   const groups = useMemo(() => {
@@ -205,7 +210,9 @@ export function TypographyContent({
 
         <CharacterSetBody
           selected={selectedGlyph}
+          previewGlyph={previewGlyph}
           onSelect={setSelectedGlyph}
+          onHover={setHoveredGlyph}
         />
       </View>
 
@@ -457,10 +464,14 @@ function NoontreeBanner({ onDownloaded }: { onDownloaded?: () => void }) {
 
 function CharacterSetBody({
   selected,
+  previewGlyph,
   onSelect,
+  onHover,
 }: {
   selected: string;
+  previewGlyph: string;
   onSelect: (g: string) => void;
+  onHover: (g: string | null) => void;
 }) {
   const { width } = useWindowDimensions();
   const split = width >= 1100;
@@ -472,36 +483,42 @@ function CharacterSetBody({
         glyphs={UPPERCASE}
         selected={selected}
         onSelect={onSelect}
+        onHover={onHover}
       />
       <GlyphGroup
         title="Lowercase"
         glyphs={LOWERCASE}
         selected={selected}
         onSelect={onSelect}
+        onHover={onHover}
       />
       <GlyphGroup
         title="Punctuation"
         glyphs={PUNCTUATION}
         selected={selected}
         onSelect={onSelect}
+        onHover={onHover}
       />
       <GlyphGroup
         title="Math and symbols"
         glyphs={MATH_SYMBOLS}
         selected={selected}
         onSelect={onSelect}
+        onHover={onHover}
       />
       <GlyphGroup
         title="Numbers"
         glyphs={NUMBERS}
         selected={selected}
         onSelect={onSelect}
+        onHover={onHover}
       />
       <GlyphGroup
         title="Currency"
         glyphs={CURRENCY}
         selected={selected}
         onSelect={onSelect}
+        onHover={onHover}
       />
     </View>
   );
@@ -521,7 +538,7 @@ function CharacterSetBody({
           : { width: "100%", marginTop: space["24"] }
       }
     >
-      <GlyphPreview char={selected} />
+      <GlyphPreview char={previewGlyph} />
     </View>
   );
 
@@ -545,11 +562,13 @@ function GlyphGroup({
   glyphs,
   selected,
   onSelect,
+  onHover,
 }: {
   title: string;
   glyphs: string[];
   selected: string;
   onSelect: (g: string) => void;
+  onHover: (g: string | null) => void;
 }) {
   const shell = useShell();
   // 6 columns gives a tight Figma-style grid that scales to ~5 on narrow.
@@ -582,6 +601,7 @@ function GlyphGroup({
             char={g}
             selected={g === selected}
             onPress={() => onSelect(g)}
+            onHover={onHover}
             cols={cols}
             isLast={i === glyphs.length - 1}
           />
@@ -595,12 +615,14 @@ function GlyphCell({
   char,
   selected,
   onPress,
+  onHover,
   cols,
   isLast,
 }: {
   char: string;
   selected: boolean;
   onPress: () => void;
+  onHover: (g: string | null) => void;
   cols: number;
   isLast: boolean;
 }) {
@@ -608,6 +630,8 @@ function GlyphCell({
   return (
     <Pressable
       onPress={onPress}
+      onHoverIn={() => onHover(char)}
+      onHoverOut={() => onHover(null)}
       accessibilityRole="button"
       accessibilityLabel={`Glyph ${char}`}
       accessibilityState={{ selected }}
@@ -647,8 +671,39 @@ function GlyphCell({
   );
 }
 
+// Noontree font metrics, normalised to em (read directly from the OTF
+// `head` + `OS/2` tables — both Regular and Bold report identical values):
+//   unitsPerEm = 1000
+//   sxHeight   = 500   → x-height  = 0.50 em
+//   sCapHeight = 700   → cap height = 0.70 em
+//   ascender   = 950   → 0.95 em above baseline
+//   descender  = −250  → 0.25 em below baseline
+const NOONTREE_METRICS = {
+  ascent: 0.95,
+  descent: 0.25,
+  capHeight: 0.7,
+  xHeight: 0.5,
+} as const;
+
 function GlyphPreview({ char }: { char: string }) {
   const shell = useShell();
+  const fontSize = 220;
+  // Line-height pinned to the font's natural ascent + descent so the line
+  // box exactly matches the glyph metrics — this lets us position metric
+  // hairlines from the top of the line box without browser-leading drift.
+  const lineHeight = fontSize * (NOONTREE_METRICS.ascent + NOONTREE_METRICS.descent);
+  const baselineY = fontSize * NOONTREE_METRICS.ascent;
+  const capY = baselineY - fontSize * NOONTREE_METRICS.capHeight;
+  const xY = baselineY - fontSize * NOONTREE_METRICS.xHeight;
+  const descenderY = baselineY + fontSize * NOONTREE_METRICS.descent;
+
+  const metrics: { y: number; label: string }[] = [
+    { y: capY, label: "Cap height" },
+    { y: xY, label: "x-height" },
+    { y: baselineY, label: "Baseline" },
+    { y: descenderY, label: "Descender" },
+  ];
+
   return (
     <View
       style={{
@@ -658,19 +713,71 @@ function GlyphPreview({ char }: { char: string }) {
         borderRadius: radius["20"],
         alignItems: "center",
         justifyContent: "center",
+        paddingHorizontal: space["24"],
       }}
     >
-      <Text
+      <View
         style={{
-          fontFamily: "Noontree-Bold",
-          fontSize: 240,
-          lineHeight: 240,
-          color: shell.textPrimary,
-          letterSpacing: -6,
+          position: "relative",
+          width: "100%",
+          height: lineHeight,
+          alignItems: "center",
         }}
       >
-        {char}
-      </Text>
+        {/* Metric hairlines — span the full preview width so the glyph is
+            framed by horizontal rules at every typographic landmark. */}
+        {metrics.map((m) => (
+          <View
+            key={`${m.label}-line`}
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: m.y - 0.5,
+              height: 1,
+              backgroundColor: shell.border,
+            }}
+          />
+        ))}
+
+        {/* Glyph — line-height matches `lineHeight` above, so the baseline
+            sits exactly at `baselineY` from the top of this wrapper. */}
+        <Text
+          style={{
+            fontFamily: "Noontree-Bold",
+            fontSize,
+            lineHeight,
+            color: shell.textPrimary,
+            letterSpacing: -6,
+          }}
+        >
+          {char}
+        </Text>
+
+        {/* Labels — rendered after the lines so the small surface-coloured
+            backdrop of each label paints over the hairline, leaving a clean
+            "tag" on the right edge of every metric. */}
+        {metrics.map((m) => (
+          <Text
+            key={`${m.label}-label`}
+            style={{
+              position: "absolute",
+              right: 0,
+              top: m.y - 7,
+              paddingHorizontal: 6,
+              backgroundColor: shell.sidebarBg,
+              fontFamily: "Noontree-Medium",
+              fontSize: 11,
+              lineHeight: 14,
+              letterSpacing: 0.5,
+              color: shell.textTertiary,
+              textTransform: "uppercase",
+            }}
+          >
+            {m.label}
+          </Text>
+        ))}
+      </View>
     </View>
   );
 }
