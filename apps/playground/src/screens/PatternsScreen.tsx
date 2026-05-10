@@ -5,6 +5,7 @@ import { Icon } from "@field-ds/icons";
 import { colour, radius, space } from "@field-ds/tokens";
 
 import { PageScaffold, type SidebarItem } from "../components/PageScaffold";
+import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Patterns">;
@@ -18,6 +19,7 @@ const SIDEBAR: SidebarItem[] = [
 ];
 
 export function PatternsScreen(_: Props) {
+  const shell = useShell();
   return (
     <PageScaffold
       topNavActive="Patterns"
@@ -36,18 +38,14 @@ export function PatternsScreen(_: Props) {
             width: 88,
             height: 88,
             borderRadius: 44,
-            backgroundColor: colour.surface.secondary,
+            backgroundColor: shell.sidebarBg,
             borderWidth: 1,
-            borderColor: colour.border.subtle,
+            borderColor: shell.border,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <Icon
-            name="system-clock"
-            size={32}
-            color={colour["text-n-icon"].tertiary}
-          />
+          <Icon name="system-clock" size={32} color={shell.textTertiary} />
         </View>
         <Text
           style={{
@@ -55,7 +53,7 @@ export function PatternsScreen(_: Props) {
             fontSize: 28,
             lineHeight: 32,
             letterSpacing: -0.4,
-            color: colour["text-n-icon"].primary,
+            color: shell.textPrimary,
             marginTop: space["20"],
           }}
         >
@@ -66,7 +64,7 @@ export function PatternsScreen(_: Props) {
             fontFamily: "Noontree-Medium",
             fontSize: 16,
             lineHeight: 24,
-            color: "rgba(0,0,0,0.5)",
+            color: shell.textSecondary,
             marginTop: space["8"],
             maxWidth: 480,
             textAlign: "center",
@@ -93,6 +91,8 @@ export function PatternsScreen(_: Props) {
               lineHeight: 16,
               textTransform: "uppercase",
               letterSpacing: 0.6,
+              // The yellow-subtle chip stays light-toned in both themes, so
+              // its text is always anchored to the light-mode primary token.
               color: colour["text-n-icon"].primary,
             }}
           >
