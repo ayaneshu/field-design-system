@@ -35,7 +35,12 @@ const CLOSE_DURATION = 260;
 
 export type AccordionProps = {
   title: string;
-  body: ReactNode;
+  /**
+   * Content slot. Anything passed as children renders inside the expanded
+   * body. Strings are auto-wrapped in `Body_B14_Regular`; nodes render as-is,
+   * letting consumers compose custom content (lists, tables, controls, etc).
+   */
+  children?: ReactNode;
   expanded?: boolean;
   onExpandedChange?: (next: boolean) => void;
   defaultExpanded?: boolean;
@@ -62,7 +67,7 @@ export type AccordionProps = {
  */
 export function Accordion({
   title,
-  body,
+  children,
   expanded: controlledExpanded,
   onExpandedChange,
   defaultExpanded = false,
@@ -121,28 +126,46 @@ export function Accordion({
   // Body content is rendered twice with the same layout: once visible inside
   // the animated clipping wrapper, once hidden offscreen for measurement.
   // Both render at intrinsic size; only the wrapper's height animates.
+  //
+  // Structure mirrors the Figma "Details > Content Slot" hierarchy:
+  //   Details — surface.secondary background, space.12 padding (the body fill).
+  //   Content Slot — wraps whatever children the consumer passes, centered.
+  // Strings get auto-wrapped in Body_B14_Regular as a convenience; ReactNodes
+  // render untouched so consumers can compose any layout in the slot.
   const renderBodyContent = () => (
     <View
+      // @ts-expect-error — dataSet on web
+      dataSet={{
+        slot: "details",
+        tokenBg: "colour.surface.secondary",
+        tokenPadding: "space.12",
+      }}
       style={{
         backgroundColor: colour.surface.secondary,
         paddingHorizontal: PADDING,
         paddingVertical: PADDING,
       }}
     >
-      {typeof body === "string" ? (
-        <Text
-          // @ts-expect-error — dataSet on Text on web
-          dataSet={{
-            tokenTextStyle: "textStyles.Body_B14_Regular",
-            tokenColor: "colour.text-n-icon.primary",
-          }}
-          style={[textStyles.Body_B14_Regular, { color: colour["text-n-icon"].primary }]}
-        >
-          {body}
-        </Text>
-      ) : (
-        body
-      )}
+      <View
+        // @ts-expect-error — dataSet on web
+        dataSet={{ slot: "content-slot" }}
+        style={{ alignItems: "center", justifyContent: "center" }}
+      >
+        {typeof children === "string" ? (
+          <Text
+            // @ts-expect-error — dataSet on Text on web
+            dataSet={{
+              tokenTextStyle: "textStyles.Body_B14_Regular",
+              tokenColor: "colour.text-n-icon.primary",
+            }}
+            style={[textStyles.Body_B14_Regular, { color: colour["text-n-icon"].primary }]}
+          >
+            {children}
+          </Text>
+        ) : (
+          children
+        )}
+      </View>
     </View>
   );
 

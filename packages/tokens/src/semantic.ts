@@ -17,6 +17,7 @@ export const colour = {
     "yellow-light": "#feee00",
     "yellow-dark": "#a36200",
     success: "#0f8857",
+    success_bold: "#0b623f",
   },
   surface: {
     primary: "#ffffff",
@@ -26,6 +27,7 @@ export const colour = {
     "tertiary-inverted": "#343d54",
     "secondary-inverted": "#1d2539",
     "primary-inverted": "#101628",
+    absolute_black: "#000000",
     "action-subtle": "#ebf4ff",
     "action-bold": "#0f7eff",
     "action-extrabold": "#0f61ff",
@@ -45,6 +47,7 @@ export const colour = {
     "overlay-bold": "#000000cc",
   },
   border: {
+    white: "#ffffff",
     primary: "#eaecf0",
     subtle: "#f2f3f7",
     medium: "#d0d4dd",
@@ -54,9 +57,11 @@ export const colour = {
     "action-bold": "#0f61ff",
     supermall: "#c0c2f6",
     error: "#fdb5b5",
+    error_bold: "#d92626",
     warning: "#fedbb4",
     yellow: "#fff7c2",
     success: "#adf0d5",
+    success_bold: "#0f8857",
   },
 } as const;
 export type Colour = typeof colour;
@@ -199,3 +204,6 @@ export const radius = {
   rounded: 9999,
 } as const;
 export type Radius = typeof radius;
+
+export const Icon_Color = "#1d2539" as const;
+export type IconColor = typeof Icon_Color;

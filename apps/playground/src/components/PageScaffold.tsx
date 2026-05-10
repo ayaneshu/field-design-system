@@ -35,6 +35,14 @@ export type SidebarItem = {
    * Playground under "Illustrations").
    */
   indent?: boolean;
+  /**
+   * Optional flag — render the row as a collapsible section header. Subsequent
+   * `indent: true` rows are treated as the section's children and hidden when
+   * the parent is collapsed. The parent shows a chevron on the right that
+   * flips between right (collapsed) and down (expanded). Clicking the parent
+   * toggles expansion locally — it does NOT call `onSelect`.
+   */
+  collapsible?: boolean;
 };
 
 /**
@@ -92,24 +100,27 @@ export function PageScaffold({
   const titleLineHeight = Math.round(titleSize * 0.95);
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: shell.pageBg }}
-      contentContainerStyle={{ paddingBottom: space["72"] }}
-    >
+    <View style={{ flex: 1, backgroundColor: shell.pageBg }}>
+      {/* Persistent header — lives outside the scrollable page so it stays
+          fixed at the top on every screen. */}
       <TopHeader variant="light" active={topNavActive ?? null} />
 
-      <View
-        style={{
-          paddingHorizontal: horizontalPad,
-          paddingTop: 24,
-          flexDirection: showSidebar ? "row" : "column",
-          gap: showSidebar ? railGap : space["24"],
-          // In row mode (desktop), keep the sticky sidebar from being
-          // stretched by the main column. In column mode (tablet/mobile),
-          // let pill row stretch to full width like before.
-          alignItems: showSidebar ? "flex-start" : "stretch",
-        }}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: space["72"] }}
       >
+        <View
+          style={{
+            paddingHorizontal: horizontalPad,
+            paddingTop: 24,
+            flexDirection: showSidebar ? "row" : "column",
+            gap: showSidebar ? railGap : space["24"],
+            // In row mode (desktop), keep the sticky sidebar from being
+            // stretched by the main column. In column mode (tablet/mobile),
+            // let pill row stretch to full width like before.
+            alignItems: showSidebar ? "flex-start" : "stretch",
+          }}
+        >
         {showSidebar ? (
           <Sidebar items={sidebar} onSelect={onSidebarSelect} />
         ) : (
@@ -197,9 +208,10 @@ export function PageScaffold({
           ) : (
             children
           )}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -298,6 +310,14 @@ export function DetailSection({
   );
 }
 
+// Top header height per breakpoint (mirrors TopHeader.tsx). Used to size
+// the sticky sidebar so it never extends past the viewport bottom.
+const HEADER_HEIGHT_COMPACT = 64;
+const HEADER_HEIGHT_FULL = 92;
+// Vertical breathing room above and below the sticky sidebar inside the
+// viewport (matches the page's `paddingTop: 24`).
+const SIDEBAR_VERTICAL_INSET = 24;
+
 function Sidebar({
   items,
   onSelect,
@@ -305,8 +325,63 @@ function Sidebar({
   items: SidebarItem[];
   onSelect?: (key: string) => void;
 }) {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const { shell } = useTheme();
+  const headerHeight =
+    width < 720 ? HEADER_HEIGHT_COMPACT : HEADER_HEIGHT_FULL;
+  // Sidebar fills the remaining viewport below the header, minus a top + bottom
+  // gutter so it doesn't bump the screen edges.
+  const sidebarMaxHeight =
+    height - headerHeight - SIDEBAR_VERTICAL_INSET * 2;
+
+  // Track which collapsible groups are expanded. Default: any group whose
+  // direct `indent: true` children include an active row starts expanded so
+  // the user can see where they are in the tree without expanding it manually.
+  const [expanded, setExpanded] = useState<Set<string>>(() => {
+    const initial = new Set<string>();
+    for (let i = 0; i < items.length; i++) {
+      const parent = items[i];
+      if (!parent.collapsible) continue;
+      for (let j = i + 1; j < items.length; j++) {
+        const child = items[j];
+        if (!child.indent) break;
+        if (child.active) {
+          initial.add(parent.key);
+          break;
+        }
+      }
+    }
+    return initial;
+  });
+
+  const toggleGroup = (key: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  // Compute the visible item list — drop indented children whose parent
+  // collapsible group is currently collapsed.
+  const visibleItems: SidebarItem[] = [];
+  let activeGroupKey: string | null = null;
+  let activeGroupExpanded = true;
+  for (const item of items) {
+    if (item.collapsible) {
+      activeGroupKey = item.key;
+      activeGroupExpanded = expanded.has(item.key);
+      visibleItems.push(item);
+    } else if (item.indent && activeGroupKey) {
+      if (activeGroupExpanded) visibleItems.push(item);
+    } else {
+      activeGroupKey = null;
+      activeGroupExpanded = true;
+      visibleItems.push(item);
+    }
+  }
+
   return (
     <View
       style={{
@@ -314,54 +389,94 @@ function Sidebar({
         flexShrink: 0,
         // @ts-expect-error sticky on web
         position: "sticky",
-        top: 24,
+        top: SIDEBAR_VERTICAL_INSET,
         alignSelf: "flex-start",
+        // Cap to the visible viewport so a long item list scrolls inside the
+        // sidebar instead of pushing past the screen edges.
+        maxHeight: sidebarMaxHeight,
         backgroundColor: shell.sidebarBg,
         borderRadius: radius["32"],
         padding: space["8"],
-        gap: space["4"],
+        // Hide the rounded corner where the inner ScrollView meets the
+        // padding so the scroll thumb doesn't paint over the rail.
+        overflow: "hidden",
       }}
     >
-      {items.map((item) => (
-        <View key={item.key}>
-          <SidebarRow item={item} onSelect={onSelect} />
-          {item.dividerAfter ? (
-            <View
-              style={{
-                height: 12,
-                paddingHorizontal: space["16"],
-                justifyContent: "center",
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ gap: space["4"] }}
+        showsVerticalScrollIndicator={false}
+      >
+        {visibleItems.map((item) => (
+          <View key={item.key}>
+            <SidebarRow
+              item={item}
+              isExpanded={
+                item.collapsible ? expanded.has(item.key) : undefined
+              }
+              onPress={() => {
+                if (item.collapsible) {
+                  toggleGroup(item.key);
+                } else {
+                  onSelect?.(item.key);
+                }
               }}
-            >
+            />
+            {item.dividerAfter ? (
               <View
                 style={{
-                  height: 1,
-                  backgroundColor: shell.sidebarDivider,
+                  height: 12,
+                  paddingHorizontal: space["16"],
+                  justifyContent: "center",
                 }}
-              />
-            </View>
-          ) : null}
-        </View>
-      ))}
+              >
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: shell.sidebarDivider,
+                  }}
+                />
+              </View>
+            ) : null}
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
 
 function SidebarRow({
   item,
-  onSelect,
+  isExpanded,
+  onPress,
 }: {
   item: SidebarItem;
-  onSelect?: (key: string) => void;
+  /** Defined only for collapsible parent rows; drives the chevron direction. */
+  isExpanded?: boolean;
+  onPress: () => void;
 }) {
   const { shell } = useTheme();
+  const labelColor = item.active
+    ? shell.textPrimary
+    : item.indent
+      ? shell.textTertiary
+      : shell.textSecondary;
   return (
     <Pressable
-      onPress={() => onSelect?.(item.key)}
+      onPress={onPress}
       accessibilityRole="button"
-      accessibilityState={item.active ? { selected: true } : {}}
+      accessibilityState={
+        item.collapsible
+          ? { expanded: isExpanded === true }
+          : item.active
+            ? { selected: true }
+            : {}
+      }
       // @ts-expect-error hover
       style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => ({
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         paddingLeft: item.indent ? space["32"] : space["16"],
         paddingRight: space["16"],
         paddingVertical: item.indent ? space["12"] : space["16"],
@@ -384,15 +499,18 @@ function SidebarRow({
           fontSize: item.indent ? 14 : 16,
           lineHeight: item.indent ? 18 : 20,
           letterSpacing: -0.15,
-          color: item.active
-            ? shell.textPrimary
-            : item.indent
-              ? shell.textTertiary
-              : shell.textSecondary,
+          color: labelColor,
         }}
       >
         {item.label}
       </Text>
+      {item.collapsible ? (
+        <Icon
+          name={isExpanded ? "system-chevron-down" : "system-chevron-right"}
+          size={20}
+          color={labelColor}
+        />
+      ) : null}
     </Pressable>
   );
 }

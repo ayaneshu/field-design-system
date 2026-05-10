@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Platform,
   Pressable,
@@ -11,23 +11,10 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { space } from "@field-ds/tokens";
 
+import { ParticleImageField } from "../components/ParticleImageField";
 import { TopHeader } from "../components/TopHeader";
 import { useTheme } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
-
-// Drift keyframes for the bloom particle field. Each particle picks a
-// random delay/duration so the animation looks chaotic without using a
-// requestAnimationFrame loop.
-const BLOOM_KEYFRAMES_ID = "bloom-particle-keyframes";
-const BLOOM_KEYFRAMES_CSS = `
-@keyframes bloomParticleDrift {
-  0%   { transform: translate3d(0,   0,   0); opacity: 0; }
-  10%  {                                        opacity: 0.6; }
-  50%  { transform: translate3d(40px, -60px, 0); opacity: 1; }
-  90%  {                                        opacity: 0.5; }
-  100% { transform: translate3d(80px, -120px, 0); opacity: 0; }
-}
-`;
 
 // Idle shimmer keyframe — keeps the silver "field" title alive without any
 // pointer interaction. Injected into <head> once on mount.
@@ -201,18 +188,6 @@ export function HomeScreen({ navigation }: Props) {
     setTitleRect({ x: r.left, y: r.top, w: r.width, h: r.height });
   }, [tSize, subtitleSize]);
 
-  // Inject the bloom particle keyframes once; wire up hover + cursor
-  // tracking on the visible "field" title. Only active in light mode —
-  // dark mode is already dark, so the bloom would be a no-op.
-  useEffect(() => {
-    if (Platform.OS !== "web" || typeof document === "undefined") return;
-    if (!document.getElementById(BLOOM_KEYFRAMES_ID)) {
-      const tag = document.createElement("style");
-      tag.id = BLOOM_KEYFRAMES_ID;
-      tag.textContent = BLOOM_KEYFRAMES_CSS;
-      document.head.appendChild(tag);
-    }
-  }, []);
   // Reset bloom state on theme toggle so a stuck overlay can't survive
   // across modes.
   useEffect(() => {
@@ -405,8 +380,6 @@ export function HomeScreen({ navigation }: Props) {
 
 // ─────────── Hover bloom overlay ───────────
 
-const PARTICLE_COUNT = 180;
-
 function BloomOverlay({
   mode,
   active,
@@ -424,10 +397,9 @@ function BloomOverlay({
   const tracking = -titleFontSize * 0.04;
   if (Platform.OS !== "web") return null;
   // Bloom shows the opposite theme: light-mode page reveals dark, dark
-  // reveals light. Particles flip color so they remain visible.
+  // reveals light.
   const isInvertedDark = mode === "light";
   const veilBg = isInvertedDark ? "#000000" : "#ffffff";
-  const particleColor = isInvertedDark ? "#ffffff" : "#1a2238";
   const titleGradient = isInvertedDark ? SILVER_GRADIENT : STEEL_GRADIENT;
   return (
     <View
@@ -448,7 +420,7 @@ function BloomOverlay({
         zIndex: 50,
       }}
     >
-      <ParticleField count={PARTICLE_COUNT} color={particleColor} />
+      <ParticleImageField active={active} tone={isInvertedDark ? "light" : "dark"} />
 
       {/* Inverted-mode duplicate of the "field" title — positioned over
           the underlying original so when the bloom passes the title
@@ -480,62 +452,6 @@ function BloomOverlay({
         field
       </Text>
     </View>
-  );
-}
-
-function ParticleField({ count, color }: { count: number; color: string }) {
-  // Generate particle props once per mount so the layout stays stable.
-  // Each dot has a random position, size, animation duration and delay
-  // so the field looks chaotic rather than periodic.
-  const particles = useMemo(() => {
-    const out: {
-      key: number;
-      left: string;
-      top: string;
-      size: number;
-      delay: number;
-      duration: number;
-      opacity: number;
-    }[] = [];
-    for (let i = 0; i < count; i++) {
-      out.push({
-        key: i,
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        size: Math.random() < 0.7 ? 2 : Math.random() < 0.85 ? 3 : 4,
-        delay: -Math.random() * 12,
-        duration: 8 + Math.random() * 10,
-        opacity: 0.4 + Math.random() * 0.5,
-      });
-    }
-    return out;
-  }, [count]);
-
-  return (
-    <>
-      {particles.map((p) => (
-        <View
-          key={p.key}
-          // @ts-expect-error CSS animation props pass through on rn-web
-          style={{
-            position: "absolute",
-            left: p.left,
-            top: p.top,
-            width: p.size,
-            height: p.size,
-            borderRadius: 9999,
-            backgroundColor: color,
-            opacity: p.opacity,
-            animationName: "bloomParticleDrift",
-            animationDuration: `${p.duration}s`,
-            animationTimingFunction: "linear",
-            animationIterationCount: "infinite",
-            animationDelay: `${p.delay}s`,
-            willChange: "transform, opacity",
-          }}
-        />
-      ))}
-    </>
   );
 }
 
@@ -741,7 +657,6 @@ function CursorNav({
   onPress: (key: keyof RootStackParamList) => void;
 }) {
   const palette = useHomePalette();
-  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
   const isRow = width >= 720;
 
   return (
@@ -778,11 +693,6 @@ function CursorNav({
               entry={entry}
               index={i}
               width={width}
-              dimmed={hoverIdx !== null && hoverIdx !== i}
-              onHoverIn={() => setHoverIdx(i)}
-              onHoverOut={() =>
-                setHoverIdx((prev) => (prev === i ? null : prev))
-              }
               onPress={() => onPress(entry.key)}
             />
           </View>
@@ -796,20 +706,16 @@ function NavCol({
   entry,
   index,
   width,
-  dimmed,
-  onHoverIn,
-  onHoverOut,
   onPress,
 }: {
   entry: Entry;
   index: number;
   width: number;
-  dimmed: boolean;
-  onHoverIn: () => void;
-  onHoverOut: () => void;
   onPress: () => void;
 }) {
   const palette = useHomePalette();
+  const { mode } = useTheme();
+  const [hovered, setHovered] = useState(false);
   const desktop = width >= 1100;
   // Per the Figma: 48px Regular for the menu titles. Scales down on
   // narrower viewports so the row still fits without wrapping.
@@ -820,26 +726,57 @@ function NavCol({
   const numberLabel = String(index + 1).padStart(2, "0");
   const numberFromTop = Math.round(titleLine * 0.22);
 
+  // Metal shader is glyph-clipped via background-clip:text. Only applied
+  // on web because RN-Web is the only target that honours those CSS
+  // properties; native fall-through keeps the solid colour.
+  const isWebHover = hovered && Platform.OS === "web";
+  const gradient = mode === "dark" ? SILVER_GRADIENT : STEEL_GRADIENT;
+  const titleStyle = isWebHover
+    ? {
+        fontFamily: "Noontree-Regular",
+        fontSize: titleFontSize,
+        lineHeight: titleLine,
+        letterSpacing: -titleFontSize * 0.025,
+        color: "transparent",
+        backgroundImage: gradient,
+        backgroundSize: "200% 100%",
+        backgroundClip: "text",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        animationName: "metalTitleShimmer",
+        animationDuration: "6s",
+        animationTimingFunction: "linear",
+        animationIterationCount: "infinite",
+      }
+    : {
+        fontFamily: "Noontree-Regular",
+        fontSize: titleFontSize,
+        lineHeight: titleLine,
+        letterSpacing: -titleFontSize * 0.025,
+        color: palette.bodyPrimary,
+      };
+
   return (
     <Pressable
       onPress={onPress}
-      onHoverIn={onHoverIn}
-      onHoverOut={onHoverOut}
+      onHoverIn={() => setHovered(true)}
+      onHoverOut={() => setHovered(false)}
       accessibilityRole="button"
       accessibilityLabel={entry.title}
       // @ts-expect-error hover
-      style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => ({
+      style={({ pressed, hovered: pHovered }: { pressed: boolean; hovered?: boolean }) => ({
         flexDirection: "column",
         alignItems: "flex-start",
         paddingVertical: width >= 720 ? 12 : 18,
         opacity: pressed ? 0.85 : 1,
-        transform: [{ translateY: hovered ? -2 : 0 }],
-        // @ts-expect-error filter passes through to DOM on rn-web
-        filter: dimmed ? "blur(4px)" : "blur(0px)",
+        // Larger vertical lift on hover so the active row clearly pops
+        // out of the row. Symmetric easing on the way in and on the way
+        // out so the row eases back into place rather than snapping.
+        transform: [{ translateY: pHovered ? -14 : 0 }],
         // @ts-expect-error rn-web passes CSS transition props through
-        transitionProperty: "filter, transform, opacity",
-        transitionDuration: "300ms",
-        transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+        transitionProperty: "transform, opacity",
+        transitionDuration: "420ms",
+        transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
       })}
     >
       <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
@@ -855,17 +792,8 @@ function NavCol({
         >
           {numberLabel}
         </Text>
-        <Text
-          style={{
-            fontFamily: "Noontree-Regular",
-            fontSize: titleFontSize,
-            lineHeight: titleLine,
-            letterSpacing: -titleFontSize * 0.025,
-            color: palette.bodyPrimary,
-          }}
-        >
-          {entry.title}
-        </Text>
+        {/* @ts-expect-error web-only style props passed through to the DOM */}
+        <Text style={titleStyle}>{entry.title}</Text>
       </View>
       <Text
         style={{

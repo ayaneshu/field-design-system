@@ -1,10 +1,30 @@
-# Button
+# Button family
 
-Action controls for triggering primary, secondary, and supportive actions across noon flows. Maps to the Figma `M-PrimaryButton`, `M-SecondaryButton`, `M-SecondaryNeutralButton`, `M-NeutralButton`, `M-NeutralRoundButton`, `M-TextButtonBlue`, `M-TextButtonNeutral`, and `M-IconButton` families.
+Action controls for triggering primary, secondary, and supportive actions across noon flows. The four rectangular families each ship as their own component (matching Figma's M- components 1:1) and the round / text / icon families round out the set.
+
+## Components
+
+| Component                | Figma                       | When to use                                                                 |
+| ------------------------ | --------------------------- | --------------------------------------------------------------------------- |
+| `PrimaryButton`          | `M-PrimaryButton`           | Filled blue, highest emphasis. The single most important action on a screen. |
+| `SecondaryButton`        | `M-SecondaryButton`         | Outline blue. Supportive action paired with a primary.                      |
+| `SecondaryNeutralButton` | `M-SecondaryNeutralButton`  | Outline neutral. Quiet adjacent action where blue would compete.            |
+| `NeutralButton`          | `M-NeutralButton`           | Filled near-black. Mid-emphasis alt to Primary on light surfaces.           |
+| `RoundButton`            | `M-NeutralRoundButton`      | Pill-shaped neutral CTA for toolbars, map chips, sticky headers.            |
+| `TextButton`             | `M-TextButtonBlue`, `M-TextButtonNeutral` | Low-emphasis inline action ("View all", row-level "Edit").    |
+| `IconButton`             | `M-IconButton`              | Square circular icon-only button (back chevrons, close, overflow).          |
 
 ## Storybook
 
-[View Button stories in Storybook](../../../../apps/storybook/src/stories/Button.stories.tsx)
+Each rectangular family has its own story file:
+
+- [PrimaryButton stories](../../../../apps/storybook/src/stories/PrimaryButton.stories.tsx)
+- [SecondaryButton stories](../../../../apps/storybook/src/stories/SecondaryButton.stories.tsx)
+- [SecondaryNeutralButton stories](../../../../apps/storybook/src/stories/SecondaryNeutralButton.stories.tsx)
+- [NeutralButton stories](../../../../apps/storybook/src/stories/NeutralButton.stories.tsx)
+- [RoundButton stories](../../../../apps/storybook/src/stories/RoundButton.stories.tsx)
+- [TextButton stories](../../../../apps/storybook/src/stories/TextButton.stories.tsx)
+- [IconButton stories](../../../../apps/storybook/src/stories/IconButton.stories.tsx)
 
 Run locally:
 
@@ -12,32 +32,24 @@ Run locally:
 pnpm --filter storybook dev
 ```
 
-Then open the **Components / Button** group in the sidebar — covers `Button`, `RoundButton`, `TextButton`, and `IconButton`.
-
-## Components
-
-| Component     | Figma                                                          | When to use                                                                 |
-| ------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `Button`      | `M-PrimaryButton`, `M-SecondaryButton`, `M-SecondaryNeutralButton`, `M-NeutralButton` | Rectangular text+icon CTAs. Pick `variant` to set emphasis.   |
-| `RoundButton` | `M-NeutralRoundButton`                                          | Pill-shaped neutral CTA for toolbars, map chips, sticky headers.            |
-| `TextButton`  | `M-TextButtonBlue`, `M-TextButtonNeutral`                       | Low-emphasis inline action ("View all", row-level "Edit").                  |
-| `IconButton`  | `M-IconButton`                                                  | Square circular icon-only button (back chevrons, close, overflow controls). |
-
 ## Usage
 
 ```tsx
 import {
-  Button,
+  PrimaryButton,
+  SecondaryButton,
+  SecondaryNeutralButton,
+  NeutralButton,
   RoundButton,
   TextButton,
   IconButton,
 } from "@field-ds/components";
 
-<Button label="Continue" variant="primary" />
-<Button label="Cancel" variant="secondary" />
-<Button label="Schedule" variant="neutral" iconLeft="system-plus" />
-<Button label="Saving" variant="primary" loading />
-<Button label="Unavailable" variant="primary" disabled />
+<PrimaryButton label="Continue" />
+<SecondaryButton label="Cancel" />
+<SecondaryNeutralButton label="Skip" />
+<NeutralButton label="Schedule" iconLeft="system-plus" />
+<NeutralButton label="Compact" size="H32" />
 
 <RoundButton label="Filter" iconLeft="system-plus" />
 <TextButton label="View all" iconRight="system-arrow-right" />
@@ -46,50 +58,54 @@ import {
 
 ## Sizes
 
+The rectangular families share a height scale per Figma:
+
 | Size  | Use                                            | Type | Icon |
 | ----- | ---------------------------------------------- | ---- | ---- |
 | `H56` | Sheet / full-width CTAs                        | A17  | 24   |
 | `H52` | Inline content actions                         | A16  | 24   |
 | `H48` | Inline content actions                         | A14  | 20   |
-| `H40` | Dense inline actions                           | A12  | 16   |
+| `H40` | Dense inline actions (per-variant footprint)   | A12 / A14 | 16 / 20 |
 | `H36` | Rows / tables / compact contexts               | A12  | 16   |
-| `H32` | Toolbars (only on `variant="neutral"` per DS) | A12  | 16   |
+| `H32` | Toolbars (only on `NeutralButton`)             | A12  | 16   |
+
+`H40` is intentionally per-variant: `PrimaryButton` keeps the tighter 12px / radius 8 footprint with A12; the outline + neutral families expand to 16x10–12 / radius 10 / A12 (Secondary) or A14 (Secondary-Neutral, Neutral). See [`sizing.ts`](sizing.ts) for the exact specs and `BUTTON_SIZE_H40_OVERRIDES`.
 
 `RoundButton` ships in `H40` / `H36`. `TextButton` ships in `A14` / `A12`. `IconButton` ships in `H40` / `H36`.
 
 ## States
 
-All filled / outline buttons support **default**, **pressed**, **loader**, and **disabled** states. Loader keeps the footprint by stamping a centred spinner over the content (label + icons fade to opacity 0 — the button doesn't reflow).
+All rectangular + round buttons support **default**, **pressed**, **loader**, and **disabled** states. Loader keeps the footprint by stamping a centred spinner over the content (label + icons fade to opacity 0 — the button doesn't reflow).
 
-`TextButton` and `IconButton` ship without a `loader` state per Figma — use `Button` if you need a loading spinner.
+`TextButton` and `IconButton` ship without a `loader` state per Figma — use one of the rectangular families if you need a loading spinner.
 
-## Props (Button)
+## Props (rectangular family — Primary / Secondary / Secondary-Neutral / Neutral)
 
-| Prop                 | Type                                                     | Default      | Notes                                              |
-| -------------------- | -------------------------------------------------------- | ------------ | -------------------------------------------------- |
-| `label`              | `string`                                                 | —            | Required visible label.                            |
-| `variant`            | `"primary" \| "secondary" \| "secondary-neutral" \| "neutral"` | `"primary"`  | Emphasis level.                                    |
-| `size`               | `"H56" \| "H52" \| "H48" \| "H40" \| "H36" \| "H32"`     | `"H56"`      | `H32` is only valid on `variant="neutral"`.        |
-| `iconLeft`           | `IconName`                                               | —            | Glyph from `@field-ds/icons`.                      |
-| `iconRight`          | `IconName`                                               | —            | Glyph from `@field-ds/icons`.                      |
-| `loading`            | `boolean`                                                | `false`      | Shows centred spinner; preserves footprint.        |
-| `disabled`           | `boolean`                                                | `false`      | Non-interactive, muted colour.                     |
-| `fullWidth`          | `boolean`                                                | `false`      | Stretches to fill parent width.                    |
-| `onPress`            | `() => void`                                             | —            | Tap handler.                                       |
-| `accessibilityLabel` | `string`                                                 | label        | Falls back to `label`.                             |
-| `style`              | `StyleProp<ViewStyle>`                                   | —            | Forwarded to outer `Pressable`.                    |
+| Prop                 | Type                   | Default      | Notes                                                |
+| -------------------- | ---------------------- | ------------ | ---------------------------------------------------- |
+| `label`              | `string`               | —            | Required visible label.                              |
+| `size`               | family-specific union  | `"H56"`      | `H32` is only valid on `NeutralButton`.              |
+| `iconLeft`           | `IconName`             | —            | Glyph from `@field-ds/icons`.                        |
+| `iconRight`          | `IconName`             | —            | Glyph from `@field-ds/icons`.                        |
+| `loading`            | `boolean`              | `false`      | Shows centred spinner; preserves footprint.          |
+| `disabled`           | `boolean`              | `false`      | Non-interactive, muted colour.                       |
+| `fullWidth`          | `boolean`              | `false`      | Stretches to fill parent width.                      |
+| `onPress`            | `() => void`           | —            | Tap handler.                                         |
+| `accessibilityLabel` | `string`               | label        | Falls back to `label`.                               |
+| `style`              | `StyleProp<ViewStyle>` | —            | Forwarded to outer `Pressable`.                      |
 
-See `Button.tsx`, `RoundButton.tsx`, `TextButton.tsx`, and `IconButton.tsx` for the full per-component prop reference.
+See the per-component files (`PrimaryButton.tsx`, `SecondaryButton.tsx`, `SecondaryNeutralButton.tsx`, `NeutralButton.tsx`) for tone specifics, plus `RoundButton.tsx` / `TextButton.tsx` / `IconButton.tsx` for those families' props.
 
 ## Tokens used
 
-- `colour.surface.action-bold`, `surface.action-extrabold`, `surface.action-subtle` — Primary fill, pressed, Secondary pressed
+- `colour.surface.action-bold`, `surface.action-extrabold`, `surface.action-subtle` — Primary fill / pressed; Secondary pressed
 - `colour.surface.primary-inverted`, `surface.secondary-inverted` — Neutral fill / pressed
-- `colour.surface.primary`, `surface.secondary` — base / pressed surface for outline + disabled
+- `colour.surface.primary`, `surface.secondary`, `surface.muted` — outline base / pressed; disabled background
 - `colour.border.action`, `border.primary`, `border.subtle` — outline borders
 - `colour.text-n-icon.on-surface-bold` — label on dark / blue fills
 - `colour.text-n-icon.action` — Secondary + Text-Blue label
-- `colour.text-n-icon.primary` — Secondary-Neutral + Text-Neutral label
+- `colour.text-n-icon.primary` — Secondary-Neutral default + Text-Neutral label
+- `colour.text-n-icon.secondary` — Secondary-Neutral pressed
 - `colour.text-n-icon.muted` — disabled label / icon
 - `radius.6` / `radius.8` / `radius.10` / `radius.12` / `radius.rounded` — corner per height
 - `space.4` … `space.24` — gap + padding per height

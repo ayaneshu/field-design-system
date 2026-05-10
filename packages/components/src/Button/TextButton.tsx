@@ -19,25 +19,31 @@ export type TextButtonTone = "blue" | "neutral";
 export type TextButtonSize = "A14" | "A12";
 
 type TextSpec = {
+  height: number;
   paddingX: number;
   paddingY: number;
   gap: number;
+  radius: number;
   iconSize: number;
   text: FieldTextStyle;
 };
 
 const TEXT_SIZE: Record<TextButtonSize, TextSpec> = {
   A14: {
+    height: 28,
     paddingX: space["8"],
     paddingY: space["4"],
     gap: space["4"],
+    radius: radius["6"],
     iconSize: 20,
     text: textStyles.Action_A14_SemiBold,
   },
   A12: {
-    paddingX: space["8"],
+    height: 24,
+    paddingX: space["6"],
     paddingY: space["4"],
     gap: space["4"],
+    radius: radius["4"],
     iconSize: 16,
     text: textStyles.Action_A12_SemiBold,
   },
@@ -114,9 +120,11 @@ export function TextButton({
       }}
       style={({ pressed }) => [
         {
+          minHeight: spec.height,
+          maxHeight: spec.height,
           paddingHorizontal: spec.paddingX,
           paddingVertical: spec.paddingY,
-          borderRadius: radius["6"],
+          borderRadius: spec.radius,
           alignSelf: "flex-start",
           flexDirection: "row",
           alignItems: "center",

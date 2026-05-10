@@ -14,7 +14,7 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 import { Accordion } from "@field-ds/components";
 
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
-import { componentsSidebar } from "../navigation/sidebars";
+import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
 import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
 
@@ -38,7 +38,6 @@ export function AccordionScreen({ navigation }: Props) {
     <PreviewSurface tall>
       <Accordion
         title={title || "Title"}
-        body={body || "Body text…"}
         expanded={expanded}
         onExpandedChange={setExpanded}
         iconLeft={
@@ -50,17 +49,20 @@ export function AccordionScreen({ navigation }: Props) {
             />
           ) : undefined
         }
-      />
+      >
+        {body || "Body text…"}
+      </Accordion>
     </PreviewSurface>
   );
 
   const statesPreview = (
     <View style={{ gap: space["24"] }}>
       <PreviewSurface>
-        <Accordion
-          title="Title"
-          body="A compact, high-performance wall charger built with GaN technology for faster, cooler, more efficient charging. 65W output handles laptops, tablets and phones at top speed."
-        />
+        <Accordion title="Title">
+          A compact, high-performance wall charger built with GaN technology for
+          faster, cooler, more efficient charging. 65W output handles laptops,
+          tablets and phones at top speed.
+        </Accordion>
       </PreviewSurface>
 
       <PreviewSurface>
@@ -74,8 +76,10 @@ export function AccordionScreen({ navigation }: Props) {
               color={colour["text-n-icon"].primary}
             />
           }
-          body="Free standard shipping on orders over AED 100. Returns accepted within 14 days of delivery. Items must be unused and in original packaging."
-        />
+        >
+          Free standard shipping on orders over AED 100. Returns accepted within
+          14 days of delivery. Items must be unused and in original packaging.
+        </Accordion>
       </PreviewSurface>
 
       <PreviewSurface>
@@ -84,20 +88,26 @@ export function AccordionScreen({ navigation }: Props) {
             title="Specifications"
             expanded={openItem === "specs"}
             onExpandedChange={(next) => setOpenItem(next ? "specs" : null)}
-            body="65W GaN output · 1× USB-C PD · 1× USB-A QC 3.0 · folding pins · MFi certified."
-          />
+          >
+            65W GaN output · 1× USB-C PD · 1× USB-A QC 3.0 · folding pins · MFi
+            certified.
+          </Accordion>
           <Accordion
             title="What's in the box"
             expanded={openItem === "box"}
             onExpandedChange={(next) => setOpenItem(next ? "box" : null)}
-            body="Charger · 1m USB-C to USB-C cable · quick-start guide · 2-year warranty card."
-          />
+          >
+            Charger · 1m USB-C to USB-C cable · quick-start guide · 2-year
+            warranty card.
+          </Accordion>
           <Accordion
             title="FAQ"
             expanded={openItem === "faq"}
             onExpandedChange={(next) => setOpenItem(next ? "faq" : null)}
-            body="Compatible with most laptops that support USB-C PD. Works in 100–240V regions; pin adapter not included."
-          />
+          >
+            Compatible with most laptops that support USB-C PD. Works in 100–240V
+            regions; pin adapter not included.
+          </Accordion>
         </View>
       </PreviewSurface>
     </View>
@@ -111,10 +121,7 @@ export function AccordionScreen({ navigation }: Props) {
       version="V0.1"
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/apps/playground/src/components/Accordion.tsx"
       sidebar={componentsSidebar("Accordion")}
-      onSidebarSelect={(key) => {
-        if (key === "all") navigation.navigate("Components" as never);
-        else navigation.navigate(key as never);
-      }}
+      onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
     >
       <DetailSection
         heading="Playground"
