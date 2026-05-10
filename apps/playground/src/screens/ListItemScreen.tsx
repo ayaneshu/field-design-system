@@ -283,27 +283,31 @@ export function ListItemScreen({ navigation }: Props) {
           </PropRow>
           <PropRow>
             <PropLabel>Size</PropLabel>
-            <SegmentedToggle
-              value={size}
-              onChange={setSize}
-              options={[
-                { label: "Small", value: "small" },
-                { label: "Big", value: "big" },
-              ]}
-            />
+            <View style={{ minWidth: 220 }}>
+              <FieldSwitch<"small" | "big">
+                options={[
+                  { value: "small", label: "Small" },
+                  { value: "big", label: "Big" },
+                ]}
+                value={size}
+                onChange={setSize}
+              />
+            </View>
           </PropRow>
           <PropRow>
             <PropLabel>Leading slot</PropLabel>
-            <SegmentedToggle
-              value={leadingMode}
-              onChange={setLeadingMode}
-              options={[
-                { label: "Icon", value: "icon" },
-                { label: "Checkbox", value: "checkbox" },
-                { label: "Avatar", value: "avatar" },
-                { label: "None", value: "none" },
-              ]}
-            />
+            <View style={{ minWidth: 320 }}>
+              <FieldSwitch<LeadingMode>
+                options={[
+                  { value: "icon", label: "Icon" },
+                  { value: "checkbox", label: "Checkbox" },
+                  { value: "avatar", label: "Avatar" },
+                  { value: "none", label: "None" },
+                ]}
+                value={leadingMode}
+                onChange={setLeadingMode}
+              />
+            </View>
           </PropRow>
           <PropRow>
             <PropLabel>Show chevron</PropLabel>
@@ -475,58 +479,3 @@ function DSTextInput({
   );
 }
 
-function SegmentedToggle<T extends string>({
-  value,
-  onChange,
-  options,
-}: {
-  value: T;
-  onChange: (v: T) => void;
-  options: { label: string; value: T }[];
-}) {
-  const shell = useShell();
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        borderWidth: 1,
-        borderColor: shell.border,
-        borderRadius: radius["8"],
-        overflow: "hidden",
-      }}
-    >
-      {options.map((opt, i) => {
-        const active = opt.value === value;
-        return (
-          <Pressable
-            key={opt.value}
-            onPress={() => onChange(opt.value)}
-            style={({ pressed }) => ({
-              paddingHorizontal: space["12"],
-              paddingVertical: space["8"],
-              backgroundColor: active
-                ? colour["text-n-icon"].action
-                : colour.surface.primary,
-              borderLeftWidth: i === 0 ? 0 : 1,
-              borderLeftColor: shell.border,
-              opacity: pressed ? 0.85 : 1,
-            })}
-          >
-            <Text
-              style={[
-                textStyles.Body_B12_SemiBold,
-                {
-                  color: active
-                    ? colour.surface.primary
-                    : shell.textPrimary,
-                },
-              ]}
-            >
-              {opt.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}

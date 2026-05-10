@@ -1,14 +1,16 @@
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
   PageHeader,
+  Toggle as FieldToggle,
   type PageHeaderType,
   type PageHeaderTrailing,
 } from "@field-ds/components";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
+import { Dropdown, type DropdownOption } from "../components/Dropdown";
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
 import { useShell } from "../theme/ThemeContext";
@@ -27,6 +29,18 @@ const TYPES: PageHeaderType[] = [
   "back-only",
   "icons",
 ];
+
+const TYPE_LABEL: Record<PageHeaderType, string> = {
+  title: "Title",
+  "title-center": "Title · centred",
+  "search-bar": "Search bar",
+  "search-pill": "Search pill",
+  "search-pill-wide": "Search pill · wide",
+  location: "Location",
+  breadcrumb: "Breadcrumb",
+  "back-only": "Back only",
+  icons: "Icons",
+};
 
 const SHARE: PageHeaderTrailing = {
   icon: "system-upload",
@@ -61,23 +75,23 @@ const TRAILING_BY_TYPE: Record<PageHeaderType, PageHeaderTrailing[]> = {
   icons: [SEARCH, HEART, SHARE],
 };
 
+const DEFAULT_TITLE = "Page title";
+const DEFAULT_SUBTITLE = "Subtitle text below the title";
+
 export function PageHeaderScreen({ navigation }: Props) {
   const [type, setType] = useState<PageHeaderType>("title");
   const [showSubtitle, setShowSubtitle] = useState(false);
-  const [longTitle, setLongTitle] = useState(false);
+  const [title, setTitle] = useState(DEFAULT_TITLE);
+  const [subtitle, setSubtitle] = useState(DEFAULT_SUBTITLE);
   const [searchValue, setSearchValue] = useState("");
-
-  const titleText = longTitle
-    ? "A very long page title that should truncate gracefully"
-    : "Page title";
 
   const playgroundPreview = (
     <PreviewSurface tall>
       <PhoneFrame>
         <PageHeader
           type={type}
-          title={titleText}
-          subtitle={showSubtitle ? "Subtitle text below the title" : undefined}
+          title={title || DEFAULT_TITLE}
+          subtitle={showSubtitle ? (subtitle || DEFAULT_SUBTITLE) : undefined}
           addressLabel="Home"
           path="- BDA Complex, 100 Feet Rd Block, Koramangla"
           searchPlaceholder={
@@ -151,27 +165,35 @@ export function PageHeaderScreen({ navigation }: Props) {
         <PropList>
           <PropRow>
             <PropLabel>Type</PropLabel>
-            <SegmentedControl
-              options={TYPES}
+            <Dropdown<PageHeaderType>
               value={type}
               onChange={setType}
+              menuWidth={240}
+              options={TYPES.map<DropdownOption<PageHeaderType>>((t) => ({
+                value: t,
+                label: TYPE_LABEL[t],
+              }))}
             />
           </PropRow>
-          <PropRow>
+          <PropRow alignTop>
+            <PropLabel>Title</PropLabel>
+            <DSTextInput
+              value={title}
+              onChangeText={setTitle}
+              placeholder={DEFAULT_TITLE}
+            />
+          </PropRow>
+          <PropRow alignTop>
             <PropLabel>Subtitle</PropLabel>
-            <SegmentedControl
-              options={["off", "on"] as const}
-              value={showSubtitle ? "on" : "off"}
-              onChange={(v) => setShowSubtitle(v === "on")}
+            <DSTextInput
+              value={subtitle}
+              onChangeText={setSubtitle}
+              placeholder={DEFAULT_SUBTITLE}
             />
           </PropRow>
           <PropRow last>
-            <PropLabel>Long title</PropLabel>
-            <SegmentedControl
-              options={["off", "on"] as const}
-              value={longTitle ? "on" : "off"}
-              onChange={(v) => setLongTitle(v === "on")}
-            />
+            <PropLabel>Show subtitle</PropLabel>
+            <Toggle value={showSubtitle} onValueChange={setShowSubtitle} />
           </PropRow>
         </PropList>
       </DetailSection>
@@ -231,13 +253,21 @@ function PropList({ children }: { children: ReactNode }) {
   return <View>{children}</View>;
 }
 
-function PropRow({ children, last }: { children: ReactNode; last?: boolean }) {
+function PropRow({
+  children,
+  last,
+  alignTop,
+}: {
+  children: ReactNode;
+  last?: boolean;
+  alignTop?: boolean;
+}) {
   const shell = useShell();
   return (
     <View
       style={{
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: alignTop ? "flex-start" : "center",
         justifyContent: "space-between",
         gap: space["12"],
         paddingVertical: space["16"],
@@ -256,7 +286,7 @@ function PropLabel({ children }: { children: ReactNode }) {
     <Text
       style={[
         textStyles.Body_B16_Medium,
-        { color: shell.textPrimary, minWidth: 96 },
+        { color: shell.textPrimary, minWidth: 96, paddingTop: 2 },
       ]}
     >
       {children}
@@ -264,53 +294,54 @@ function PropLabel({ children }: { children: ReactNode }) {
   );
 }
 
-function SegmentedControl<T extends string>({
-  options,
+function Toggle({
   value,
-  onChange,
+  onValueChange,
 }: {
-  options: readonly T[];
-  value: T;
-  onChange: (next: T) => void;
+  value: boolean;
+  onValueChange: (v: boolean) => void;
+}) {
+  return <FieldToggle on={value} onChange={onValueChange} size="H20" />;
+}
+
+function DSTextInput({
+  value,
+  onChangeText,
+  placeholder,
+}: {
+  value: string;
+  onChangeText: (v: string) => void;
+  placeholder?: string;
 }) {
   return (
     <View
       style={{
-        flexDirection: "row",
-        flexWrap: "wrap",
-        backgroundColor: colour.surface.muted,
-        borderRadius: radius.rounded,
-        padding: 2,
+        width: 280,
+        backgroundColor: colour.surface.primary,
+        borderWidth: 1,
+        borderColor: colour.border.primary,
+        borderRadius: radius["10"],
+        paddingHorizontal: space["12"],
+        paddingVertical: space["8"],
+        justifyContent: "center",
       }}
     >
-      {options.map((opt) => {
-        const active = opt === value;
-        return (
-          <Pressable
-            key={String(opt)}
-            onPress={() => onChange(opt)}
-            style={{
-              paddingVertical: space["6"],
-              paddingHorizontal: space["12"],
-              borderRadius: radius.rounded,
-              backgroundColor: active ? colour.surface.primary : "transparent",
-            }}
-          >
-            <Text
-              style={[
-                textStyles.Body_B12_SemiBold,
-                {
-                  color: active
-                    ? colour["text-n-icon"].primary
-                    : colour["text-n-icon"].tertiary,
-                },
-              ]}
-            >
-              {String(opt)}
-            </Text>
-          </Pressable>
-        );
-      })}
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={colour["text-n-icon"].muted}
+        // @ts-expect-error — outlineStyle is web-only and supported by RN-Web
+        style={[
+          textStyles.Body_B14_SemiBold,
+          {
+            color: colour["text-n-icon"].primary,
+            paddingTop: 0,
+            paddingBottom: 0,
+            outlineStyle: "none",
+          },
+        ]}
+      />
     </View>
   );
 }

@@ -1,10 +1,17 @@
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   Pressable,
   Text,
   View,
   useWindowDimensions,
 } from "react-native";
+import Svg, { Circle, Path, Polygon, Rect } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { base, colour, radius, space } from "@field-ds/tokens";
@@ -228,6 +235,24 @@ function pickRandomHoverColor(prev?: string | null): string {
   return next;
 }
 
+// ─────────── Ink context ───────────
+//
+// Every illustration receives `tone` (the foreground ink) as a prop, but
+// many also need `ambient` — the card's surface colour — so that "cut-outs"
+// inside filled shapes (e.g. a checkmark stroke inside a filled checkbox,
+// or a label sliver inside a filled button) always read against whatever
+// colour the card is currently painting. Hardcoding white for cut-outs
+// breaks the moment the card surface is also light (dark mode → light tone
+// → light fill → white cut-out vanishes).
+type InkValue = { tone: string; ambient: string };
+const InkContext = createContext<InkValue>({
+  tone: colour["text-n-icon"].primary,
+  ambient: colour.surface.primary,
+});
+export function useInk() {
+  return useContext(InkContext);
+}
+
 export function HubCardShell({
   label,
   cardsPerRow,
@@ -257,6 +282,24 @@ export function HubCardShell({
     mode === "dark" ? shell.textPrimary : colour["text-n-icon"].primary;
   const activeInk = colour.surface.primary;
 
+  // Dot-grid backdrop. A radial-gradient dot every 12px is small enough to
+  // disappear unless you look for it — it gives the tile a sense of "design
+  // canvas" without competing with the skeleton on top. Idle uses the
+  // primary ink at 6% alpha; hover keeps the same density but swaps to
+  // white at 14% so the grid stays visible against the saturated accent.
+  // RN-Web maps these CSS props straight through to the underlying div.
+  const dotColor =
+    hovered
+      ? "rgba(255,255,255,0.14)"
+      : mode === "dark"
+        ? "rgba(244,246,251,0.07)"
+        : "rgba(29,37,57,0.07)";
+  const gridStyle = {
+    backgroundImage: `radial-gradient(circle at 1px 1px, ${dotColor} 1px, transparent 0)`,
+    backgroundSize: "12px 12px",
+    backgroundPosition: "6px 6px",
+  } as Record<string, string>;
+
   return (
     <Pressable
       onPress={onPress}
@@ -282,21 +325,60 @@ export function HubCardShell({
       }}
     >
       <View
-        // @ts-expect-error transition props pass through on rn-web
         style={{
           aspectRatio: 1.5,
           backgroundColor: hovered ? activeBg : idleBg,
           borderRadius: radius["16"],
           overflow: "hidden",
-          padding: space["28"],
-          alignItems: "center",
-          justifyContent: "center",
-          transitionProperty: "background-color",
+          // @ts-expect-error transition props pass through on rn-web
+          transitionProperty: "background-color, box-shadow",
           transitionDuration: "260ms",
           transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+          boxShadow: hovered
+            ? "0 10px 24px rgba(29, 37, 57, 0.10)"
+            : "0 1px 0 rgba(29, 37, 57, 0.02)",
+          ...gridStyle,
         }}
       >
-        {renderIllustration(hovered ? activeInk : idleInk)}
+        {/* Subtle inner stroke — adds a designer's hairline frame, kept very
+            faint so it reads as polish rather than chrome. */}
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            borderRadius: radius["16"],
+            borderWidth: 1,
+            borderColor: hovered
+              ? "rgba(255,255,255,0.18)"
+              : mode === "dark"
+                ? "rgba(244,246,251,0.06)"
+                : "rgba(29,37,57,0.05)",
+          }}
+        />
+        <View
+          style={{
+            flex: 1,
+            padding: space["28"],
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <InkContext.Provider
+            value={{
+              tone: hovered ? activeInk : idleInk,
+              // The card surface beneath the illustration. Cut-outs inside
+              // filled shapes paint with this so they always show "what's
+              // behind the fill" rather than a hardcoded white.
+              ambient: hovered ? activeBg : idleBg,
+            }}
+          >
+            {renderIllustration(hovered ? activeInk : idleInk)}
+          </InkContext.Provider>
+        </View>
       </View>
       <Text
         numberOfLines={1}
@@ -316,9 +398,19 @@ export function HubCardShell({
 }
 
 // ─────────── Card illustrations (minimal, monochrome) ───────────
+//
+// Family recipe applied to every tile in both Foundations and Components:
+//   1. Hairline 1.5px strokes everywhere — same draftsmanship vocabulary.
+//   2. Three-tier opacity ramp: 1.0 / 0.45 / 0.22 for clear hierarchy.
+//   3. Focal element framed by ambient context (a label, a paragraph line,
+//      a corner annotation) so the tile reads as "in use", not isolated.
+//   4. Radii vocabulary stays consistent: 4 utility, 6 cards, 9999 pills.
+//   5. One designer's note per tile — a tiny mark that elevates it from
+//      sketch to spec.
 
-const ILLO_W = 160;
-const ILLO_H = 96;
+const ILLO_W = 200;
+const ILLO_H = 116;
+const STROKE = 1.5;
 
 function IlloFrame({ children }: { children: React.ReactNode }) {
   return (
@@ -335,154 +427,258 @@ function IlloFrame({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Tiny "label" sliver — a hairline rounded bar at the given width / alpha.
+ * Used across every tile to evoke text without rendering Text (which would
+ * change the family between glyphic and skeleton tiles).
+ */
+function LabelBar({
+  width,
+  alpha = 0.45,
+  tone,
+  height = STROKE + 1,
+}: {
+  width: number;
+  alpha?: number;
+  tone: string;
+  height?: number;
+}) {
+  return (
+    <View
+      style={{
+        width,
+        height,
+        borderRadius: 1.5,
+        backgroundColor: tone,
+        opacity: alpha,
+      }}
+    />
+  );
+}
+
 function ColoursIllustration({ tone }: { tone: string }) {
-  // Three overlapping circular swatches.
+  // Three large discs overlapping (the focal "palette") with a thinner
+  // ring-only swatch at the back. Below: a ramp of four mini-swatches —
+  // suggesting the underlying base palette ramp. The combination reads as
+  // "tokens layered on a base scale" rather than a vague cluster.
   return (
     <IlloFrame>
-      <View style={{ flexDirection: "row" }}>
-        {[1, 0.55, 0.18].map((opacity, i) => (
+      <View style={{ alignItems: "center", gap: 12 }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {/* Outline-only "ghost" disc anchoring the back of the stack. */}
           <View
-            key={i}
             style={{
-              width: 56,
-              height: 56,
-              borderRadius: radius.rounded,
-              backgroundColor: tone,
-              opacity,
-              marginLeft: i === 0 ? 0 : -16,
+              width: 48,
+              height: 48,
+              borderRadius: 9999,
+              borderWidth: STROKE,
+              borderColor: tone,
+              opacity: 0.22,
+              marginRight: -22,
             }}
           />
-        ))}
+          {[0.22, 0.55, 1].map((opacity, i) => (
+            <View
+              key={i}
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 9999,
+                backgroundColor: tone,
+                opacity,
+                marginLeft: i === 0 ? 0 : -22,
+              }}
+            />
+          ))}
+        </View>
+        {/* Mini ramp — 6 swatches stepping in alpha, evoking a token scale. */}
+        <View style={{ flexDirection: "row", gap: 4 }}>
+          {[0.18, 0.3, 0.45, 0.6, 0.8, 1].map((a, i) => (
+            <View
+              key={i}
+              style={{
+                width: 14,
+                height: 8,
+                borderRadius: 2,
+                backgroundColor: tone,
+                opacity: a,
+              }}
+            />
+          ))}
+        </View>
       </View>
     </IlloFrame>
   );
 }
 
 function IconsIllustration({ tone }: { tone: string }) {
-  // 3x2 grid of icon-shaped squares with rounded corners.
+  // A miniature "icon library card" — a hairline search field on top with
+  // a magnifying glass + placeholder line, then a 4-column row of glyphs
+  // below. The composition reads as "a system of icons" rather than four
+  // disconnected shapes floating in space.
+  const Glyph = ({ kind }: { kind: "circle" | "square" | "diamond" | "plus" }) => (
+    <View
+      style={{
+        width: 20,
+        height: 20,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {kind === "circle" ? (
+        <View
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: 9999,
+            borderWidth: STROKE,
+            borderColor: tone,
+          }}
+        />
+      ) : kind === "square" ? (
+        <View
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: 3,
+            borderWidth: STROKE,
+            borderColor: tone,
+          }}
+        />
+      ) : kind === "diamond" ? (
+        <View
+          style={{
+            width: 12,
+            height: 12,
+            borderWidth: STROKE,
+            borderColor: tone,
+            borderRadius: 1.5,
+            transform: [{ rotate: "45deg" }],
+          }}
+        />
+      ) : (
+        <>
+          <View
+            style={{
+              position: "absolute",
+              width: 12,
+              height: STROKE,
+              backgroundColor: tone,
+            }}
+          />
+          <View
+            style={{
+              position: "absolute",
+              width: STROKE,
+              height: 12,
+              backgroundColor: tone,
+            }}
+          />
+        </>
+      )}
+    </View>
+  );
   return (
     <IlloFrame>
-      <View
-        style={{
-          width: 132,
-          height: 76,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: 8,
-        }}
-      >
-        {[
-          { kind: "square" },
-          { kind: "circle" },
-          { kind: "tri" },
-          { kind: "circle" },
-          { kind: "square" },
-          { kind: "tri" },
-        ].map((g, i) => (
-          <View
-            key={i}
-            style={{
-              width: 38,
-              height: 34,
-              borderRadius: g.kind === "circle" ? radius.rounded : radius["6"],
-              borderWidth: 2,
-              borderColor: tone,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {g.kind === "tri" ? (
-              <View
-                style={{
-                  width: 14,
-                  height: 14,
-                  backgroundColor: tone,
-                  transform: [{ rotate: "45deg" }],
-                }}
-              />
-            ) : g.kind === "square" ? (
-              <View
-                style={{
-                  width: 10,
-                  height: 10,
-                  backgroundColor: tone,
-                }}
-              />
-            ) : (
-              <View
-                style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: radius.rounded,
-                  backgroundColor: tone,
-                }}
-              />
-            )}
-          </View>
-        ))}
+      <View style={{ alignItems: "center", gap: 10 }}>
+        {/* Search field at the top */}
+        <View
+          style={{
+            width: 140,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderWidth: STROKE,
+            borderColor: tone,
+            borderRadius: 9999,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <Svg width={10} height={10} viewBox="0 0 12 12" fill="none">
+            <Circle cx="5" cy="5" r="3.25" stroke={tone} strokeWidth={1.25} />
+            <Path d="M7.6 7.6 L10 10" stroke={tone} strokeWidth={1.25} strokeLinecap="round" />
+          </Svg>
+          <LabelBar width={70} height={STROKE} alpha={0.45} tone={tone} />
+        </View>
+        {/* Icon row */}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 18 }}>
+          <Glyph kind="circle" />
+          <Glyph kind="square" />
+          <Glyph kind="diamond" />
+          <Glyph kind="plus" />
+        </View>
       </View>
     </IlloFrame>
   );
 }
 
 function IllustrationsIllustration({ tone }: { tone: string }) {
-  // Picture frame with a horizon-line motif inside.
+  // A scenic canvas — sun, mountain horizon (SVG polygon so the silhouette
+  // reads cleanly at small sizes), and a thin foreground line. Below the
+  // canvas: a tiny caption-line ribbon, as if this were a card with a name
+  // tag. Reads as "art in a frame" with intent.
   return (
     <IlloFrame>
-      <View
-        style={{
-          width: 120,
-          height: 80,
-          borderWidth: 2,
-          borderColor: tone,
-          borderRadius: radius["8"],
-          padding: 8,
-          gap: 6,
-          flexDirection: "column",
-        }}
-      >
-        <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-          <View
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: radius.rounded,
-              backgroundColor: tone,
-              opacity: 0.6,
-            }}
-          />
-        </View>
+      <View style={{ alignItems: "center", gap: 6 }}>
         <View
           style={{
-            flexDirection: "row",
-            alignItems: "flex-end",
-            gap: 6,
-            flex: 1,
+            width: 144,
+            height: 76,
+            borderWidth: STROKE,
+            borderColor: tone,
+            borderRadius: radius["6"],
+            overflow: "hidden",
+            justifyContent: "flex-end",
           }}
         >
+          <Svg
+            width={144 - STROKE * 2}
+            height={76 - STROKE * 2}
+            viewBox="0 0 142 74"
+            style={{ position: "absolute", top: 0, left: 0 }}
+          >
+            {/* Sun */}
+            <Circle cx={100} cy={22} r={10} fill={tone} opacity={0.55} />
+            {/* Back mountain */}
+            <Polygon
+              points="0,74 36,32 70,74"
+              fill={tone}
+              opacity={0.45}
+            />
+            {/* Front mountain */}
+            <Polygon
+              points="36,74 80,20 122,74"
+              fill={tone}
+              opacity={0.92}
+            />
+            {/* Far mountain — small */}
+            <Polygon
+              points="90,74 116,42 142,74"
+              fill={tone}
+              opacity={0.6}
+            />
+            {/* Horizon hairline at the base */}
+            <Path
+              d={`M0 74 L142 74`}
+              stroke={tone}
+              strokeWidth={STROKE}
+              opacity={0.18}
+            />
+          </Svg>
+        </View>
+        {/* Caption ribbon below the canvas */}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
           <View
             style={{
-              width: 24,
-              height: 28,
+              width: 6,
+              height: 6,
+              borderRadius: 9999,
               backgroundColor: tone,
-              opacity: 0.7,
+              opacity: 0.55,
             }}
           />
-          <View
-            style={{
-              width: 18,
-              height: 38,
-              backgroundColor: tone,
-            }}
-          />
-          <View
-            style={{
-              width: 30,
-              height: 22,
-              backgroundColor: tone,
-              opacity: 0.5,
-            }}
-          />
+          <LabelBar width={64} alpha={0.4} tone={tone} />
         </View>
       </View>
     </IlloFrame>
@@ -490,82 +686,157 @@ function IllustrationsIllustration({ tone }: { tone: string }) {
 }
 
 function RadiusIllustration({ tone }: { tone: string }) {
-  // Three squares moving from sharp → soft → fully rounded.
+  // Four squares stepping from sharp to pill — each annotated with a small
+  // L-shaped corner tick (the "spec annotation") at the top-left corner,
+  // turning the row from a row of shapes into a corner-radius spec sheet.
+  const Step = ({ r, alpha }: { r: number; alpha: number }) => (
+    <View
+      style={{
+        width: 36,
+        height: 36,
+        borderWidth: STROKE,
+        borderColor: tone,
+        borderRadius: r,
+        opacity: alpha,
+      }}
+    >
+      {/* Corner annotation — a tiny L shape just outside the shape's top-left
+          corner, only on the more-rounded steps so the eye picks up the
+          progression of curvature. */}
+      {r > 4 ? (
+        <View
+          style={{
+            position: "absolute",
+            top: r > 16 ? 8 : 4,
+            left: r > 16 ? 8 : 4,
+            width: 6,
+            height: 6,
+            borderTopWidth: STROKE,
+            borderLeftWidth: STROKE,
+            borderColor: tone,
+            opacity: 0.55,
+            borderTopLeftRadius: Math.min(r * 0.7, 4),
+          }}
+        />
+      ) : null}
+    </View>
+  );
   return (
     <IlloFrame>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 12,
-        }}
-      >
-        {[2, 12, radius.rounded].map((r, i) => (
-          <View
-            key={i}
-            style={{
-              width: 40,
-              height: 40,
-              borderWidth: 2,
-              borderColor: tone,
-              borderRadius: r,
-              opacity: 0.55 + i * 0.225,
-            }}
-          />
-        ))}
+      <View style={{ alignItems: "center", gap: 10 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          {([
+            [2, 0.45],
+            [8, 0.6],
+            [16, 0.78],
+            [9999, 1],
+          ] as const).map(([r, alpha], i) => (
+            <Step key={i} r={r} alpha={alpha} />
+          ))}
+        </View>
+        <LabelBar width={80} alpha={0.3} tone={tone} />
       </View>
     </IlloFrame>
   );
 }
 
 function SpacingIllustration({ tone }: { tone: string }) {
-  // A stack of horizontal bars at different lengths to evoke a spacing
-  // scale. Each bar steps up in width.
+  // Stack of bars stepping in width plus a vertical measurement bracket
+  // on the right side — the bracket is the designer's note that lifts this
+  // from "stacked bars" to "a measurement spec".
+  const widths = [40, 64, 88, 112, 136];
+  const totalHeight = widths.length * 5 + (widths.length - 1) * 8;
   return (
     <IlloFrame>
-      <View style={{ alignItems: "flex-start", gap: 8 }}>
-        {[40, 64, 96, 120].map((w, i) => (
+      <View style={{ alignItems: "center", gap: 8 }}>
+        <View style={{ flexDirection: "row", alignItems: "stretch", gap: 8 }}>
+          <View style={{ alignItems: "flex-start", gap: 8 }}>
+            {widths.map((w, i) => (
+              <View
+                key={i}
+                style={{
+                  width: w,
+                  height: 5,
+                  borderRadius: 1.5,
+                  backgroundColor: tone,
+                  opacity: 0.3 + i * 0.16,
+                }}
+              />
+            ))}
+          </View>
+          {/* Right-side measurement bracket — top + bottom tick + vertical
+              hairline = the spec mark. */}
           <View
-            key={i}
             style={{
-              width: w,
-              height: 6,
-              borderRadius: radius["2"],
-              backgroundColor: tone,
-              opacity: 0.45 + i * 0.18,
+              width: 8,
+              height: totalHeight,
+              alignItems: "flex-start",
+              justifyContent: "space-between",
             }}
-          />
-        ))}
+          >
+            <View style={{ width: 6, height: STROKE, backgroundColor: tone, opacity: 0.55 }} />
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: STROKE,
+                height: totalHeight,
+                backgroundColor: tone,
+                opacity: 0.4,
+              }}
+            />
+            <View style={{ width: 6, height: STROKE, backgroundColor: tone, opacity: 0.55 }} />
+          </View>
+        </View>
       </View>
     </IlloFrame>
   );
 }
 
 function TypographyIllustration({ tone }: { tone: string }) {
-  // Big "Aa" with a baseline.
+  // "Aa" letterforms with cap-height and baseline guides, plus a sample
+  // text line below the baseline (low-alpha) — turning the tile into a
+  // type specimen card.
   return (
     <IlloFrame>
-      <View style={{ alignItems: "center" }}>
-        <Text
-          style={{
-            fontFamily: "Noontree-Bold",
-            fontSize: 64,
-            lineHeight: 64,
-            letterSpacing: -2,
-            color: tone,
-          }}
-        >
-          Aa
-        </Text>
-        <View
-          style={{
-            marginTop: 8,
-            width: 96,
-            height: 2,
-            backgroundColor: tone,
-            opacity: 0.4,
-          }}
-        />
+      <View style={{ alignItems: "center", gap: 6 }}>
+        <View style={{ alignItems: "center" }}>
+          <View
+            style={{
+              width: 120,
+              height: STROKE,
+              backgroundColor: tone,
+              opacity: 0.22,
+              marginBottom: -2,
+            }}
+          />
+          <Text
+            style={{
+              fontFamily: "Noontree-Bold",
+              fontSize: 60,
+              lineHeight: 60,
+              letterSpacing: -1.5,
+              color: tone,
+            }}
+          >
+            Aa
+          </Text>
+          <View
+            style={{
+              marginTop: -2,
+              width: 120,
+              height: STROKE,
+              backgroundColor: tone,
+              opacity: 0.45,
+            }}
+          />
+        </View>
+        {/* Specimen line beneath the baseline */}
+        <View style={{ gap: 3, alignItems: "center" }}>
+          <LabelBar width={104} alpha={0.4} tone={tone} />
+          <LabelBar width={72} alpha={0.28} tone={tone} />
+        </View>
       </View>
     </IlloFrame>
   );

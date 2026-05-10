@@ -5,6 +5,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Icon } from "@field-ds/icons";
 import {
   SearchBar,
+  Switch as FieldSwitch,
   Toggle as FieldToggle,
   type SearchBarSize,
 } from "@field-ds/components";
@@ -155,7 +156,13 @@ export function SearchBarScreen({ navigation }: Props) {
         <PropList>
           <PropRow>
             <PropLabel>Size</PropLabel>
-            <SegmentedControl options={SIZES} value={size} onChange={setSize} />
+            <View style={{ minWidth: 220 }}>
+              <FieldSwitch<SearchBarSize>
+                options={SIZES.map((s) => ({ value: s, label: s }))}
+                value={size}
+                onChange={setSize}
+              />
+            </View>
           </PropRow>
           <PropRow alignTop>
             <PropLabel>Placeholder</PropLabel>
@@ -358,52 +365,3 @@ function DSTextInput({
   );
 }
 
-function SegmentedControl<T extends string>({
-  options,
-  value,
-  onChange,
-}: {
-  options: readonly T[];
-  value: T;
-  onChange: (next: T) => void;
-}) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        backgroundColor: colour.surface.muted,
-        borderRadius: radius.rounded,
-        padding: 2,
-      }}
-    >
-      {options.map((opt) => {
-        const active = opt === value;
-        return (
-          <Pressable
-            key={opt}
-            onPress={() => onChange(opt)}
-            style={{
-              paddingVertical: space["6"],
-              paddingHorizontal: space["12"],
-              borderRadius: radius.rounded,
-              backgroundColor: active ? colour.surface.primary : "transparent",
-            }}
-          >
-            <Text
-              style={[
-                textStyles.Body_B12_SemiBold,
-                {
-                  color: active
-                    ? colour["text-n-icon"].primary
-                    : colour["text-n-icon"].tertiary,
-                },
-              ]}
-            >
-              {opt}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}

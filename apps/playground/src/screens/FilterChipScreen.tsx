@@ -1,16 +1,18 @@
 import { useState, type ReactNode } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Text, TextInput, View } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
   FilterChip,
+  Switch as FieldSwitch,
   Toggle as FieldToggle,
   type FilterChipContent,
 } from "@field-ds/components";
 import type { IconName } from "@field-ds/icons";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
+import { Dropdown, type DropdownOption } from "../components/Dropdown";
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
 import { useShell } from "../theme/ThemeContext";
@@ -20,8 +22,9 @@ type Props = NativeStackScreenProps<RootStackParamList, "FilterChip">;
 
 const CONTENTS: FilterChipContent[] = ["label", "slot"];
 
-// Curated icon picker — small enough to fit in a row of swatches but covers
-// the chips designers actually reach for.
+// Curated icon picker — the chips designers actually reach for. Surfaced
+// via the generic <Dropdown> so the row stays compact and consistent with
+// the rest of the playground.
 const ICONS: IconName[] = [
   "system-preferences",
   "system-sort",
@@ -29,6 +32,14 @@ const ICONS: IconName[] = [
   "system-heart",
   "system-bag",
 ];
+
+const ICON_LABEL: Record<string, string> = {
+  "system-preferences": "Preferences",
+  "system-sort": "Sort",
+  "system-search": "Search",
+  "system-heart": "Heart",
+  "system-bag": "Bag",
+};
 
 export function FilterChipScreen({ navigation }: Props) {
   const [content, setContent] = useState<FilterChipContent>("label");
@@ -222,18 +233,20 @@ export function FilterChipScreen({ navigation }: Props) {
         <PropList>
           <PropRow>
             <PropLabel>Content</PropLabel>
-            <SegmentedControl
-              options={CONTENTS}
-              value={content}
-              onChange={setContent}
-            />
+            <View style={{ minWidth: 220 }}>
+              <FieldSwitch<FilterChipContent>
+                options={CONTENTS.map((c) => ({ value: c, label: c }))}
+                value={content}
+                onChange={setContent}
+              />
+            </View>
           </PropRow>
           <PropRow>
             <PropLabel>Label</PropLabel>
-            <SegmentedControl
-              options={["Filter", "Sort", "Category"] as const}
-              value={label as "Filter" | "Sort" | "Category"}
-              onChange={setLabel}
+            <DSTextInput
+              value={label}
+              onChangeText={setLabel}
+              placeholder="Filter"
             />
           </PropRow>
           <PropRow>
@@ -246,10 +259,15 @@ export function FilterChipScreen({ navigation }: Props) {
           </PropRow>
           <PropRow>
             <PropLabel>Glyph</PropLabel>
-            <SegmentedControl
-              options={ICONS}
+            <Dropdown<IconName>
               value={iconLeft}
               onChange={setIconLeft}
+              menuWidth={240}
+              options={ICONS.map<DropdownOption<IconName>>((g) => ({
+                value: g,
+                label: ICON_LABEL[g] ?? g,
+                icon: g,
+              }))}
             />
           </PropRow>
           <PropRow>
@@ -397,54 +415,44 @@ function Toggle({
   return <FieldToggle on={value} onChange={onValueChange} size="H20" />;
 }
 
-function SegmentedControl<T extends string>({
-  options,
+function DSTextInput({
   value,
-  onChange,
+  onChangeText,
+  placeholder,
 }: {
-  options: readonly T[];
-  value: T;
-  onChange: (next: T) => void;
+  value: string;
+  onChangeText: (v: string) => void;
+  placeholder?: string;
 }) {
   return (
     <View
       style={{
-        flexDirection: "row",
-        backgroundColor: colour.surface.muted,
-        borderRadius: radius.rounded,
-        padding: 2,
+        width: 240,
+        backgroundColor: colour.surface.primary,
+        borderWidth: 1,
+        borderColor: colour.border.primary,
+        borderRadius: radius["10"],
+        paddingHorizontal: space["12"],
+        paddingVertical: space["8"],
+        justifyContent: "center",
       }}
     >
-      {options.map((opt) => {
-        const active = opt === value;
-        return (
-          <Pressable
-            key={opt}
-            onPress={() => onChange(opt)}
-            style={{
-              paddingVertical: space["6"],
-              paddingHorizontal: space["12"],
-              borderRadius: radius.rounded,
-              backgroundColor: active
-                ? colour.surface.primary
-                : "transparent",
-            }}
-          >
-            <Text
-              style={[
-                textStyles.Body_B12_SemiBold,
-                {
-                  color: active
-                    ? colour["text-n-icon"].primary
-                    : colour["text-n-icon"].tertiary,
-                },
-              ]}
-            >
-              {opt}
-            </Text>
-          </Pressable>
-        );
-      })}
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={colour["text-n-icon"].muted}
+        // @ts-expect-error — outlineStyle is web-only and supported by RN-Web
+        style={[
+          textStyles.Body_B14_SemiBold,
+          {
+            color: colour["text-n-icon"].primary,
+            paddingTop: 0,
+            paddingBottom: 0,
+            outlineStyle: "none",
+          },
+        ]}
+      />
     </View>
   );
 }

@@ -12,6 +12,7 @@ import { Icon } from "@field-ds/icons";
 import { colour, radius, space, textStyles, type TextStyleName } from "@field-ds/tokens";
 
 import { useShell } from "../theme/ThemeContext";
+import { buildZip } from "../utils/zip";
 
 const NOONTREE_WEIGHTS = [
   "Light",
@@ -85,10 +86,7 @@ export function TypographyDownloadButton({
   const onLight = variant === "light";
   const downloadAll = async () => {
     if (Platform.OS !== "web") return;
-    for (const w of NOONTREE_WEIGHTS) {
-      downloadAsset(FONT_OTF[w], `Noontree-${w}.otf`);
-      await new Promise((r) => setTimeout(r, 120));
-    }
+    await downloadFontZip();
     onDone?.();
   };
   return (
@@ -350,10 +348,7 @@ export function TypographyContent({
 function NoontreeBanner({ onDownloaded }: { onDownloaded?: () => void }) {
   const downloadAll = async () => {
     if (Platform.OS !== "web") return;
-    for (const w of NOONTREE_WEIGHTS) {
-      downloadAsset(FONT_OTF[w], `Noontree-${w}.otf`);
-      await new Promise((r) => setTimeout(r, 120));
-    }
+    await downloadFontZip();
     onDownloaded?.();
   };
 
@@ -922,19 +917,52 @@ function prettyName(name: string) {
   return name.replace(/^(Heading|Body|Action)_/, "").replace(/_/g, " ");
 }
 
-function downloadAsset(asset: unknown, filename: string) {
+/**
+ * Resolve the bundler asset to a URL string. Metro's `require(*.otf)` returns
+ * either a string href or an object with a `uri` field depending on platform.
+ */
+function assetHref(asset: unknown): string {
+  if (typeof asset === "string") return asset;
+  if (
+    asset &&
+    typeof asset === "object" &&
+    "uri" in (asset as Record<string, unknown>)
+  ) {
+    return String((asset as { uri: string }).uri);
+  }
+  return "";
+}
+
+/**
+ * Fetch every Noontree weight, bundle them into a single STORE-method .zip,
+ * and trigger one download as `Noontree.zip`. The .otf files are already
+ * compressed internally, so a zip without deflate stays compact and fast.
+ */
+async function downloadFontZip() {
   if (typeof document === "undefined") return;
-  const href =
-    typeof asset === "string"
-      ? asset
-      : asset && typeof asset === "object" && "uri" in (asset as Record<string, unknown>)
-        ? String((asset as { uri: string }).uri)
-        : "";
-  if (!href) return;
+  const files = await Promise.all(
+    NOONTREE_WEIGHTS.map(async (w) => {
+      const href = assetHref(FONT_OTF[w]);
+      if (!href) return null;
+      const res = await fetch(href);
+      if (!res.ok) return null;
+      const data = new Uint8Array(await res.arrayBuffer());
+      return { name: `Noontree-${w}.otf`, data };
+    }),
+  );
+  const entries = files.filter((f): f is { name: string; data: Uint8Array } =>
+    f !== null,
+  );
+  if (entries.length === 0) return;
+  const blob = buildZip(entries);
+  const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = href;
-  a.download = filename;
+  a.href = url;
+  a.download = "Noontree.zip";
   document.body.appendChild(a);
   a.click();
   a.remove();
+  // Free the blob URL on the next tick — the browser has already opened the
+  // download stream by then.
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
 }

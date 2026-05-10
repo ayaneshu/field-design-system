@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
   RatingInput,
+  Switch as FieldSwitch,
   Toggle as FieldToggle,
   type RatingInputSize,
 } from "@field-ds/components";
@@ -17,7 +18,6 @@ import type { RootStackParamList } from "../navigation/types";
 type Props = NativeStackScreenProps<RootStackParamList, "RatingInput">;
 
 const SIZES: RatingInputSize[] = [20, 28, 32];
-const EMOJIS = ["😊", "🎉", "🔥", "❤️", "⭐"] as const;
 
 const FEEDBACK_LABELS = [
   "Tap a star to rate",
@@ -33,7 +33,6 @@ export function RatingInputScreen({ navigation }: Props) {
   const [size, setSize] = useState<RatingInputSize>(28);
   const [emojis, setEmojis] = useState(true);
   const [disabled, setDisabled] = useState(false);
-  const [emoji, setEmoji] = useState<string>("😊");
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -43,7 +42,6 @@ export function RatingInputScreen({ navigation }: Props) {
           onChange={setRating}
           size={size}
           emojis={emojis}
-          emoji={emoji}
           disabled={disabled}
         />
         <Text
@@ -135,28 +133,21 @@ export function RatingInputScreen({ navigation }: Props) {
         <PropList>
           <PropRow>
             <PropLabel>Size</PropLabel>
-            <SegmentedControl
-              options={SIZES}
-              value={size}
-              onChange={setSize}
-              format={(n) => `${n}px`}
-            />
+            <View style={{ minWidth: 240 }}>
+              <FieldSwitch<RatingInputSize>
+                options={SIZES.map((s) => ({ value: s, label: `${s}px` }))}
+                value={size}
+                onChange={setSize}
+              />
+            </View>
           </PropRow>
           <PropRow>
             <PropLabel>Emojis</PropLabel>
             <Toggle value={emojis} onValueChange={setEmojis} />
           </PropRow>
-          <PropRow>
+          <PropRow last>
             <PropLabel>Disabled</PropLabel>
             <Toggle value={disabled} onValueChange={setDisabled} />
-          </PropRow>
-          <PropRow last>
-            <PropLabel>Emoji</PropLabel>
-            <SegmentedControl
-              options={EMOJIS}
-              value={emoji}
-              onChange={setEmoji}
-            />
           </PropRow>
         </PropList>
       </DetailSection>
@@ -240,56 +231,3 @@ function Toggle({
   return <FieldToggle on={value} onChange={onValueChange} size="H20" />;
 }
 
-function SegmentedControl<T extends string | number>({
-  options,
-  value,
-  onChange,
-  format,
-}: {
-  options: readonly T[];
-  value: T;
-  onChange: (next: T) => void;
-  format?: (v: T) => string;
-}) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        backgroundColor: colour.surface.muted,
-        borderRadius: radius.rounded,
-        padding: 2,
-      }}
-    >
-      {options.map((opt) => {
-        const active = opt === value;
-        return (
-          <Pressable
-            key={String(opt)}
-            onPress={() => onChange(opt)}
-            style={{
-              paddingVertical: space["6"],
-              paddingHorizontal: space["12"],
-              borderRadius: radius.rounded,
-              backgroundColor: active
-                ? colour.surface.primary
-                : "transparent",
-            }}
-          >
-            <Text
-              style={[
-                textStyles.Body_B12_SemiBold,
-                {
-                  color: active
-                    ? colour["text-n-icon"].primary
-                    : colour["text-n-icon"].tertiary,
-                },
-              ]}
-            >
-              {format ? format(opt) : String(opt)}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}

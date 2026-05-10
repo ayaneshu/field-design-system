@@ -613,87 +613,135 @@ function DesignDevelopToggle({
   );
 }
 
+const COMPONENTS_SRC_BASE =
+  "https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src";
+
+/**
+ * Normalise the per-screen `repoUrl` into the **component folder** URL we
+ * want "Open Github" to land on. Each component on disk lives under
+ * `packages/components/src/<Folder>/`; the screens historically passed file
+ * paths in a couple of different shapes:
+ *
+ *   - `.../packages/components/src/Button/PrimaryButton.tsx`  → "Button"
+ *   - `.../packages/components/src/Checkbox.tsx`              → "Checkbox"
+ *   - `.../apps/playground/src/components/Accordion.tsx`      → "Accordion"
+ *
+ * Strategy:
+ *   1. If the URL has `/components/src/`, take the next segment.
+ *   2. Otherwise fall back to the URL's basename (strip the `.tsx`).
+ *   3. Build the folder URL from the canonical components base.
+ */
+function repoFolderUrl(repoUrl: string): string {
+  const marker = "/components/src/";
+  let folder = "";
+  const idx = repoUrl.indexOf(marker);
+  if (idx !== -1) {
+    folder = repoUrl.slice(idx + marker.length).split("/")[0];
+  } else {
+    const last = repoUrl.split("/").pop() ?? "";
+    folder = last;
+  }
+  folder = folder.replace(/\.tsx$/i, "");
+  if (!folder) return repoUrl;
+  return `${COMPONENTS_SRC_BASE}/${folder}`;
+}
+
 function DevelopPanel({ repoUrl }: { repoUrl: string }) {
   const { shell } = useTheme();
+  const folderUrl = repoFolderUrl(repoUrl);
   const open = () => {
     if (Platform.OS === "web" && typeof window !== "undefined") {
-      window.open(repoUrl, "_blank", "noopener,noreferrer");
+      window.open(folderUrl, "_blank", "noopener,noreferrer");
       return;
     }
-    Linking.openURL(repoUrl).catch(() => {});
+    Linking.openURL(folderUrl).catch(() => {});
   };
+
   return (
     <View>
-      <Text
-        style={[
-          textStyles.Heading_H24_Bold,
-          { color: shell.textPrimary, marginBottom: space["20"] },
-        ]}
-      >
-        Source
-      </Text>
-      <Pressable
-        onPress={open}
-        accessibilityRole="link"
-        accessibilityLabel={`Open ${repoUrl} on GitHub`}
-        // @ts-expect-error hover
-        style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => ({
+      <View
+        style={{
           flexDirection: "row",
           alignItems: "center",
-          gap: space["16"],
-          padding: space["20"],
-          borderRadius: radius["16"],
-          borderWidth: 1,
-          borderColor: shell.border,
-          backgroundColor: hovered ? shell.sidebarRowHoverBg : "transparent",
-          opacity: pressed ? 0.88 : 1,
-          // @ts-expect-error rn-web passes CSS transition props through
-          transitionProperty: "background-color",
-          transitionDuration: "150ms",
-          transitionTimingFunction: "ease-out",
-        })}
+          paddingBottom: space["16"],
+          borderBottomWidth: 1,
+          borderBottomColor: shell.border,
+        }}
       >
-        <View
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: radius.rounded,
-            backgroundColor: shell.sidebarBg,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Icon
-            name="system-link"
-            size={20}
-            color={colour["text-n-icon"].primary}
-          />
-        </View>
-        <View style={{ flex: 1, minWidth: 0 }}>
+        <ColumnLabel flex={2} color={shell.textTertiary}>Library</ColumnLabel>
+        <ColumnLabel flex={2} color={shell.textTertiary}>Version</ColumnLabel>
+        <ColumnLabel flex={3} color={shell.textTertiary}>Link</ColumnLabel>
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingTop: space["20"],
+        }}
+      >
+        <View style={{ flex: 2 }}>
           <Text
             style={[
               textStyles.Body_B16_SemiBold,
               { color: shell.textPrimary },
             ]}
           >
-            View on GitHub
-          </Text>
-          <Text
-            numberOfLines={1}
-            style={[
-              textStyles.Body_B12_Regular,
-              { color: shell.textTertiary, marginTop: 2 },
-            ]}
-          >
-            {repoUrl}
+            React Native
           </Text>
         </View>
-        <Icon
-          name="system-arrow-up-right"
-          size={18}
-          color={colour["text-n-icon"].secondary}
-        />
-      </Pressable>
+        <View style={{ flex: 2 }}>
+          <Text
+            style={[
+              textStyles.Body_B16_Regular,
+              { color: shell.textSecondary },
+            ]}
+          >
+            —
+          </Text>
+        </View>
+        <View style={{ flex: 3 }}>
+          <Pressable
+            onPress={open}
+            accessibilityRole="link"
+            accessibilityLabel={`Open ${folderUrl} on GitHub`}
+            // @ts-expect-error hover is web-only
+            style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => ({
+              alignSelf: "flex-start",
+              opacity: pressed ? 0.7 : 1,
+              // @ts-expect-error cursor is web-only
+              cursor: "pointer",
+              // @ts-expect-error textDecoration is web-only
+              textDecoration: hovered ? "underline" : "none",
+            })}
+          >
+            <Text
+              style={[
+                textStyles.Body_B16_SemiBold,
+                { color: colour["text-n-icon"].action },
+              ]}
+            >
+              Open Github
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function ColumnLabel({
+  children,
+  flex,
+  color,
+}: {
+  children: ReactNode;
+  flex: number;
+  color: string;
+}) {
+  return (
+    <View style={{ flex }}>
+      <Text style={[textStyles.Body_B14_Regular, { color }]}>{children}</Text>
     </View>
   );
 }
