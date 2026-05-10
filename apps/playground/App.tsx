@@ -31,6 +31,12 @@ import { BottomNavScreen } from "./src/screens/BottomNavScreen";
 import { InputTextScreen } from "./src/screens/InputTextScreen";
 import { InputTextareaScreen } from "./src/screens/InputTextareaScreen";
 import { ListItemScreen } from "./src/screens/ListItemScreen";
+import { PageHeaderScreen } from "./src/screens/PageHeaderScreen";
+import { RadioScreen } from "./src/screens/RadioScreen";
+import { RatingInputScreen } from "./src/screens/RatingInputScreen";
+import { SearchBarScreen } from "./src/screens/SearchBarScreen";
+import { SwitchScreen } from "./src/screens/SwitchScreen";
+import { ToggleScreen } from "./src/screens/ToggleScreen";
 import type { RootStackParamList } from "./src/navigation/types";
 import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
 
@@ -121,6 +127,12 @@ function ThemedNavigationShell() {
           component={InputTextareaScreen}
         />
         <RootStack.Screen name="ListItem" component={ListItemScreen} />
+        <RootStack.Screen name="PageHeader" component={PageHeaderScreen} />
+        <RootStack.Screen name="Radio" component={RadioScreen} />
+        <RootStack.Screen name="RatingInput" component={RatingInputScreen} />
+        <RootStack.Screen name="SearchBar" component={SearchBarScreen} />
+        <RootStack.Screen name="Switch" component={SwitchScreen} />
+        <RootStack.Screen name="Toggle" component={ToggleScreen} />
       </RootStack.Navigator>
     </NavigationContainer>
   );

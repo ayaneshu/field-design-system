@@ -120,6 +120,24 @@ export function componentsSidebar(activeKey: string): SidebarItem[] {
       label: "List Item",
       active: activeKey === "ListItem",
     },
+    {
+      key: "PageHeader",
+      label: "Page Header",
+      active: activeKey === "PageHeader",
+    },
+    { key: "Radio", label: "Radio", active: activeKey === "Radio" },
+    {
+      key: "RatingInput",
+      label: "Rating Input",
+      active: activeKey === "RatingInput",
+    },
+    {
+      key: "SearchBar",
+      label: "Search Bar",
+      active: activeKey === "SearchBar",
+    },
+    { key: "Switch", label: "Switch", active: activeKey === "Switch" },
+    { key: "Toggle", label: "Toggle", active: activeKey === "Toggle" },
   ];
 }
 

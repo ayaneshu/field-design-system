@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from "react";
 import {
   Pressable,
-  Switch,
   Text,
   TextInput,
   View,
@@ -11,7 +10,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Icon } from "@field-ds/icons";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
-import { Accordion } from "@field-ds/components";
+import { Accordion, Toggle as FieldToggle } from "@field-ds/components";
 
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
@@ -270,20 +269,7 @@ function DSSwitch({
   value: boolean;
   onValueChange: (v: boolean) => void;
 }) {
-  return (
-    <Switch
-      value={value}
-      onValueChange={onValueChange}
-      trackColor={{
-        false: colour.surface.muted,
-        true: colour["text-n-icon"].action,
-      }}
-      thumbColor={colour.surface.primary}
-      ios_backgroundColor={colour.surface.muted}
-      // @ts-expect-error — react-native-web supports activeThumbColor
-      activeThumbColor={colour.surface.primary}
-    />
-  );
+  return <FieldToggle on={value} onChange={onValueChange} size="H20" />;
 }
 
 function DSTextInput({

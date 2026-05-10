@@ -1,6 +1,14 @@
 export { Accordion, type AccordionProps } from "./Accordion";
+export {
+  Switch,
+  type SwitchProps,
+  type SwitchSize,
+  type SwitchOption,
+} from "./Switch";
+export { Toggle, type ToggleProps, type ToggleSize } from "./Toggle";
 export { ListItem, type ListItemProps, type ListItemSize } from "./ListItem";
 export { Checkbox, type CheckboxProps, type CheckboxSize } from "./Checkbox";
+export { Radio, type RadioProps, type RadioSize } from "./Radio";
 export {
   FilterChip,
   type FilterChipProps,
@@ -32,6 +40,23 @@ export {
   type InputTextLabelMode,
 } from "./InputText";
 export { InputTextarea, type InputTextareaProps } from "./InputTextarea";
+export {
+  SearchBar,
+  type SearchBarProps,
+  type SearchBarRef,
+  type SearchBarSize,
+} from "./SearchBar";
+export {
+  PageHeader,
+  type PageHeaderProps,
+  type PageHeaderType,
+  type PageHeaderTrailing,
+} from "./PageHeader";
+export {
+  RatingInput,
+  type RatingInputProps,
+  type RatingInputSize,
+} from "./RatingInput";
 export {
   PrimaryButton,
   SecondaryButton,

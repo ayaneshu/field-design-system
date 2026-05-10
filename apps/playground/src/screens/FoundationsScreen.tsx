@@ -7,12 +7,13 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { colour, radius, space } from "@field-ds/tokens";
+import { base, colour, radius, space } from "@field-ds/tokens";
 
 import { CopyToast } from "../components/CopyToast";
 import { PageScaffold, type SidebarItem } from "../components/PageScaffold";
 import { ViewToggle, type ViewMode } from "../components/ViewToggle";
 import { useCopy } from "../hooks/useCopy";
+import { useTheme } from "../theme/ThemeContext";
 import { ColorsContent } from "../sections/ColorsContent";
 import { TypographyContent } from "../sections/TypographyContent";
 import { IconsContent } from "../sections/IconsContent";
@@ -202,6 +203,31 @@ function HubCardView({
  * illustration; hover fills the tile with the brand action colour and
  * inverts the illustration ink to white so the motif still reads.
  */
+// Hover palette — one of these tokens is picked at random every time the
+// pointer enters a thumbnail, so the same card cycles through different hues
+// across multiple hovers. Each entry is the saturated 700-shade pulled from
+// the base colour ramps in @field-ds/tokens (mint = the emerald ramp, which
+// is the system's green-teal mint).
+const HOVER_PALETTE: readonly string[] = [
+  base.colour["brand-blue"]["700"],
+  base.colour.red["700"],
+  base.colour.orange["700"],
+  base.colour.noon["600"],
+  base.colour.purple["700"],
+  base.colour.green["700"],
+  base.colour.emerald["700"],
+];
+
+function pickRandomHoverColor(prev?: string | null): string {
+  // Bias toward "different from last" — if we'd repeat the previous colour,
+  // re-roll once so consecutive hovers feel varied.
+  const next = HOVER_PALETTE[Math.floor(Math.random() * HOVER_PALETTE.length)];
+  if (next === prev && HOVER_PALETTE.length > 1) {
+    return HOVER_PALETTE[(HOVER_PALETTE.indexOf(next) + 1) % HOVER_PALETTE.length];
+  }
+  return next;
+}
+
 export function HubCardShell({
   label,
   cardsPerRow,
@@ -213,17 +239,31 @@ export function HubCardShell({
   onPress: () => void;
   renderIllustration: (tone: string) => ReactNode;
 }) {
+  const { mode, shell } = useTheme();
   const [hovered, setHovered] = useState(false);
   const [pressed, setPressed] = useState(false);
-  const idleBg = colour.surface.tertiary;
-  const idleInk = colour["text-n-icon"].primary;
-  const activeBg = colour["text-n-icon"].action;
+  // Active hover colour is rolled fresh on each hover-in so the thumbnail
+  // doesn't always flash the same accent.
+  const [activeBg, setActiveBg] = useState<string>(() =>
+    pickRandomHoverColor(null),
+  );
+  // Idle thumbnail palette flips with the shell theme. In light mode we keep
+  // the original soft surface + dark navy ink; in dark mode the card surface
+  // matches the sidebar (rather than staying as a light island) and the
+  // illustration ink lifts to the primary text token so the motif still
+  // reads against the dark fill.
+  const idleBg = mode === "dark" ? shell.sidebarBg : colour.surface.tertiary;
+  const idleInk =
+    mode === "dark" ? shell.textPrimary : colour["text-n-icon"].primary;
   const activeInk = colour.surface.primary;
 
   return (
     <Pressable
       onPress={onPress}
-      onHoverIn={() => setHovered(true)}
+      onHoverIn={() => {
+        setActiveBg((prev) => pickRandomHoverColor(prev));
+        setHovered(true);
+      }}
       onHoverOut={() => setHovered(false)}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
@@ -266,7 +306,7 @@ export function HubCardShell({
           fontSize: 18,
           lineHeight: 24,
           letterSpacing: -0.15,
-          color: colour["text-n-icon"].primary,
+          color: shell.textPrimary,
         }}
       >
         {label}

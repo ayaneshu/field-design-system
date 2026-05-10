@@ -396,11 +396,17 @@ function BloomOverlay({
   const radius = active ? 2600 : 0;
   const tracking = -titleFontSize * 0.04;
   if (Platform.OS !== "web") return null;
-  // Bloom shows the opposite theme: light-mode page reveals dark, dark
-  // reveals light.
-  const isInvertedDark = mode === "light";
-  const veilBg = isInvertedDark ? "#000000" : "#ffffff";
-  const titleGradient = isInvertedDark ? SILVER_GRADIENT : STEEL_GRADIENT;
+  // Bloom is the inverted theme of the underlying page:
+  //  - Light-mode page (white) → dark bloom: black veil, silver shimmer
+  //    title, light (white) particles.
+  //  - Dark-mode page (black)  → light bloom: white veil, dark-steel
+  //    shimmer title, dark (black) particles.
+  // Particle tone always matches the OPPOSITE of the page's surface so the
+  // dots stay readable inside the inverted veil.
+  const isLightPage = mode === "light";
+  const veilBg = isLightPage ? "#000000" : "#ffffff";
+  const titleGradient = isLightPage ? SILVER_GRADIENT : STEEL_GRADIENT;
+  const particleTone: "light" | "dark" = isLightPage ? "light" : "dark";
   return (
     <View
       pointerEvents="none"
@@ -420,12 +426,14 @@ function BloomOverlay({
         zIndex: 50,
       }}
     >
-      <ParticleImageField active={active} tone={isInvertedDark ? "light" : "dark"} />
+      <ParticleImageField active={active} tone={particleTone} />
 
       {/* Inverted-mode duplicate of the "field" title — positioned over
           the underlying original so when the bloom passes the title
           bounds the user sees it flip from one finish to the other in
-          place. */}
+          place. Dark-mode page already shows silver underneath, but we
+          still render the duplicate so the bloom layer paints a clean
+          title rather than punching a transparent hole through itself. */}
       <Text
         // @ts-expect-error web-only background-clip / animation props
         style={{
