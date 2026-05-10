@@ -21,7 +21,7 @@ import {
   SegmentedControl,
   Toggle,
 } from "../components/playground-controls";
-import { componentsSidebar } from "../navigation/sidebars";
+import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "TextButton">;
@@ -86,10 +86,7 @@ export function TextButtonScreen({ navigation }: Props) {
       version="V0.1"
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Button/TextButton.tsx"
       sidebar={componentsSidebar("TextButton")}
-      onSidebarSelect={(key) => {
-        if (key === "all") navigation.navigate("Components" as never);
-        else navigation.navigate(key as never);
-      }}
+      onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
     >
       <DetailSection
         heading="Playground"

@@ -244,7 +244,7 @@
           "letterSpacing": "{font.body.b14.letter-spacing}",
           "lineHeight": "{font.body.b14.line-height}",
           "textTransform": "none",
-          "textDecoration": "none"
+          "textDecoration": "line-through"
         }
       }
     },
@@ -306,7 +306,7 @@
           "letterSpacing": "{font.body.b12.letter-spacing}",
           "lineHeight": "{font.body.b12.line-height}",
           "textTransform": "none",
-          "textDecoration": "none"
+          "textDecoration": "line-through"
         }
       }
     },
@@ -368,7 +368,7 @@
           "letterSpacing": "{font.body.b11.letter-spacing}",
           "lineHeight": "{font.body.b11.line-height}",
           "textTransform": "none",
-          "textDecoration": "none"
+          "textDecoration": "line-through"
         }
       }
     }

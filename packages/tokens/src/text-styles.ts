@@ -148,6 +148,7 @@ export const textStyles = {
     fontWeight: "400",
     lineHeight: 18,
     letterSpacing: -0.1,
+    textDecorationLine: "line-through",
   },
   Body_B12_Regular: {
     fontFamily: "Noontree-Regular",
@@ -183,6 +184,7 @@ export const textStyles = {
     fontWeight: "400",
     lineHeight: 16,
     letterSpacing: -0.1,
+    textDecorationLine: "line-through",
   },
   Body_B11_Regular: {
     fontFamily: "Noontree-Regular",
@@ -218,6 +220,7 @@ export const textStyles = {
     fontWeight: "400",
     lineHeight: 14,
     letterSpacing: -0.1,
+    textDecorationLine: "line-through",
   },
   Action_A17_SemiBold: {
     fontFamily: "Noontree-SemiBold",

@@ -5,6 +5,15 @@ import { radius, space, textStyles, type FieldTextStyle } from "@field-ds/tokens
 // the rectangular Button enforces it via the variant/size combinations.
 export type ButtonSize = "H56" | "H52" | "H48" | "H40" | "H36" | "H32";
 
+// Variants of the rectangular Button (mirrors ButtonVariant in Button.tsx).
+// Kept in sizing.ts so getButtonSpec() can resolve the per-variant H40 override
+// without importing from Button.tsx (would be a cycle).
+export type RectButtonVariant =
+  | "primary"
+  | "secondary"
+  | "secondary-neutral"
+  | "neutral";
+
 export type ButtonSizeSpec = {
   height: number;
   paddingX: number;
@@ -14,12 +23,14 @@ export type ButtonSizeSpec = {
   iconSize: number;
   spinnerSize: number;
   text: FieldTextStyle;
+  // Token name (e.g. "textStyles.Action_A14_SemiBold") emitted as a dataSet
+  // attribute for the design-system audit tooling.
+  textStyleName: string;
 };
 
-// One row per Figma height variant. Padding/radius/icon/text values lifted
-// verbatim from M-Button/Primary-Button (Figma 596:201) — every other rect
-// variant inherits the same dimensions, only the surface/border/text colour
-// changes per variant.
+// Default per-size spec. H56/H52/H48/H36/H32 are uniform across all rectangular
+// variants. H40 is the odd one out — Primary uses tighter padding/radius/icon
+// than the outline + neutral variants — and is overridden via getButtonSpec().
 export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
   H56: {
     height: 56,
@@ -30,6 +41,7 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     iconSize: 24,
     spinnerSize: 24,
     text: textStyles.Action_A17_SemiBold,
+    textStyleName: "textStyles.Action_A17_SemiBold",
   },
   H52: {
     height: 52,
@@ -40,6 +52,7 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     iconSize: 24,
     spinnerSize: 24,
     text: textStyles.Action_A16_SemiBold,
+    textStyleName: "textStyles.Action_A16_SemiBold",
   },
   H48: {
     height: 48,
@@ -50,7 +63,10 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     iconSize: 20,
     spinnerSize: 20,
     text: textStyles.Action_A14_SemiBold,
+    textStyleName: "textStyles.Action_A14_SemiBold",
   },
+  // Default H40 = Primary footprint (12px padding, gap 4, radius 8, 16px icon).
+  // Other variants override via BUTTON_SIZE_H40_OVERRIDES.
   H40: {
     height: 40,
     paddingX: space["12"],
@@ -60,6 +76,7 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     iconSize: 16,
     spinnerSize: 16,
     text: textStyles.Action_A12_SemiBold,
+    textStyleName: "textStyles.Action_A12_SemiBold",
   },
   H36: {
     height: 36,
@@ -70,6 +87,7 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     iconSize: 16,
     spinnerSize: 16,
     text: textStyles.Action_A12_SemiBold,
+    textStyleName: "textStyles.Action_A12_SemiBold",
   },
   H32: {
     height: 32,
@@ -80,8 +98,62 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     iconSize: 16,
     spinnerSize: 16,
     text: textStyles.Action_A12_SemiBold,
+    textStyleName: "textStyles.Action_A12_SemiBold",
   },
 };
+
+// Per-variant H40 overrides. Lifted from Figma Button page (node 178:2):
+//   secondary         → 16×10 padding, gap 6, radius 10, 20px icon, A12 text
+//   secondary-neutral → 16×12 padding, gap 6, radius 10, 20px icon, A14 text
+//   neutral           → 16×12 padding, gap 6, radius 10, 20px icon, A14 text
+const BUTTON_SIZE_H40_OVERRIDES: Partial<
+  Record<RectButtonVariant, ButtonSizeSpec>
+> = {
+  secondary: {
+    height: 40,
+    paddingX: space["16"],
+    paddingY: space["10"],
+    radius: radius["10"],
+    gap: space["6"],
+    iconSize: 20,
+    spinnerSize: 18,
+    text: textStyles.Action_A12_SemiBold,
+    textStyleName: "textStyles.Action_A12_SemiBold",
+  },
+  "secondary-neutral": {
+    height: 40,
+    paddingX: space["16"],
+    paddingY: space["12"],
+    radius: radius["10"],
+    gap: space["6"],
+    iconSize: 20,
+    spinnerSize: 18,
+    text: textStyles.Action_A14_SemiBold,
+    textStyleName: "textStyles.Action_A14_SemiBold",
+  },
+  neutral: {
+    height: 40,
+    paddingX: space["16"],
+    paddingY: space["12"],
+    radius: radius["10"],
+    gap: space["6"],
+    iconSize: 20,
+    spinnerSize: 20,
+    text: textStyles.Action_A14_SemiBold,
+    textStyleName: "textStyles.Action_A14_SemiBold",
+  },
+};
+
+export function getButtonSpec(
+  variant: RectButtonVariant,
+  size: ButtonSize,
+): ButtonSizeSpec {
+  if (size === "H40") {
+    const override = BUTTON_SIZE_H40_OVERRIDES[variant];
+    if (override) return override;
+  }
+  return BUTTON_SIZE[size];
+}
 
 // CSS-only press transition. Native ignores these — the press surface there
 // just snaps. Matches the curve used elsewhere (Accordion / Checkbox). Cast

@@ -20,24 +20,23 @@ Then open the Accordion stories in the sidebar.
 import { Accordion } from "@field-ds/components";
 import { Icon } from "@field-ds/icons";
 
-// Uncontrolled
-<Accordion title="Delivery" body="Same-day delivery available across UAE." />
+// Uncontrolled — children fills the content slot
+<Accordion title="Delivery">Same-day delivery available across UAE.</Accordion>
 
 // With initial open state
-<Accordion
-  title="Returns policy"
-  body="Returns accepted within 14 days."
-  defaultExpanded
-/>
+<Accordion title="Returns policy" defaultExpanded>
+  Returns accepted within 14 days.
+</Accordion>
 
-// Controlled
+// Controlled, with a custom node in the slot
 <Accordion
   title="Specifications"
-  body={<SpecsTable />}
   expanded={open}
   onExpandedChange={setOpen}
   iconLeft={<Icon name="system-info" size={20} />}
-/>
+>
+  <SpecsTable />
+</Accordion>
 ```
 
 ## Props
@@ -45,12 +44,18 @@ import { Icon } from "@field-ds/icons";
 | Prop                | Type                          | Default | Notes                                                              |
 | ------------------- | ----------------------------- | ------- | ------------------------------------------------------------------ |
 | `title`             | `string`                      | —       | Header text. Truncates to one line.                                |
-| `body`              | `ReactNode`                   | —       | String renders as `Body_B14_Regular`; nodes render as-is.          |
+| `children`          | `ReactNode`                   | —       | Content slot. Strings auto-wrap in `Body_B14_Regular`; nodes render as-is. |
 | `expanded`          | `boolean`                     | —       | Controlled open state. Omit to use uncontrolled.                   |
 | `defaultExpanded`   | `boolean`                     | `false` | Initial open state in uncontrolled mode.                           |
 | `onExpandedChange`  | `(next: boolean) => void`     | —       | Fires after the user toggles.                                      |
 | `iconLeft`          | `ReactNode`                   | —       | Optional 20×20 icon shown left of the title.                       |
 | `style`             | `StyleProp<ViewStyle>`        | —       | Forwarded to the outer container.                                  |
+
+## Content slot
+
+The body is a slot — anything passed as `children` renders inside the expanded
+panel. Pass a string for the default `Body_B14_Regular` text, or any React node
+to compose custom content (lists, tables, forms, etc).
 
 ## Animation
 

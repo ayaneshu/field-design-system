@@ -16,12 +16,21 @@ import { ComponentsListScreen } from "./src/screens/ComponentsListScreen";
 import { PatternsScreen } from "./src/screens/PatternsScreen";
 import { IllustrationsScreen } from "./src/screens/IllustrationsScreen";
 import { AccordionScreen } from "./src/screens/AccordionScreen";
-import { ButtonScreen } from "./src/screens/ButtonScreen";
+import { PrimaryButtonScreen } from "./src/screens/PrimaryButtonScreen";
+import { SecondaryButtonScreen } from "./src/screens/SecondaryButtonScreen";
+import { SecondaryNeutralButtonScreen } from "./src/screens/SecondaryNeutralButtonScreen";
+import { NeutralButtonScreen } from "./src/screens/NeutralButtonScreen";
 import { RoundButtonScreen } from "./src/screens/RoundButtonScreen";
 import { TextButtonScreen } from "./src/screens/TextButtonScreen";
 import { IconButtonScreen } from "./src/screens/IconButtonScreen";
 import { CheckboxScreen } from "./src/screens/CheckboxScreen";
+import { DividerScreen } from "./src/screens/DividerScreen";
+import { FilterChipScreen } from "./src/screens/FilterChipScreen";
+import { InfoBannerScreen } from "./src/screens/InfoBannerScreen";
 import { BottomNavScreen } from "./src/screens/BottomNavScreen";
+import { InputTextScreen } from "./src/screens/InputTextScreen";
+import { InputTextareaScreen } from "./src/screens/InputTextareaScreen";
+import { ListItemScreen } from "./src/screens/ListItemScreen";
 import type { RootStackParamList } from "./src/navigation/types";
 import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
 
@@ -79,12 +88,39 @@ function ThemedNavigationShell() {
         <RootStack.Screen name="Patterns" component={PatternsScreen} />
         <RootStack.Screen name="Illustrations" component={IllustrationsScreen} />
         <RootStack.Screen name="Accordion" component={AccordionScreen} />
-        <RootStack.Screen name="Button" component={ButtonScreen} />
+        <RootStack.Screen
+          name="PrimaryButton"
+          component={PrimaryButtonScreen}
+        />
+        <RootStack.Screen
+          name="SecondaryButton"
+          component={SecondaryButtonScreen}
+        />
+        <RootStack.Screen
+          name="SecondaryNeutralButton"
+          component={SecondaryNeutralButtonScreen}
+        />
+        <RootStack.Screen
+          name="NeutralButton"
+          component={NeutralButtonScreen}
+        />
         <RootStack.Screen name="RoundButton" component={RoundButtonScreen} />
         <RootStack.Screen name="TextButton" component={TextButtonScreen} />
         <RootStack.Screen name="IconButton" component={IconButtonScreen} />
         <RootStack.Screen name="Checkbox" component={CheckboxScreen} />
+        <RootStack.Screen name="Divider" component={DividerScreen} />
+        <RootStack.Screen name="FilterChip" component={FilterChipScreen} />
+        <RootStack.Screen
+          name="InfoBanner"
+          component={InfoBannerScreen}
+        />
         <RootStack.Screen name="BottomNav" component={BottomNavScreen} />
+        <RootStack.Screen name="InputText" component={InputTextScreen} />
+        <RootStack.Screen
+          name="InputTextarea"
+          component={InputTextareaScreen}
+        />
+        <RootStack.Screen name="ListItem" component={ListItemScreen} />
       </RootStack.Navigator>
     </NavigationContainer>
   );

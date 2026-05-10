@@ -5,6 +5,10 @@ import { radius } from "@field-ds/tokens";
 
 import { PageScaffold, type SidebarItem } from "../components/PageScaffold";
 import { HubCardShell } from "./FoundationsScreen";
+import {
+  componentsSidebar,
+  navigateFromSidebar,
+} from "../navigation/sidebars";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Components">;
@@ -19,17 +23,62 @@ type ComponentEntry = {
 const COMPONENTS: ComponentEntry[] = [
   { route: "Accordion", name: "Accordion", illustration: AccordionIllustration },
   { route: "BottomNav", name: "BottomNav", illustration: BottomNavIllustration },
-  { route: "Button", name: "Button", illustration: ButtonIllustration },
   { route: "Checkbox", name: "Checkbox", illustration: CheckboxIllustration },
+  { route: "Divider", name: "Divider", illustration: DividerIllustration },
+  {
+    route: "FilterChip",
+    name: "Filter Chip",
+    illustration: FilterChipIllustration,
+  },
   {
     route: "IconButton",
     name: "Icon Button",
     illustration: IconButtonIllustration,
   },
   {
+    route: "InfoBanner",
+    name: "Info Banner",
+    illustration: InfoBannerIllustration,
+  },
+  {
+    route: "InputText",
+    name: "Input Text",
+    illustration: InputTextIllustration,
+  },
+  {
+    route: "InputTextarea",
+    name: "Input Textarea",
+    illustration: InputTextareaIllustration,
+  },
+  {
+    route: "ListItem",
+    name: "List Item",
+    illustration: ListItemIllustration,
+  },
+  {
+    route: "NeutralButton",
+    name: "Neutral Button",
+    illustration: NeutralButtonIllustration,
+  },
+  {
+    route: "PrimaryButton",
+    name: "Primary Button",
+    illustration: PrimaryButtonIllustration,
+  },
+  {
     route: "RoundButton",
     name: "Round Button",
     illustration: RoundButtonIllustration,
+  },
+  {
+    route: "SecondaryButton",
+    name: "Secondary Button",
+    illustration: SecondaryButtonIllustration,
+  },
+  {
+    route: "SecondaryNeutralButton",
+    name: "Secondary Neutral Button",
+    illustration: SecondaryNeutralButtonIllustration,
   },
   {
     route: "TextButton",
@@ -39,15 +88,13 @@ const COMPONENTS: ComponentEntry[] = [
 ];
 
 export function ComponentsListScreen({ navigation }: Props) {
-  // Header row: the section name + divider, active because we're on the index.
-  const sidebarItems: SidebarItem[] = [
-    { key: "all", label: "Components", active: true, dividerAfter: true },
-    ...COMPONENTS.map((c) => ({
-      key: c.route,
-      label: c.name,
-      active: false,
-    })),
-  ];
+  // Reuse the shared sidebar so the Button group + indented children stay
+  // consistent with the per-component detail pages. We're on the index so
+  // the back-link row at the top (`all`) is the active one.
+  const baseSidebar = componentsSidebar("");
+  const sidebarItems: SidebarItem[] = baseSidebar.map((item, i) =>
+    i === 0 ? { ...item, active: true } : item,
+  );
 
   const { width } = useWindowDimensions();
   const cardsPerRow = width >= 1280 ? 4 : width >= 800 ? 3 : 2;
@@ -59,8 +106,9 @@ export function ComponentsListScreen({ navigation }: Props) {
       subtitle="Production-ready building blocks composed from Field DS tokens. Tap one to explore states, props and live demos."
       sidebar={sidebarItems}
       onSidebarSelect={(key) => {
+        // We're already on the Components index — ignore the back-link.
         if (key === "all") return;
-        navigation.navigate(key as never);
+        navigateFromSidebar(navigation, key);
       }}
     >
       <View
@@ -318,27 +366,133 @@ function CheckboxIllustration({ tone }: { tone: string }) {
   );
 }
 
-function ButtonIllustration({ tone }: { tone: string }) {
-  // Pair of rectangular buttons — filled + outline — to evoke the rectangular
-  // Button family (primary + secondary).
+function DividerIllustration({ tone }: { tone: string }) {
+  // Two text rows separated by a hairline — solid above, dashed below.
   return (
     <IlloFrame>
-      <View style={{ gap: 10, alignItems: "center" }}>
+      <View style={{ width: 132, gap: 10 }}>
         <View
           style={{
-            width: 100,
-            height: 22,
-            borderRadius: radius["6"],
+            width: 84,
+            height: 4,
+            borderRadius: 2,
             backgroundColor: tone,
+            opacity: 0.7,
           }}
         />
         <View
           style={{
-            width: 100,
+            height: 0,
+            borderTopWidth: 2,
+            borderTopColor: tone,
+          }}
+        />
+        <View
+          style={{
+            width: 64,
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: tone,
+            opacity: 0.7,
+          }}
+        />
+        <View
+          style={{
+            height: 0,
+            borderTopWidth: 2,
+            borderTopColor: tone,
+            borderStyle: "dashed",
+            opacity: 0.8,
+          }}
+        />
+        <View
+          style={{
+            width: 76,
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: tone,
+            opacity: 0.7,
+          }}
+        />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function PrimaryButtonIllustration({ tone }: { tone: string }) {
+  // Single filled rectangular CTA — high emphasis.
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          width: 110,
+          height: 28,
+          borderRadius: radius["8"],
+          backgroundColor: tone,
+        }}
+      />
+    </IlloFrame>
+  );
+}
+
+function SecondaryButtonIllustration({ tone }: { tone: string }) {
+  // Outline rectangular CTA with a 2px border.
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          width: 110,
+          height: 28,
+          borderRadius: radius["8"],
+          borderWidth: 2,
+          borderColor: tone,
+        }}
+      />
+    </IlloFrame>
+  );
+}
+
+function SecondaryNeutralButtonIllustration({ tone }: { tone: string }) {
+  // Outline rectangular CTA with a softer (lower-opacity) border to evoke
+  // the muted-neutral border vs. the action-blue border of Secondary.
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          width: 110,
+          height: 28,
+          borderRadius: radius["8"],
+          borderWidth: 2,
+          borderColor: tone,
+          opacity: 0.55,
+        }}
+      />
+    </IlloFrame>
+  );
+}
+
+function NeutralButtonIllustration({ tone }: { tone: string }) {
+  // Two stacked filled CTAs to evoke a quieter mid-emphasis fill that often
+  // sits beside another Neutral action on a light surface.
+  return (
+    <IlloFrame>
+      <View style={{ gap: 8, alignItems: "center" }}>
+        <View
+          style={{
+            width: 90,
             height: 22,
             borderRadius: radius["6"],
-            borderWidth: 2,
-            borderColor: tone,
+            backgroundColor: tone,
+            opacity: 0.85,
+          }}
+        />
+        <View
+          style={{
+            width: 90,
+            height: 22,
+            borderRadius: radius["6"],
+            backgroundColor: tone,
+            opacity: 0.55,
           }}
         />
       </View>
@@ -404,6 +558,273 @@ function TextButtonIllustration({ tone }: { tone: string }) {
             borderLeftColor: tone,
           }}
         />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function FilterChipIllustration({ tone }: { tone: string }) {
+  // Two pill-shaped chips — one default outline, one bold-bordered with an
+  // inline cross to evoke the M-FilterChip "Added" treatment.
+  return (
+    <IlloFrame>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderWidth: 2,
+            borderColor: tone,
+            opacity: 0.5,
+            borderRadius: radius["8"],
+          }}
+        >
+          <View
+            style={{ width: 6, height: 6, backgroundColor: tone, borderRadius: 1 }}
+          />
+          <View
+            style={{ width: 30, height: 4, backgroundColor: tone, borderRadius: 2 }}
+          />
+          <View
+            style={{
+              width: 0,
+              height: 0,
+              borderLeftWidth: 4,
+              borderRightWidth: 4,
+              borderTopWidth: 5,
+              borderLeftColor: "transparent",
+              borderRightColor: "transparent",
+              borderTopColor: tone,
+            }}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderWidth: 2,
+            borderColor: tone,
+            borderRadius: radius["8"],
+          }}
+        >
+          <View
+            style={{ width: 30, height: 4, backgroundColor: tone, borderRadius: 2 }}
+          />
+          <View style={{ width: 1, height: 10, backgroundColor: tone, opacity: 0.4 }} />
+          <View style={{ position: "relative", width: 8, height: 8 }}>
+            <View
+              style={{
+                position: "absolute",
+                top: 3,
+                left: 0,
+                width: 8,
+                height: 2,
+                backgroundColor: tone,
+                transform: [{ rotate: "45deg" }],
+              }}
+            />
+            <View
+              style={{
+                position: "absolute",
+                top: 3,
+                left: 0,
+                width: 8,
+                height: 2,
+                backgroundColor: tone,
+                transform: [{ rotate: "-45deg" }],
+              }}
+            />
+          </View>
+        </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function InputTextIllustration({ tone }: { tone: string }) {
+  // Label tag + outlined field with a blinking caret to evoke a single-line
+  // input.
+  return (
+    <IlloFrame>
+      <View style={{ width: 132, gap: 6 }}>
+        <View
+          style={{ width: 36, height: 4, backgroundColor: tone, borderRadius: 2 }}
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+            paddingHorizontal: 10,
+            paddingVertical: 10,
+            borderWidth: 2,
+            borderColor: tone,
+            borderRadius: radius["6"],
+          }}
+        >
+          <View
+            style={{ width: 56, height: 4, backgroundColor: tone, opacity: 0.55, borderRadius: 2 }}
+          />
+          <View style={{ width: 2, height: 12, backgroundColor: tone }} />
+        </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function InputTextareaIllustration({ tone }: { tone: string }) {
+  // Label tag + a taller outlined field with multiple text-line shimmers.
+  return (
+    <IlloFrame>
+      <View style={{ width: 132, gap: 6 }}>
+        <View
+          style={{ width: 40, height: 4, backgroundColor: tone, borderRadius: 2 }}
+        />
+        <View
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            borderWidth: 2,
+            borderColor: tone,
+            borderRadius: radius["6"],
+            gap: 5,
+            minHeight: 56,
+          }}
+        >
+          <View
+            style={{ width: 100, height: 3, backgroundColor: tone, opacity: 0.55, borderRadius: 2 }}
+          />
+          <View
+            style={{ width: 84, height: 3, backgroundColor: tone, opacity: 0.55, borderRadius: 2 }}
+          />
+          <View
+            style={{ width: 60, height: 3, backgroundColor: tone, opacity: 0.55, borderRadius: 2 }}
+          />
+        </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function ListItemIllustration({ tone }: { tone: string }) {
+  // Three rows: a 24x24 leading dot, two text lines, and a trailing chevron —
+  // the canonical "list item with leading icon, body, and trailing affordance"
+  // composition.
+  const Row = ({ trailingChevron }: { trailingChevron?: boolean }) => (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        paddingHorizontal: 8,
+        paddingVertical: 6,
+      }}
+    >
+      <View
+        style={{
+          width: 12,
+          height: 12,
+          borderRadius: 9999,
+          backgroundColor: tone,
+          opacity: 0.85,
+        }}
+      />
+      <View style={{ flex: 1, gap: 3 }}>
+        <View
+          style={{ width: 60, height: 4, backgroundColor: tone, borderRadius: 2 }}
+        />
+        <View
+          style={{
+            width: 38,
+            height: 3,
+            backgroundColor: tone,
+            opacity: 0.5,
+            borderRadius: 2,
+          }}
+        />
+      </View>
+      {trailingChevron && (
+        <View
+          style={{
+            width: 0,
+            height: 0,
+            borderTopWidth: 5,
+            borderBottomWidth: 5,
+            borderLeftWidth: 6,
+            borderTopColor: "transparent",
+            borderBottomColor: "transparent",
+            borderLeftColor: tone,
+            opacity: 0.7,
+          }}
+        />
+      )}
+    </View>
+  );
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          width: 132,
+          borderWidth: 2,
+          borderColor: tone,
+          borderRadius: radius["6"],
+          overflow: "hidden",
+        }}
+      >
+        <Row trailingChevron />
+        <View style={{ height: 1, backgroundColor: tone, opacity: 0.3 }} />
+        <Row trailingChevron />
+        <View style={{ height: 1, backgroundColor: tone, opacity: 0.3 }} />
+        <Row />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function InfoBannerIllustration({ tone }: { tone: string }) {
+  // Stack of two pills — one with a leading dot icon, one without. Evokes
+  // the M-InfoBanner "with icon" / "no icon" treatments.
+  return (
+    <IlloFrame>
+      <View style={{ gap: 10, alignItems: "flex-start" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            borderRadius: 9999,
+            backgroundColor: tone,
+            opacity: 0.18,
+          }}
+        >
+          <View
+            style={{ width: 8, height: 8, backgroundColor: tone, borderRadius: 9999 }}
+          />
+          <View
+            style={{ width: 50, height: 4, backgroundColor: tone, borderRadius: 2 }}
+          />
+        </View>
+        <View
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            borderRadius: 9999,
+            backgroundColor: tone,
+            opacity: 0.18,
+          }}
+        >
+          <View
+            style={{ width: 64, height: 4, backgroundColor: tone, borderRadius: 2 }}
+          />
+        </View>
       </View>
     </IlloFrame>
   );

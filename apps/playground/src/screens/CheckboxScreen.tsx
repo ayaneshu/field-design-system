@@ -6,7 +6,7 @@ import { Checkbox, type CheckboxSize } from "@field-ds/components";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
-import { componentsSidebar } from "../navigation/sidebars";
+import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
 import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
 
@@ -129,10 +129,7 @@ export function CheckboxScreen({ navigation }: Props) {
       version="V0.1"
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Checkbox.tsx"
       sidebar={componentsSidebar("Checkbox")}
-      onSidebarSelect={(key) => {
-        if (key === "all") navigation.navigate("Components" as never);
-        else navigation.navigate(key as never);
-      }}
+      onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
     >
       <DetailSection
         heading="Playground"

@@ -82,9 +82,10 @@ export function RoundButton({
 }: RoundButtonProps) {
   const spec = ROUND_SIZE[size];
   const isInert = disabled || loading;
-  const fg = disabled
-    ? colour["text-n-icon"].muted
-    : colour["text-n-icon"].primary;
+  const tokenTextStyle =
+    size === "H40"
+      ? "textStyles.Action_A14_SemiBold"
+      : "textStyles.Action_A12_SemiBold";
 
   return (
     <Pressable
@@ -111,67 +112,77 @@ export function RoundButton({
           alignItems: "center",
           justifyContent: "center",
           gap: spec.gap,
-          backgroundColor: disabled
+          backgroundColor: pressed && !isInert
             ? colour.surface.secondary
-            : pressed
-              ? colour.surface.secondary
-              : colour.surface.primary,
+            : colour.surface.primary,
           borderWidth: 1,
-          borderColor: disabled
-            ? colour.border.subtle
-            : colour.border.primary,
+          borderColor: colour.border.primary,
           ...PRESS_TRANSITION,
         },
         style,
       ]}
     >
-      <View
-        aria-hidden={loading || undefined}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: spec.gap,
-          opacity: loading ? 0 : 1,
-        }}
-      >
-        {iconLeft ? (
-          <Icon name={iconLeft} size={spec.iconSize} color={fg} />
-        ) : null}
-        <Text
-          numberOfLines={1}
-          // @ts-expect-error — dataSet on Text on web
-          dataSet={{
-            tokenTextStyle:
-              size === "H40"
-                ? "textStyles.Action_A14_SemiBold"
-                : "textStyles.Action_A12_SemiBold",
-            tokenColor: "colour.text-n-icon.primary",
-          }}
-          style={[noFauxBold(spec.text), { color: fg }]}
-        >
-          {label}
-        </Text>
-        {iconRight ? (
-          <Icon name={iconRight} size={spec.iconSize} color={fg} />
-        ) : null}
-      </View>
+      {({ pressed }) => {
+        const fg = disabled
+          ? colour["text-n-icon"].muted
+          : pressed
+            ? colour["text-n-icon"].secondary
+            : colour["text-n-icon"].primary;
+        const tokenColor = disabled
+          ? "colour.text-n-icon.muted"
+          : pressed
+            ? "colour.text-n-icon.secondary"
+            : "colour.text-n-icon.primary";
 
-      {loading ? (
-        <View
-          pointerEvents="none"
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <ActivityIndicator size="small" color={fg} />
-        </View>
-      ) : null}
+        return (
+          <>
+            <View
+              aria-hidden={loading || undefined}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spec.gap,
+                opacity: loading ? 0 : 1,
+              }}
+            >
+              {iconLeft ? (
+                <Icon name={iconLeft} size={spec.iconSize} color={fg} />
+              ) : null}
+              <Text
+                numberOfLines={1}
+                // @ts-expect-error — dataSet on Text on web
+                dataSet={{
+                  tokenTextStyle,
+                  tokenColor,
+                }}
+                style={[noFauxBold(spec.text), { color: fg }]}
+              >
+                {label}
+              </Text>
+              {iconRight ? (
+                <Icon name={iconRight} size={spec.iconSize} color={fg} />
+              ) : null}
+            </View>
+
+            {loading ? (
+              <View
+                pointerEvents="none"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <ActivityIndicator size="small" color={fg} />
+              </View>
+            ) : null}
+          </>
+        );
+      }}
     </Pressable>
   );
 }
