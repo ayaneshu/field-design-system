@@ -65,6 +65,7 @@ export {
   IconButton,
   RoundButton,
   TextButton,
+  NeutralTextButton,
   type ButtonSize,
   type PrimaryButtonProps,
   type PrimaryButtonSize,
@@ -81,5 +82,6 @@ export {
   type RoundButtonSize,
   type TextButtonProps,
   type TextButtonSize,
-  type TextButtonTone,
+  type NeutralTextButtonProps,
+  type NeutralTextButtonSize,
 } from "./Button";

@@ -1,7 +1,6 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -44,18 +43,21 @@ const SIDEBAR_ITEMS: { key: SidebarKey; label: string }[] = [
 ];
 
 export function FoundationsScreen({ route, navigation }: Props) {
-  const initial = route.params?.section ?? null;
-  const [active, setActive] = useState<"all" | FoundationsSection>(
-    initial ?? "all",
-  );
+  // Route params are the single source of truth for the active sub-section
+  // so the URL (`/foundations`, `/foundations/colours`, etc.) and the
+  // visible page stay in sync. Changing the section is just
+  // `setParams({ section })`, which routes through the linking config and
+  // updates the browser address bar.
+  const active: "all" | FoundationsSection = route.params?.section ?? "all";
+  const setActive = (next: "all" | FoundationsSection) => {
+    navigation.setParams({
+      section: next === "all" ? undefined : next,
+    } as never);
+  };
   // Grid/List view mode for the Colours page; lives at this level so the
   // toggle can be rendered in the page-header right slot (Figma).
   const [coloursView, setColoursView] = useState<ViewMode>("grid");
   const { toast, copy } = useCopy();
-
-  useEffect(() => {
-    if (route.params?.section) setActive(route.params.section);
-  }, [route.params?.section]);
 
   // First row is the section anchor — always rendered with a divider after,
   // never highlighted while on a sub-section. Subsequent rows toggle `active`

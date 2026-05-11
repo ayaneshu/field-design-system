@@ -23,6 +23,7 @@ export type RootStackParamList = {
   NeutralButton: undefined;
   RoundButton: undefined;
   TextButton: undefined;
+  NeutralTextButton: undefined;
   IconButton: undefined;
   InputText: undefined;
   InputTextarea: undefined;

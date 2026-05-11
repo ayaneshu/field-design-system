@@ -112,6 +112,11 @@ const COMPONENTS: ComponentEntry[] = [
     illustration: TextButtonIllustration,
   },
   {
+    route: "NeutralTextButton",
+    name: "Text Button Neutral",
+    illustration: NeutralTextButtonIllustration,
+  },
+  {
     route: "Toggle",
     name: "Toggle",
     illustration: ToggleIllustration,
@@ -1091,6 +1096,40 @@ function TextButtonIllustration({ tone }: { tone: string }) {
               strokeLinejoin="round"
             />
           </Svg>
+        </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function NeutralTextButtonIllustration({ tone }: { tone: string }) {
+  // A short notice block — heading line, two body lines, then a quiet
+  // "Dismiss" CTA on the right. Neutral text buttons rarely carry a
+  // directional arrow; they sit beside copy as dismissive / supportive
+  // actions, which is what this layout reads as.
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          width: 160,
+          paddingHorizontal: 10,
+          paddingVertical: 8,
+          borderRadius: 8,
+          borderWidth: STROKE,
+          borderColor: tone,
+          opacity: 0.95,
+          gap: 6,
+        }}
+      >
+        <LabelBar width={110} alpha={0.85} tone={tone} height={STROKE + 1} />
+        <View style={{ gap: 3 }}>
+          <LabelBar width={134} alpha={0.4} tone={tone} height={STROKE} />
+          <LabelBar width={108} alpha={0.4} tone={tone} height={STROKE} />
+        </View>
+        <View
+          style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 2 }}
+        >
+          <LabelBar width={42} alpha={0.9} tone={tone} height={STROKE + 1} />
         </View>
       </View>
     </IlloFrame>

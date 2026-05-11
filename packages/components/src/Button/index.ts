@@ -27,8 +27,12 @@ export {
   TextButton,
   type TextButtonProps,
   type TextButtonSize,
-  type TextButtonTone,
 } from "./TextButton";
+export {
+  NeutralTextButton,
+  type NeutralTextButtonProps,
+  type NeutralTextButtonSize,
+} from "./NeutralTextButton";
 export {
   IconButton,
   type IconButtonProps,

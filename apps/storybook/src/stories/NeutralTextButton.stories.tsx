@@ -1,11 +1,14 @@
 import { Text, View } from "react-native";
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { TextButton, type TextButtonSize } from "@field-ds/components";
+import {
+  NeutralTextButton,
+  type NeutralTextButtonSize,
+} from "@field-ds/components";
 import type { IconName } from "@field-ds/icons";
 import { colour, space, textStyles } from "@field-ds/tokens";
 
-const SIZES: TextButtonSize[] = ["A14", "A12"];
+const SIZES: NeutralTextButtonSize[] = ["A14", "A12"];
 
 const ICON_PICKER_OPTIONS: (IconName | undefined)[] = [
   undefined,
@@ -27,8 +30,8 @@ const ICON_PICKER_OPTIONS: (IconName | undefined)[] = [
 ];
 
 const meta = {
-  title: "Components/TextButton",
-  component: TextButton,
+  title: "Components/NeutralTextButton",
+  component: NeutralTextButton,
   argTypes: {
     size: { control: "inline-radio", options: SIZES },
     label: { control: "text" },
@@ -38,20 +41,20 @@ const meta = {
   },
   args: {
     size: "A14",
-    label: "View all",
+    label: "Dismiss",
     iconLeft: undefined,
-    iconRight: "system-arrow-right",
+    iconRight: undefined,
     disabled: false,
   },
   parameters: {
     docs: {
       description: {
         component:
-          "Low-emphasis blue CTA mapping to Figma's M-TextButtonBlue. Transparent surface with optional icons, picking up a subtle tint on press. Use for inline supportive actions ('View all', row-level 'Edit', toolbar links). For the neutral tone, see NeutralTextButton.",
+          "Low-emphasis neutral-tone CTA mapping to Figma's M-TextButtonNeutral. Transparent surface with a near-black label and optional icons, picking up a subtle neutral tint on press. Use on coloured / inverted surfaces or when blue would compete. For the default blue text link, see TextButton.",
       },
     },
   },
-} satisfies Meta<typeof TextButton>;
+} satisfies Meta<typeof NeutralTextButton>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -77,13 +80,13 @@ export const Sizes: Story = {
               flexWrap: "wrap",
             }}
           >
-            <TextButton label="View all" size={sz} />
-            <TextButton
-              label="View all"
+            <NeutralTextButton label="Dismiss" size={sz} />
+            <NeutralTextButton
+              label="Edit"
               size={sz}
-              iconRight="system-arrow-right"
+              iconLeft="system-edit"
             />
-            <TextButton label="View all" size={sz} disabled />
+            <NeutralTextButton label="Dismiss" size={sz} disabled />
           </View>
         </View>
       ))}

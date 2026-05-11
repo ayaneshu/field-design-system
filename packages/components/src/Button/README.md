@@ -11,7 +11,8 @@ Action controls for triggering primary, secondary, and supportive actions across
 | `SecondaryNeutralButton` | `M-SecondaryNeutralButton`  | Outline neutral. Quiet adjacent action where blue would compete.            |
 | `NeutralButton`          | `M-NeutralButton`           | Filled near-black. Mid-emphasis alt to Primary on light surfaces.           |
 | `RoundButton`            | `M-NeutralRoundButton`      | Pill-shaped neutral CTA for toolbars, map chips, sticky headers.            |
-| `TextButton`             | `M-TextButtonBlue`, `M-TextButtonNeutral` | Low-emphasis inline action ("View all", row-level "Edit").    |
+| `TextButton`             | `M-TextButtonBlue`          | Low-emphasis inline action with a blue label ("View all", row-level "Edit"). |
+| `NeutralTextButton`      | `M-TextButtonNeutral`       | Same as `TextButton` but in the neutral text tone — for coloured / inverted surfaces or quiet inline actions. |
 | `IconButton`             | `M-IconButton`              | Square circular icon-only button (back chevrons, close, overflow).          |
 
 ## Storybook
@@ -24,6 +25,7 @@ Each rectangular family has its own story file:
 - [NeutralButton stories](../../../../apps/storybook/src/stories/NeutralButton.stories.tsx)
 - [RoundButton stories](../../../../apps/storybook/src/stories/RoundButton.stories.tsx)
 - [TextButton stories](../../../../apps/storybook/src/stories/TextButton.stories.tsx)
+- [NeutralTextButton stories](../../../../apps/storybook/src/stories/NeutralTextButton.stories.tsx)
 - [IconButton stories](../../../../apps/storybook/src/stories/IconButton.stories.tsx)
 
 Run locally:
@@ -42,6 +44,7 @@ import {
   NeutralButton,
   RoundButton,
   TextButton,
+  NeutralTextButton,
   IconButton,
 } from "@field-ds/components";
 
@@ -53,6 +56,7 @@ import {
 
 <RoundButton label="Filter" iconLeft="system-plus" />
 <TextButton label="View all" iconRight="system-arrow-right" />
+<NeutralTextButton label="Dismiss" />
 <IconButton icon="system-arrow-right" accessibilityLabel="Next" />
 ```
 
@@ -71,13 +75,13 @@ The rectangular families share a height scale per Figma:
 
 `H40` is intentionally per-variant: `PrimaryButton` keeps the tighter 12px / radius 8 footprint with A12; the outline + neutral families expand to 16x10–12 / radius 10 / A12 (Secondary) or A14 (Secondary-Neutral, Neutral). See [`sizing.ts`](sizing.ts) for the exact specs and `BUTTON_SIZE_H40_OVERRIDES`.
 
-`RoundButton` ships in `H40` / `H36`. `TextButton` ships in `A14` / `A12`. `IconButton` ships in `H40` / `H36`.
+`RoundButton` ships in `H40` / `H36`. `TextButton` and `NeutralTextButton` ship in `A14` / `A12`. `IconButton` ships in `H40` / `H36`.
 
 ## States
 
 All rectangular + round buttons support **default**, **pressed**, **loader**, and **disabled** states. Loader keeps the footprint by stamping a centred spinner over the content (label + icons fade to opacity 0 — the button doesn't reflow).
 
-`TextButton` and `IconButton` ship without a `loader` state per Figma — use one of the rectangular families if you need a loading spinner.
+`TextButton`, `NeutralTextButton`, and `IconButton` ship without a `loader` state per Figma — use one of the rectangular families if you need a loading spinner.
 
 ## Props (rectangular family — Primary / Secondary / Secondary-Neutral / Neutral)
 
@@ -94,7 +98,7 @@ All rectangular + round buttons support **default**, **pressed**, **loader**, an
 | `accessibilityLabel` | `string`               | label        | Falls back to `label`.                               |
 | `style`              | `StyleProp<ViewStyle>` | —            | Forwarded to outer `Pressable`.                      |
 
-See the per-component files (`PrimaryButton.tsx`, `SecondaryButton.tsx`, `SecondaryNeutralButton.tsx`, `NeutralButton.tsx`) for tone specifics, plus `RoundButton.tsx` / `TextButton.tsx` / `IconButton.tsx` for those families' props.
+See the per-component files (`PrimaryButton.tsx`, `SecondaryButton.tsx`, `SecondaryNeutralButton.tsx`, `NeutralButton.tsx`) for tone specifics, plus `RoundButton.tsx` / `TextButton.tsx` / `NeutralTextButton.tsx` / `IconButton.tsx` for those families' props.
 
 ## Tokens used
 

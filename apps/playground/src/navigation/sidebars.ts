@@ -10,8 +10,9 @@ const BUTTON_GROUP_KEY = "ButtonGroup";
 
 // Children of the Button parent row. Used both for the sidebar list and to
 // decide when the parent should highlight as active. Covers every Figma
-// M-*Button family — rectangular variants, IconButton, RoundButton, and
-// TextButton — so the whole button surface area lives under one parent row.
+// M-*Button family — rectangular variants, IconButton, RoundButton, plus
+// TextButton (blue) and NeutralTextButton — so the whole button surface
+// area lives under one parent row.
 const BUTTON_CHILDREN = [
   "PrimaryButton",
   "SecondaryButton",
@@ -20,6 +21,7 @@ const BUTTON_CHILDREN = [
   "IconButton",
   "RoundButton",
   "TextButton",
+  "NeutralTextButton",
 ] as const;
 
 type ButtonChildKey = (typeof BUTTON_CHILDREN)[number];
@@ -92,6 +94,12 @@ export function componentsSidebar(activeKey: string): SidebarItem[] {
       label: "Text",
       indent: true,
       active: activeKey === "TextButton",
+    },
+    {
+      key: "NeutralTextButton",
+      label: "Text Neutral",
+      indent: true,
+      active: activeKey === "NeutralTextButton",
     },
     { key: "Checkbox", label: "Checkbox", active: activeKey === "Checkbox" },
     { key: "Divider", label: "Divider", active: activeKey === "Divider" },
