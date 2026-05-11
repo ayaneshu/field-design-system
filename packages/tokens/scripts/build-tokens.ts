@@ -104,10 +104,22 @@ const WEIGHT_TO_NUMERIC: Record<string, string> = {
 function toRNTextStyle(t: Record<string, unknown>): Record<string, unknown> {
   const family = String(t.fontFamily ?? "Noontree");
   const weight = String(t.fontWeight ?? "Regular");
+  // We deliberately emit `fontWeight: "400"` for every face, even though the
+  // semantic weight (Light → Black) is encoded in the family name. Reason:
+  // expo-font's web font loader registers each Noontree-* face at the default
+  // weight 400, and the browser synthesises faux-bold whenever a non-400
+  // numeric weight is applied on top of a 400-registered face — turning every
+  // SemiBold (or higher) label into visually-Bold text. Setting "400" here
+  // tells the browser "use the face as registered" — no synthesis. The
+  // intended visual weight comes from the family name itself
+  // (Noontree-SemiBold, Noontree-Bold, etc.).
+  // WEIGHT_TO_NUMERIC is kept above for reference / future use if expo-font
+  // ever starts emitting `font-weight:` descriptors in its @font-face entries.
+  void WEIGHT_TO_NUMERIC;
   const out: Record<string, unknown> = {
     fontFamily: `${family}-${weight}`,
     fontSize: t.fontSize,
-    fontWeight: WEIGHT_TO_NUMERIC[weight] ?? "400",
+    fontWeight: "400",
     lineHeight: t.lineHeight,
     letterSpacing: t.letterSpacing,
   };
