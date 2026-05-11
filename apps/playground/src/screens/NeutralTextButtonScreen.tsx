@@ -2,7 +2,10 @@ import { useState, type ReactNode } from "react";
 import { View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { TextButton, type TextButtonSize } from "@field-ds/components";
+import {
+  NeutralTextButton,
+  type NeutralTextButtonSize,
+} from "@field-ds/components";
 import type { IconName } from "@field-ds/icons";
 import { space } from "@field-ds/tokens";
 
@@ -20,28 +23,26 @@ import {
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
 import type { RootStackParamList } from "../navigation/types";
 
-type Props = NativeStackScreenProps<RootStackParamList, "TextButton">;
+type Props = NativeStackScreenProps<RootStackParamList, "NeutralTextButton">;
 
-const SIZES: TextButtonSize[] = ["A14", "A12"];
+const SIZES: NeutralTextButtonSize[] = ["A14", "A12"];
 
 /**
- * Low-emphasis text-only CTA in the blue action tone. Maps to Figma
- * `M-TextButtonBlue`. Use for inline supportive actions ("View all",
- * row-level "Edit", toolbar links) — never as the only action on a screen.
- * For the neutral tone, see `NeutralTextButton`.
+ * Low-emphasis text-only CTA in the neutral text tone. Maps to Figma
+ * `M-TextButtonNeutral`. Use on coloured / inverted surfaces or when a blue
+ * link would compete with surrounding content. For the default blue text
+ * link, see `TextButton`.
  */
-export function TextButtonScreen({ navigation }: Props) {
-  const [size, setSize] = useState<TextButtonSize>("A14");
+export function NeutralTextButtonScreen({ navigation }: Props) {
+  const [size, setSize] = useState<NeutralTextButtonSize>("A14");
   const [iconLeft, setIconLeft] = useState<IconName | null>(null);
-  const [iconRight, setIconRight] = useState<IconName | null>(
-    "system-arrow-right",
-  );
+  const [iconRight, setIconRight] = useState<IconName | null>(null);
   const [disabled, setDisabled] = useState(false);
 
   const playgroundPreview = (
     <PreviewSurface tall>
-      <TextButton
-        label="View all"
+      <NeutralTextButton
+        label="Dismiss"
         size={size}
         iconLeft={iconLeft ?? undefined}
         iconRight={iconRight ?? undefined}
@@ -56,13 +57,13 @@ export function TextButtonScreen({ navigation }: Props) {
         <PreviewSurface key={sz}>
           <SectionLabel>{sz}</SectionLabel>
           <Row>
-            <TextButton label="View all" size={sz} />
-            <TextButton
-              label="View all"
+            <NeutralTextButton label="Dismiss" size={sz} />
+            <NeutralTextButton
+              label="Edit"
               size={sz}
-              iconRight="system-arrow-right"
+              iconLeft="system-edit"
             />
-            <TextButton label="View all" size={sz} disabled />
+            <NeutralTextButton label="Dismiss" size={sz} disabled />
           </Row>
         </PreviewSurface>
       ))}
@@ -72,11 +73,11 @@ export function TextButtonScreen({ navigation }: Props) {
   return (
     <PageScaffold
       topNavActive="Components"
-      title="text button"
-      subtitle="Low-emphasis blue CTA — transparent surface with a coloured label. Two sizes (A14, A12). Subtle pressed-state tint; disabled colour mutes the label. For the neutral tone, see Text Neutral."
+      title="text neutral"
+      subtitle="Low-emphasis neutral-tone CTA — transparent surface with a near-black label. Two sizes (A14, A12). Use on coloured / inverted surfaces or when a blue link would compete. For the default blue text link, see Text."
       version="V0.1"
-      repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Button/TextButton.tsx"
-      sidebar={componentsSidebar("TextButton")}
+      repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Button/NeutralTextButton.tsx"
+      sidebar={componentsSidebar("NeutralTextButton")}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
     >
       <DetailSection

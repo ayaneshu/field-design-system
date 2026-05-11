@@ -11,11 +11,11 @@ import {
 
 import { PRESS_TRANSITION, noFauxBold } from "./sizing";
 
-// Maps to Figma M-TextButtonBlue (1363:208).
+// Maps to Figma M-TextButtonNeutral (1363:245).
 // Two sizes per Figma:
 //   A14 — pairs with H48/H44 filled buttons.
 //   A12 — pairs with H36 filled buttons.
-export type TextButtonSize = "A14" | "A12";
+export type NeutralTextButtonSize = "A14" | "A12";
 
 type TextSpec = {
   height: number;
@@ -27,7 +27,7 @@ type TextSpec = {
   text: FieldTextStyle;
 };
 
-const TEXT_SIZE: Record<TextButtonSize, TextSpec> = {
+const TEXT_SIZE: Record<NeutralTextButtonSize, TextSpec> = {
   A14: {
     height: 28,
     paddingX: space["8"],
@@ -48,13 +48,13 @@ const TEXT_SIZE: Record<TextButtonSize, TextSpec> = {
   },
 };
 
-const FG = colour["text-n-icon"].action;
+const FG = colour["text-n-icon"].primary;
 const FG_DISABLED = colour["text-n-icon"].muted;
-const BG_PRESSED = colour.surface["action-subtle"];
+const BG_PRESSED = colour.surface.secondary;
 
-export type TextButtonProps = {
+export type NeutralTextButtonProps = {
   label: string;
-  size?: TextButtonSize;
+  size?: NeutralTextButtonSize;
   iconLeft?: IconName;
   iconRight?: IconName;
   disabled?: boolean;
@@ -64,16 +64,16 @@ export type TextButtonProps = {
 };
 
 /**
- * M-TextButtonBlue — low-emphasis CTA. Transparent surface with a blue label
- * and optional left/right icons, picking up a subtle action tint on press.
- * Use for inline supportive actions ("View all", row-level "Edit", toolbar
- * links) — never as the only action on a screen. For quiet actions on
- * coloured / inverted surfaces, reach for `NeutralTextButton` instead.
+ * M-TextButtonNeutral — low-emphasis CTA in the neutral text tone.
+ * Transparent surface with a near-black label and optional icons, picking up
+ * a subtle neutral tint on press. Use on coloured / inverted surfaces or
+ * when a blue link would compete with the surrounding content. For the
+ * default blue text link, reach for `TextButton` instead.
  *
- *   <TextButton label="View all" />
- *   <TextButton label="Edit" iconLeft="system-plus" size="A12" />
+ *   <NeutralTextButton label="Dismiss" />
+ *   <NeutralTextButton label="Edit" iconLeft="system-edit" size="A12" />
  */
-export function TextButton({
+export function NeutralTextButton({
   label,
   size = "A14",
   iconLeft,
@@ -82,7 +82,7 @@ export function TextButton({
   onPress,
   accessibilityLabel,
   style,
-}: TextButtonProps) {
+}: NeutralTextButtonProps) {
   const spec = TEXT_SIZE[size];
   const fg = disabled ? FG_DISABLED : FG;
 
@@ -95,8 +95,8 @@ export function TextButton({
       accessibilityLabel={accessibilityLabel ?? label}
       // @ts-expect-error — dataSet on Pressable on web
       dataSet={{
-        component: "TextButton",
-        tone: "blue",
+        component: "NeutralTextButton",
+        tone: "neutral",
         size,
         state: disabled ? "disabled" : "default",
       }}
@@ -136,7 +136,7 @@ export function TextButton({
               size === "A14"
                 ? "textStyles.Action_A14_SemiBold"
                 : "textStyles.Action_A12_SemiBold",
-            tokenColor: "colour.text-n-icon.action",
+            tokenColor: "colour.text-n-icon.primary",
           }}
           style={[noFauxBold(spec.text), { color: fg }]}
         >
