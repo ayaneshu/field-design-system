@@ -7,7 +7,6 @@ import {
   type ViewStyle,
 } from "react-native";
 import Animated, {
-  Easing,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
@@ -15,12 +14,9 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon, type IconName, iconNames } from "@field-ds/icons";
-import { colour, radius, space, textStyles } from "@field-ds/tokens";
+import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
 
-// Apple-style ease-out — matches Accordion / Checkbox so selection across
-// the system feels like one motion language.
-const APPLE_EASE = Easing.bezier(0.32, 0.72, 0, 1);
-const SELECT_DURATION = 260;
+import { fieldEasingStandard } from "../fieldMotion";
 
 // Figma: M-Bottomnav — primary bottom tab bar.
 //   • Highlight bar 4×43, top of each tab, action colour when active.
@@ -190,13 +186,13 @@ function BottomNavItem({
   const label = active ? textStyles.Body_B11_Bold : textStyles.Body_B11_Medium;
 
   // Selection driver: 0 = inactive, 1 = active. Drives the highlight scale-in,
-  // a subtle icon "pop", and label fade — kept on the same APPLE_EASE curve
+  // a subtle icon "pop", and label fade — same curve as motion.easing.standard
   // as Accordion + Checkbox.
   const progress = useSharedValue(active ? 1 : 0);
   useEffect(() => {
     progress.value = withTiming(active ? 1 : 0, {
-      duration: SELECT_DURATION,
-      easing: APPLE_EASE,
+      duration: motion.duration.lg,
+      easing: fieldEasingStandard,
     });
   }, [active, progress]);
 
@@ -275,7 +271,6 @@ function BottomNavItem({
         </Animated.View>
         <Text
           numberOfLines={1}
-          // @ts-expect-error — dataSet on Text on web
           dataSet={{
             tokenTextStyle: active ? "Body_B11_Bold" : "Body_B11_Medium",
             tokenColor: active
@@ -289,8 +284,8 @@ function BottomNavItem({
               // CSS-side colour transition for RN-Web (native ignores).
               // @ts-expect-error rn-web passes through to DOM
               transitionProperty: "color",
-              transitionDuration: "200ms",
-              transitionTimingFunction: "cubic-bezier(0.32, 0.72, 0, 1)",
+              transitionDuration: `${motion.duration.base}ms`,
+              transitionTimingFunction: `cubic-bezier(${motion.easing.standard.join(",")})`,
             },
           ]}
         >

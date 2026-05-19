@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -6,8 +7,16 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native";
+import Animated, {
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 import { Icon, type IconName } from "@field-ds/icons";
+import { motion } from "@field-ds/tokens";
 
 import {
   PRESS_TRANSITION,
@@ -16,6 +25,8 @@ import {
   type ButtonSize,
   type RectButtonVariant,
 } from "./sizing";
+
+const PRIMARY_TOUCH_SCALE = 0.98;
 
 // Tone descriptor consumed by RectButton. Each public component
 // (PrimaryButton, SecondaryButton, SecondaryNeutralButton, NeutralButton)
@@ -93,9 +104,39 @@ export function RectButton({
   const spec = getButtonSpec(variantKey, size);
   const isInert = disabled || loading;
 
-  return (
+  const primaryPressScale = useSharedValue(1);
+  const isPrimary = variantKey === "primary";
+
+  const primaryScaleStyle = useAnimatedStyle(
+    () => ({
+      transform: [{ scale: isPrimary ? primaryPressScale.value : 1 }],
+    }),
+    [isPrimary],
+  );
+
+  useEffect(() => {
+    if (!isPrimary || !isInert) return;
+    cancelAnimation(primaryPressScale);
+    primaryPressScale.value = 1;
+  }, [isInert, isPrimary, primaryPressScale]);
+
+  const handlePrimaryPressIn = () => {
+    if (!isPrimary || isInert) return;
+    primaryPressScale.value = withTiming(PRIMARY_TOUCH_SCALE, {
+      duration: motion.duration.xs,
+    });
+  };
+
+  const handlePrimaryPressOut = () => {
+    if (!isPrimary || isInert) return;
+    primaryPressScale.value = withSpring(1, motion.spring.snappy);
+  };
+
+  const pressableNode = (
     <Pressable
       onPress={isInert ? undefined : onPress}
+      onPressIn={isPrimary ? handlePrimaryPressIn : undefined}
+      onPressOut={isPrimary ? handlePrimaryPressOut : undefined}
       disabled={isInert}
       accessibilityRole="button"
       accessibilityState={{ disabled: isInert, busy: loading }}
@@ -114,7 +155,14 @@ export function RectButton({
           paddingHorizontal: spec.paddingX,
           paddingVertical: spec.paddingY,
           borderRadius: spec.radius,
-          alignSelf: fullWidth ? "stretch" : "flex-start",
+          alignSelf: isPrimary
+            ? fullWidth
+              ? "stretch"
+              : undefined
+            : fullWidth
+              ? "stretch"
+              : "flex-start",
+          width: isPrimary && fullWidth ? ("100%" as const) : undefined,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
@@ -132,7 +180,7 @@ export function RectButton({
               : tone.border,
           ...PRESS_TRANSITION,
         },
-        style,
+        ...(isPrimary ? [] : [style]),
       ]}
     >
       {({ pressed }) => {
@@ -200,5 +248,21 @@ export function RectButton({
         );
       }}
     </Pressable>
+  );
+
+  if (!isPrimary) {
+    return pressableNode;
+  }
+
+  return (
+    <Animated.View
+      style={[
+        primaryScaleStyle,
+        { alignSelf: fullWidth ? "stretch" : "flex-start" },
+        style,
+      ]}
+    >
+      {pressableNode}
+    </Animated.View>
   );
 }

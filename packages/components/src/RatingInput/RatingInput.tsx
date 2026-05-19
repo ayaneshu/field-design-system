@@ -16,7 +16,9 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon } from "@field-ds/icons";
-import { colour, space } from "@field-ds/tokens";
+import { colour, motion, space } from "@field-ds/tokens";
+
+import { fieldEasingStandard } from "../fieldMotion";
 
 // Figma: M-Rating/Input (1214:646) — interactive 5-star rating with optional
 // emoji feedback at the selected star. Whole-star increments only.
@@ -160,11 +162,11 @@ function Star({ index, mode, size, emoji, disabled, onPress }: StarProps) {
 
   const handlePressIn = () => {
     if (disabled || reducedMotion) return;
-    pressScale.value = withSpring(0.92, { damping: 18, stiffness: 220 });
+    pressScale.value = withSpring(0.92, motion.spring.interaction);
   };
   const handlePressOut = () => {
     if (disabled || reducedMotion) return;
-    pressScale.value = withSpring(1, { damping: 18, stiffness: 220 });
+    pressScale.value = withSpring(1, motion.spring.interaction);
   };
 
   // Cross-fade between the three visual layers driven by `mode`. We render
@@ -175,18 +177,33 @@ function Star({ index, mode, size, emoji, disabled, onPress }: StarProps) {
   const outlineTarget = useDerivedValue(() => (mode === "outline" ? 1 : 0), [mode]);
   const emojiTarget = useDerivedValue(() => (mode === "emoji" ? 1 : 0), [mode]);
 
-  const fadeDuration = reducedMotion ? 0 : 200;
+  const fadeDuration = reducedMotion ? 0 : motion.duration.base;
 
   const filledStyle = useAnimatedStyle(
-    () => ({ opacity: withTiming(filledTarget.value, { duration: fadeDuration }) }),
+    () => ({
+      opacity: withTiming(filledTarget.value, {
+        duration: fadeDuration,
+        easing: fieldEasingStandard,
+      }),
+    }),
     [filledTarget, fadeDuration],
   );
   const outlineStyle = useAnimatedStyle(
-    () => ({ opacity: withTiming(outlineTarget.value, { duration: fadeDuration }) }),
+    () => ({
+      opacity: withTiming(outlineTarget.value, {
+        duration: fadeDuration,
+        easing: fieldEasingStandard,
+      }),
+    }),
     [outlineTarget, fadeDuration],
   );
   const emojiStyle = useAnimatedStyle(
-    () => ({ opacity: withTiming(emojiTarget.value, { duration: fadeDuration }) }),
+    () => ({
+      opacity: withTiming(emojiTarget.value, {
+        duration: fadeDuration,
+        easing: fieldEasingStandard,
+      }),
+    }),
     [emojiTarget, fadeDuration],
   );
 

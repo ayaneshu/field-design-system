@@ -13,10 +13,14 @@ import { Icon } from "@field-ds/icons";
 import { Switch as FieldSwitch } from "@field-ds/components";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
+import { MotionTimesheet, type MotionTimesheetProps } from "./motionTimesheet";
 import { TopHeader } from "./TopHeader";
+import { createDefaultComponentMotionTimeline } from "../screens/motionTimelines/createDefaultComponentMotionTimeline";
 import { useTheme } from "../theme/ThemeContext";
 
-type DetailMode = "design" | "develop";
+export type { MotionTimesheetProps, MotionTimesheetTokenRow } from "./motionTimesheet";
+
+type DetailMode = "design" | "develop" | "motion";
 
 const SIDEBAR_BREAKPOINT = 960;
 const SPLIT_BREAKPOINT = 1100;
@@ -63,6 +67,9 @@ export function PageScaffold({
   rightSlot,
   version,
   repoUrl,
+  motionTimeline,
+  motionFooter,
+  motionSpecs,
   children,
 }: {
   topNavActive?: "Foundations" | "Components" | "Patterns" | null;
@@ -78,9 +85,14 @@ export function PageScaffold({
   rightSlot?: ReactNode;
   /** Component version pill (e.g. "V0.1") shown to the right of the title. */
   version?: string;
-  /** GitHub URL surfaced under the Develop tab. When set, a Design / Develop
-   * tab toggle renders below the title row. */
+  /** GitHub URL for the Develop tab. When set, a Design / Develop / Motion specs segmented control renders. */
   repoUrl?: string;
+  /** Declarative Gantt-like motion doc (token-led captions). Shown unless `motionSpecs` overrides entirely. */
+  motionTimeline?: MotionTimesheetProps;
+  /** Extra copy under {@link MotionTimesheet} — e.g. reduced-motion caveats. */
+  motionFooter?: ReactNode;
+  /** Full override for Motion specs tab layout (advanced). */
+  motionSpecs?: ReactNode;
   children: ReactNode;
 }) {
   const { width } = useWindowDimensions();
@@ -206,6 +218,13 @@ export function PageScaffold({
 
           {repoUrl && mode === "develop" ? (
             <DevelopPanel repoUrl={repoUrl} />
+          ) : repoUrl && mode === "motion" ? (
+            <MotionSpecsPanel
+              title={title}
+              motionSpecs={motionSpecs}
+              motionTimeline={motionTimeline}
+              motionFooter={motionFooter}
+            />
           ) : (
             children
           )}
@@ -590,6 +609,37 @@ function VersionPill({ label }: { label: string }) {
   );
 }
 
+function MotionSpecsPanel({
+  title,
+  motionSpecs,
+  motionTimeline,
+  motionFooter,
+}: {
+  title: string;
+  motionSpecs?: ReactNode;
+  motionTimeline?: MotionTimesheetProps;
+  motionFooter?: ReactNode;
+}) {
+  if (motionSpecs) {
+    return (
+      <View style={{ gap: space["32"], paddingBottom: space["40"], width: "100%", alignSelf: "stretch" }}>
+        {motionSpecs}
+        {motionFooter}
+      </View>
+    );
+  }
+
+  const resolvedTimeline =
+    motionTimeline ?? createDefaultComponentMotionTimeline(title);
+
+  return (
+    <View style={{ gap: space["32"], paddingBottom: space["40"], width: "100%", alignSelf: "stretch" }}>
+      <MotionTimesheet {...resolvedTimeline} />
+      {motionFooter}
+    </View>
+  );
+}
+
 function DesignDevelopToggle({
   value,
   onChange,
@@ -597,17 +647,20 @@ function DesignDevelopToggle({
   value: DetailMode;
   onChange: (next: DetailMode) => void;
 }) {
+  const options = [
+    { value: "design" as const, label: "Design" },
+    { value: "develop" as const, label: "Develop" },
+    { value: "motion" as const, label: "Motion" },
+  ];
+
   return (
-    <View style={{ width: 220 }}>
+    <View style={{ minWidth: 320, maxWidth: 420, alignSelf: "stretch" }}>
       <FieldSwitch<DetailMode>
         size="H48"
-        options={[
-          { value: "design", label: "Design" },
-          { value: "develop", label: "Develop" },
-        ]}
+        options={options}
         value={value}
         onChange={onChange}
-        accessibilityLabel="Switch between design and develop view"
+        accessibilityLabel="Switch between Design, Develop, and Motion specs"
       />
     </View>
   );

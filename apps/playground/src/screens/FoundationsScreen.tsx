@@ -10,10 +10,10 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import Svg, { Circle, Path, Polygon, Rect } from "react-native-svg";
+import Svg, { Circle, Line, Path, Polygon, Rect } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { base, colour, radius, space } from "@field-ds/tokens";
+import { base, colour, motion, radius, space } from "@field-ds/tokens";
 
 import { CopyToast } from "../components/CopyToast";
 import { PageScaffold, type SidebarItem } from "../components/PageScaffold";
@@ -25,6 +25,7 @@ import { TypographyContent } from "../sections/TypographyContent";
 import { IconsContent } from "../sections/IconsContent";
 import { SpacingContent } from "../sections/SpacingContent";
 import { RadiusContent } from "../sections/RadiusContent";
+import { MotionContent } from "../sections/MotionContent";
 import type { FoundationsSection, RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Foundations">;
@@ -37,6 +38,7 @@ const SIDEBAR_ITEMS: { key: SidebarKey; label: string }[] = [
   { key: "colors", label: "Colours" },
   { key: "icons", label: "Icons" },
   { key: "illustrations", label: "Illustrations" },
+  { key: "motion", label: "Motion" },
   { key: "radius", label: "Radius" },
   { key: "spacing", label: "Spacing" },
   { key: "typography", label: "Typography" },
@@ -74,6 +76,7 @@ export function FoundationsScreen({ route, navigation }: Props) {
     colors: "colours",
     typography: "typography",
     icons: "icons",
+    motion: "motion",
     spacing: "spacing",
     radius: "radius",
   };
@@ -85,6 +88,8 @@ export function FoundationsScreen({ route, navigation }: Props) {
       "Noontree at every size. Type your own preview, switch families and copy the token.",
     icons:
       "System icons on a 24×24 grid. Search, then copy the name or full SVG markup.",
+    motion:
+      "Time, easing and spring presets shared by every animated control — the same numbers Checkbox, inputs and the hub use.",
     spacing:
       "A 4-pixel-aligned scale that drives layout, padding and gaps everywhere.",
     radius:
@@ -126,6 +131,8 @@ export function FoundationsScreen({ route, navigation }: Props) {
           <SpacingContent copy={copy} />
         ) : active === "radius" ? (
           <RadiusContent copy={copy} />
+        ) : active === "motion" ? (
+          <MotionContent copy={copy} />
         ) : null}
       </PageScaffold>
       <CopyToast message={toast} />
@@ -156,6 +163,7 @@ function FoundationsHub({
     { key: "colors", label: "Colours", illustration: ColoursIllustration },
     { key: "icons", label: "Icons", illustration: IconsIllustration },
     { key: "illustrations", label: "Illustrations", illustration: IllustrationsIllustration },
+    { key: "motion", label: "Motion", illustration: MotionIllustration },
     { key: "radius", label: "Radius", illustration: RadiusIllustration },
     { key: "spacing", label: "Spacing", illustration: SpacingIllustration },
     { key: "typography", label: "Typography", illustration: TypographyIllustration },
@@ -302,6 +310,10 @@ export function HubCardShell({
     backgroundPosition: "6px 6px",
   } as Record<string, string>;
 
+  const loft = motion.easing.loft;
+  const hubEasingCss = `cubic-bezier(${loft[0]}, ${loft[1]}, ${loft[2]}, ${loft[3]})`;
+  const hubDurationMs = `${motion.duration.lg}ms`;
+
   return (
     <Pressable
       onPress={onPress}
@@ -322,8 +334,8 @@ export function HubCardShell({
         transform: [{ translateY: hovered ? -4 : 0 }],
         // @ts-expect-error rn-web passes CSS transition props through to the DOM
         transitionProperty: "transform, opacity",
-        transitionDuration: "260ms",
-        transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+        transitionDuration: hubDurationMs,
+        transitionTimingFunction: hubEasingCss,
       }}
     >
       <View
@@ -334,8 +346,8 @@ export function HubCardShell({
           overflow: "hidden",
           // @ts-expect-error transition props pass through on rn-web
           transitionProperty: "background-color, box-shadow",
-          transitionDuration: "260ms",
-          transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+          transitionDuration: hubDurationMs,
+          transitionTimingFunction: hubEasingCss,
           boxShadow: hovered
             ? "0 10px 24px rgba(29, 37, 57, 0.10)"
             : "0 1px 0 rgba(29, 37, 57, 0.02)",
@@ -682,6 +694,51 @@ function IllustrationsIllustration({ tone }: { tone: string }) {
           />
           <LabelBar width={64} alpha={0.4} tone={tone} />
         </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function MotionIllustration({ tone }: { tone: string }) {
+  // Bézier control frame: start dot, end dot, two handle points, curve between.
+  const w = 142;
+  const h = 92;
+  const p0 = [8, h - 14] as const;
+  const p3 = [w - 10, 14] as const;
+  const hx1 = p0[0] + 42;
+  const hy1 = p0[1] - 28;
+  const hx2 = p3[0] - 38;
+  const hy2 = p3[1] + 24;
+  const d = `M ${p0[0]} ${p0[1]} C ${hx1} ${hy1}, ${hx2} ${hy2}, ${p3[0]} ${p3[1]}`;
+  return (
+    <IlloFrame>
+      <View style={{ alignItems: "center", gap: 8 }}>
+        <Svg width={w} height={h}>
+          <Line
+            x1={p0[0]}
+            y1={p0[1]}
+            x2={hx1}
+            y2={hy1}
+            stroke={tone}
+            strokeWidth={STROKE}
+            opacity={0.25}
+          />
+          <Line
+            x1={p3[0]}
+            y1={p3[1]}
+            x2={hx2}
+            y2={hy2}
+            stroke={tone}
+            strokeWidth={STROKE}
+            opacity={0.25}
+          />
+          <Path d={d} stroke={tone} strokeWidth={STROKE + 0.5} fill="none" opacity={0.88} />
+          <Circle cx={p0[0]} cy={p0[1]} r={3} fill={tone} opacity={0.85} />
+          <Circle cx={p3[0]} cy={p3[1]} r={3} fill={tone} opacity={0.85} />
+          <Circle cx={hx1} cy={hy1} r={2.5} stroke={tone} strokeWidth={STROKE} fill="none" opacity={0.65} />
+          <Circle cx={hx2} cy={hy2} r={2.5} stroke={tone} strokeWidth={STROKE} fill="none" opacity={0.65} />
+        </Svg>
+        <LabelBar width={76} alpha={0.35} tone={tone} />
       </View>
     </IlloFrame>
   );

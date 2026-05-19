@@ -9,12 +9,14 @@ import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
 import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
+import { toggleFlipMotionTimeline } from "./motionTimelines/toggleFlipMotionTimeline";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Toggle">;
 
 const SIZES: ToggleSize[] = ["H16", "H20", "H24"];
 
 export function ToggleScreen({ navigation }: Props) {
+  const shell = useShell();
   const [on, setOn] = useState(false);
   const [size, setSize] = useState<ToggleSize>("H20");
   const [disabled, setDisabled] = useState(false);
@@ -97,6 +99,13 @@ export function ToggleScreen({ navigation }: Props) {
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Toggle/Toggle.tsx"
       sidebar={componentsSidebar("Toggle")}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
+      motionTimeline={toggleFlipMotionTimeline}
+      motionFooter={
+        <Text style={[textStyles.Body_B14_Regular, { color: shell.textTertiary, maxWidth: 640 }]}>
+          Reduced motion: <Text style={textStyles.Body_B14_SemiBold}>useReducedMotion()</Text> assigns u
+          instantly; thumb <Text style={textStyles.Body_B14_SemiBold}>scaleX</Text> stays at 1.
+        </Text>
+      }
     >
       <DetailSection
         heading="Playground"

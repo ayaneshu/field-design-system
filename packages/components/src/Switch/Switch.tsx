@@ -8,14 +8,15 @@ import {
   type ViewStyle,
 } from "react-native";
 import Animated, {
-  Easing,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
-  withTiming,
+  withSpring,
 } from "react-native-reanimated";
 
-import { colour, radius, space, textStyles } from "@field-ds/tokens";
+import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
+
+const SPRING_TAB_THUMB = motion.spring.springLight;
 
 // Figma: M-Switch — pill-shaped segmented control.
 //   H40 default · H48 large. Each variant supports 2-4 mutually-exclusive slots.
@@ -23,9 +24,6 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 // Naming: Figma calls this M-Switch but it's structurally a segmented control.
 // Consumers who need RN's boolean Switch should rename on import:
 //   import { Switch as DSSwitch } from "@field-ds/components";
-
-const APPLE_EASE = Easing.bezier(0.32, 0.72, 0, 1);
-const SLIDE_DURATION = 220;
 
 const SIZE_CFG = {
   H40: {
@@ -74,9 +72,9 @@ export type SwitchProps<T = string> = {
  *     onChange={setMode}
  *   />
  *
- * The active slot is highlighted by a white thumb that slides between
- * positions using the same Apple-style ease-out curve used elsewhere in
- * the system. Honors `useReducedMotion()` by snapping instead of sliding.
+ * The active slot is highlighted by a white thumb that moves between
+ * positions using **`motion.spring.springLight`** (`withSpring`). Honors
+ * `useReducedMotion()` by snapping instead of sliding.
  */
 export function Switch<T = string>({
   options,
@@ -110,9 +108,8 @@ export function Switch<T = string>({
     if (reducedMotion) {
       indexProgress.value = activeIndex;
     } else {
-      indexProgress.value = withTiming(activeIndex, {
-        duration: SLIDE_DURATION,
-        easing: APPLE_EASE,
+      indexProgress.value = withSpring(activeIndex, {
+        ...SPRING_TAB_THUMB,
       });
     }
   }, [activeIndex, indexProgress, reducedMotion]);

@@ -1,6 +1,7 @@
 export type FoundationsSection =
   | "colors"
   | "icons"
+  | "motion"
   | "radius"
   | "spacing"
   | "typography";

@@ -10,6 +10,7 @@
     "./base": "./src/base.ts",
     "./semantic": "./src/semantic.ts",
     "./text-styles": "./src/text-styles.ts",
+    "./springFromTF": "./src/springFromTF.ts",
     "./raw/base.json": "./src/raw/base.json",
     "./raw/semantic.json": "./src/raw/semantic.json",
     "./raw/text-styles.json": "./src/raw/text-styles.json"

@@ -28,10 +28,11 @@ import Animated, {
   useReducedMotion,
   useSharedValue,
   withTiming,
-  Easing,
 } from "react-native-reanimated";
 
-import { colour, radius, space, textStyles } from "@field-ds/tokens";
+import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
+
+import { fieldEasingStandard } from "../fieldMotion";
 
 // Figma: M-InputText (1102:164105)
 //   Three label modes × six derived states. State is derived from focus,
@@ -41,12 +42,6 @@ const FIELD_HEIGHT = 48;
 const INLINE_FIELD_HEIGHT = 56;
 const BORDER_RADIUS = radius["12"];
 const HELPER_GAP = space["6"];
-
-// Match Apple-style ease-out used by Checkbox / Accordion so motion stays
-// consistent across the system.
-const APPLE_EASE = Easing.bezier(0.32, 0.72, 0, 1);
-const COLOUR_DURATION = 160;
-const LABEL_DURATION = 200;
 
 // Inline-mode geometry — used to centre the label-as-placeholder at rest
 // (lift=0) and lift it to the top of the field on focus / fill (lift=1).
@@ -171,15 +166,15 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
 
   useEffect(() => {
     focusProgress.value = withTiming(isFocused ? 1 : 0, {
-      duration: reducedMotion ? 0 : COLOUR_DURATION,
-      easing: APPLE_EASE,
+      duration: reducedMotion ? 0 : motion.duration.sm,
+      easing: fieldEasingStandard,
     });
   }, [isFocused, reducedMotion, focusProgress]);
 
   useEffect(() => {
     liftProgress.value = withTiming(isFocused || hasValue ? 1 : 0, {
-      duration: reducedMotion ? 0 : LABEL_DURATION,
-      easing: APPLE_EASE,
+      duration: reducedMotion ? 0 : motion.duration.base,
+      easing: fieldEasingStandard,
     });
   }, [isFocused, hasValue, reducedMotion, liftProgress]);
 

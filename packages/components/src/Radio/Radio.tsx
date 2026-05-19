@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Pressable, type StyleProp, type ViewStyle } from "react-native";
 import Animated, {
-  Easing,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
@@ -9,7 +8,9 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Path } from "react-native-svg";
 
-import { colour } from "@field-ds/tokens";
+import { colour, motion } from "@field-ds/tokens";
+
+import { fieldEasingStandard } from "../fieldMotion";
 
 // Figma: M-Radio — three sizes, three visual states.
 //   H24 default · H20 dense lists · H16 compact tables only.
@@ -17,11 +18,7 @@ const SIZE_PX = { H16: 16, H20: 20, H24: 24 } as const;
 
 export type RadioSize = keyof typeof SIZE_PX;
 
-// Apple-style ease-out — same curve used in M-Checkbox so the family animates
-// in lock-step.
-const APPLE_EASE = Easing.bezier(0.32, 0.72, 0, 1);
-const SELECT_DURATION = 220;
-const DESELECT_DURATION = 180;
+// Easing/durations align with Checkbox — `@field-ds/tokens` `motion`.
 
 // Filled-disc-with-check-cutout paths exported verbatim from the Figma
 // M-Radio source (one per size — the proportions are hand-tuned per size, not
@@ -79,8 +76,10 @@ export function Radio({
 
   useEffect(() => {
     progress.value = withTiming(selected ? 1 : 0, {
-      duration: selected ? SELECT_DURATION : DESELECT_DURATION,
-      easing: APPLE_EASE,
+      duration: selected
+        ? motion.duration.emphasized
+        : motion.duration.recede,
+      easing: fieldEasingStandard,
     });
   }, [selected, progress]);
 
@@ -138,7 +137,6 @@ export function Radio({
           alignItems: "center",
           justifyContent: "center",
           opacity: pressed && !disabled ? 0.85 : 1,
-          // @ts-expect-error rn-web passes through to DOM
           transitionProperty: "opacity",
           transitionDuration: "120ms",
           transitionTimingFunction: "ease-out",

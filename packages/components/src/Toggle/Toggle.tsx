@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import Animated, {
   Easing,
+  Extrapolation,
+  interpolate,
   interpolateColor,
   useAnimatedStyle,
   useReducedMotion,
@@ -14,20 +16,23 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { colour, radius, space } from "@field-ds/tokens";
+import { colour, motion, radius, space } from "@field-ds/tokens";
 
 // Figma: M-Toggle — binary on/off thumb-slide.
 //   H16 compact · H20 standard · H24 prominent.
 // Pair with a visible label; the component renders no text of its own.
 
-const APPLE_EASE = Easing.bezier(0.32, 0.72, 0, 1);
-const SLIDE_DURATION = 220;
+// Cubic Bézier tokens are `motion.easing.*`; Reanimated expects `Easing.bezier`(…).
+const c = motion.easing.decelerate;
+const TOGGLE_PROGRESS_EASING = Easing.bezier(c[0], c[1], c[2], c[3]);
 
 const SIZE_CFG = {
   H16: { trackW: 28, trackH: 16, thumb: space["12"], shadowRadius: 3.84 },
   H20: { trackW: 34, trackH: 20, thumb: space["16"], shadowRadius: 4.8 },
   H24: { trackW: 42, trackH: 24, thumb: space["20"], shadowRadius: 4.8 },
 } as const;
+
+const THUMB_HORIZONTAL_SQUASH = 1.5;
 
 const PADDING = space["2"];
 
@@ -72,19 +77,20 @@ export function Toggle({
   const travel = cfg.trackW - PADDING * 2 - cfg.thumb;
   const reducedMotion = useReducedMotion();
 
+  /** 0 ↔ 1 over `motion.duration.xs` ms while flipping (thumb travel + track + squash shape). */
   const progress = useSharedValue(value ? 1 : 0);
 
   useEffect(() => {
     const target = value ? 1 : 0;
     if (reducedMotion) {
       progress.value = target;
-    } else {
-      progress.value = withTiming(target, {
-        duration: SLIDE_DURATION,
-        easing: APPLE_EASE,
-      });
+      return;
     }
-  }, [value, progress, reducedMotion]);
+    progress.value = withTiming(target, {
+      duration: motion.duration.lg,
+      easing: TOGGLE_PROGRESS_EASING,
+    });
+  }, [value, reducedMotion]);
 
   const trackOnColor = disabled
     ? colour.surface.muted
@@ -94,22 +100,33 @@ export function Toggle({
     ? colour.surface.tertiary
     : colour.surface.primary;
 
-  const trackAnimatedStyle = useAnimatedStyle(
-    () => ({
-      backgroundColor: interpolateColor(
-        progress.value,
-        [0, 1],
-        [trackOffColor, trackOnColor],
-      ),
-    }),
-    [trackOffColor, trackOnColor],
-  );
-
   const direction = I18nManager.isRTL ? -1 : 1;
+
+  const trackAnimatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      [trackOffColor, trackOnColor],
+    ),
+  }));
+
   const thumbAnimatedStyle = useAnimatedStyle(
-    () => ({
-      transform: [{ translateX: progress.value * travel * direction }],
-    }),
+    () => {
+      const p = progress.value;
+      // ─── Interpolation: horizontal squash peaks at midpoint of slide (below), bound to shared `progress`.
+      const scaleX = interpolate(
+        p,
+        [0, 0.5, 1],
+        [1, THUMB_HORIZONTAL_SQUASH, 1],
+        Extrapolation.CLAMP,
+      );
+      return {
+        transform: [
+          { translateX: p * travel * direction },
+          { scaleX },
+        ],
+      };
+    },
     [travel, direction],
   );
 

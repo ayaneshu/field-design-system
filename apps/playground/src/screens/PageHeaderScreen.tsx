@@ -1,14 +1,23 @@
 import { useState, type ReactNode } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import Animated, {
+  Easing,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
+  IconButton,
   PageHeader,
   Toggle as FieldToggle,
   type PageHeaderType,
   type PageHeaderTrailing,
 } from "@field-ds/components";
-import { colour, radius, space, textStyles } from "@field-ds/tokens";
+import { Icon } from "@field-ds/icons";
+import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
 
 import { Dropdown, type DropdownOption } from "../components/Dropdown";
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
@@ -101,6 +110,14 @@ export function PageHeaderScreen({ navigation }: Props) {
           }
           searchValue={searchValue}
           onSearchChangeText={setSearchValue}
+          onSearchPillPress={
+            type === "search-pill" || type === "search-pill-wide"
+              ? () =>
+                  setType((t) =>
+                    t === "search-pill" ? "search-pill-wide" : "search-pill",
+                  )
+              : undefined
+          }
           trailing={TRAILING_BY_TYPE[type]}
         />
       </PhoneFrame>
@@ -198,10 +215,180 @@ export function PageHeaderScreen({ navigation }: Props) {
         </PropList>
       </DetailSection>
 
+      <DetailSection
+        heading="Search pill → wide · motion"
+        preview={
+          <PreviewSurface tall>
+            <PhoneFrame>
+              <AnimatedSearchPillToWideDemo />
+            </PhoneFrame>
+          </PreviewSurface>
+        }
+        spacingTop={space["56"]}
+      >
+        <Text
+          style={[
+            textStyles.Body_B14_Regular,
+            {
+              color: colour["text-n-icon"].secondary,
+              maxWidth: 560,
+              marginBottom: space["16"],
+            },
+          ]}
+        >
+          Tap the search pill to expand or collapse. The pill rail grows on a Bézier eased driver (
+          <Text style={textStyles.Body_B14_SemiBold}>motion.easing.standard</Text>, duration{" "}
+          <Text style={textStyles.Body_B14_SemiBold}>motion.duration.lg</Text>). Share fades with{" "}
+          <Text style={textStyles.Body_B14_SemiBold}>Easing.linear</Text> while its slot width and inset
+          follow the Bézier‑timed slide driver so the icon reads as entering from the left of the trailing
+          group.
+        </Text>
+      </DetailSection>
+
       <DetailSection heading="All types" preview={allVariantsPreview} />
     </PageScaffold>
   );
 }
+
+const HEADER_HEIGHT = space["56"];
+const SEARCH_PILL_HEIGHT = space["40"];
+const ICON_BTN = 40;
+const SEARCH_PILL_MIN_W = 120;
+const SHARE_SLIDE_PAD = space["14"];
+
+/** Playground-only: collapsible search pill expanding to PageHeader-wide layout + share sliding in from the left cluster. */
+function AnimatedSearchPillToWideDemo() {
+  const [expanded, setExpanded] = useState(false);
+  const slideP = useSharedValue(0);
+  const opacityP = useSharedValue(0);
+
+  const dur = motion.duration.lg;
+  const slideEase = Easing.bezier(
+    motion.easing.standard[0],
+    motion.easing.standard[1],
+    motion.easing.standard[2],
+    motion.easing.standard[3],
+  );
+
+  const toggleFromPill = () => {
+    setExpanded((prev) => {
+      const next = !prev;
+      const v = next ? 1 : 0;
+      slideP.value = withTiming(v, { duration: dur, easing: slideEase });
+      opacityP.value = withTiming(v, { duration: dur, easing: Easing.linear });
+      return next;
+    });
+  };
+
+  const pillRailStyle = useAnimatedStyle(() => ({
+    flexGrow: interpolate(slideP.value, [0, 1], [0, 1]),
+    flexShrink: 1,
+    minWidth: SEARCH_PILL_MIN_W,
+    maxWidth: "100%",
+  }));
+
+  const shareSlotStyle = useAnimatedStyle(() => ({
+    width: interpolate(slideP.value, [0, 1], [0, ICON_BTN]),
+    marginLeft: interpolate(slideP.value, [0, 1], [0, space["4"]]),
+    opacity: opacityP.value,
+    overflow: "hidden",
+    transform: [{ translateX: interpolate(slideP.value, [0, 1], [-SHARE_SLIDE_PAD, 0]) }],
+  }));
+
+  return (
+    <View
+      style={stylesMotion.header}
+      accessibilityRole="header"
+      accessibilityHint={expanded ? "Tap search to collapse trailing actions" : "Tap search to expand"}
+    >
+      <View style={stylesMotion.rowBetween}>
+        <IconButton icon="system-chevron-left" emphasis="default" accessibilityLabel="Back" />
+        <View style={stylesMotion.trailingCluster}>
+          <Animated.View style={pillRailStyle}>
+            <Pressable
+              accessibilityRole="search"
+              accessibilityLabel="Search"
+              accessibilityState={{ expanded }}
+              onPress={toggleFromPill}
+              style={({ pressed }) => [
+                stylesMotion.searchPill,
+                pressed && stylesMotion.searchPillPressed,
+              ]}
+            >
+              <Icon
+                name="system-search"
+                size={space["20"]}
+                color={colour["text-n-icon"].secondary}
+              />
+              <Text style={stylesMotion.searchPillLabel} numberOfLines={1}>
+                Search
+              </Text>
+            </Pressable>
+          </Animated.View>
+          <IconButton
+            icon="system-heart"
+            emphasis="default"
+            onPress={() => {}}
+            accessibilityLabel="Saved"
+          />
+          <Animated.View pointerEvents={expanded ? "auto" : "none"} style={shareSlotStyle}>
+            <IconButton
+              icon="system-upload"
+              emphasis="default"
+              onPress={() => {}}
+              accessibilityLabel="Share"
+            />
+          </Animated.View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const stylesMotion = StyleSheet.create({
+  header: {
+    backgroundColor: colour.surface.primary,
+    height: HEADER_HEIGHT,
+    paddingVertical: space["8"],
+    paddingHorizontal: space["12"],
+    justifyContent: "center",
+  },
+  rowBetween: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: space["8"],
+    justifyContent: "space-between",
+  },
+  trailingCluster: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: space["4"],
+  },
+  searchPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space["8"],
+    height: SEARCH_PILL_HEIGHT,
+    minWidth: SEARCH_PILL_MIN_W,
+    width: "100%",
+    paddingHorizontal: space["12"],
+    backgroundColor: colour.surface.tertiary,
+    borderRadius: radius.rounded,
+    borderWidth: 1,
+    borderColor: colour.border.subtle,
+  },
+  searchPillPressed: {
+    backgroundColor: colour.surface.secondary,
+  },
+  searchPillLabel: {
+    ...textStyles.Body_B12_Medium,
+    color: colour["text-n-icon"].secondary,
+    flexShrink: 1,
+  },
+});
 
 // ─────────── Local building blocks ───────────
 
@@ -331,7 +518,7 @@ function DSTextInput({
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={colour["text-n-icon"].muted}
-        // @ts-expect-error — outlineStyle is web-only and supported by RN-Web
+        // @ts-expect-error — outlineStyle is web-only and supported by RN-Web, so keeping it 'none' in this case.
         style={[
           textStyles.Body_B14_SemiBold,
           {

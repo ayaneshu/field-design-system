@@ -1,3 +1,7 @@
+export {
+  approximateSpringSettleMs,
+  type SpringPhysicsParams,
+} from "./fieldMotion";
 export { Accordion, type AccordionProps } from "./Accordion";
 export {
   Switch,

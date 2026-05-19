@@ -7,9 +7,11 @@
  * Resolution rules:
  *  - Strings of the form "{a.b.c}" are alias references and are resolved
  *    against the merged tree of base + semantic + text-styles.
- *  - Dimension values like "16px" / "-0.25px" are converted to numbers.
+ *  - Dimension values like "16px" / "200ms" / "-0.25px" are converted to numbers.
  *  - Color values are emitted as-is (hex strings, possibly with alpha).
- *  - Typography values are emitted as RN-friendly style objects:
+ *  - Arrays are resolved element-wise (used for cubic-bezier control points).
+ *  - Spring presets may use `$type: "springTF"` with `{ tension, friction }` only;
+ *    the token build expands those to Reanimated stiffness/damping (+ defaults).
  *      { fontFamily: "Noontree-Bold", fontSize, fontWeight, lineHeight,
  *        letterSpacing, textTransform?, textDecorationLine? }
  */
@@ -70,6 +72,9 @@ function resolveValue(node: Tree | Leaf | unknown, seen = new Set<string>()): un
     const v = resolveValue(node.$value, seen);
     return castByType(node.$type, v);
   }
+  if (Array.isArray(node)) {
+    return node.map((item) => resolveValue(item, seen));
+  }
   if (typeof node === "object" && node !== null) {
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(node)) out[k] = resolveValue(v, seen);
@@ -78,10 +83,45 @@ function resolveValue(node: Tree | Leaf | unknown, seen = new Set<string>()): un
   return node;
 }
 
+/** Prototype tension/friction → Reanimated stiffness/damping (+ shared rest defaults). */
+function expandSpringTF(value: Record<string, unknown>): Record<string, unknown> {
+  const tension = Number(value.tension);
+  const friction = Number(value.friction);
+  if (!Number.isFinite(tension) || !Number.isFinite(friction)) {
+    throw new Error(`springTF expects numeric tension & friction, got ${JSON.stringify(value)}`);
+  }
+  const mass = value.mass !== undefined ? Number(value.mass) : 1;
+  return {
+    stiffness: tension,
+    damping: friction,
+    mass,
+    overshootClamping:
+      typeof value.overshootClamping === "boolean" ? value.overshootClamping : false,
+    restDisplacementThreshold:
+      value.restDisplacementThreshold !== undefined
+        ? Number(value.restDisplacementThreshold)
+        : 0.01,
+    restSpeedThreshold:
+      value.restSpeedThreshold !== undefined ? Number(value.restSpeedThreshold) : 0.01,
+  };
+}
+
 function castByType(type: string, value: unknown): unknown {
   if (type === "dimension" && typeof value === "string") {
-    const n = parseFloat(value.replace(/px$/, ""));
+    const n = parseFloat(value.replace(/(px|ms)$/i, ""));
     return Number.isNaN(n) ? value : n;
+  }
+  if (type === "cubicBezier") {
+    if (!Array.isArray(value) || value.length !== 4) {
+      throw new Error(`cubicBezier expected a 4-number array, got ${JSON.stringify(value)}`);
+    }
+    return value.map((x) => Number(x)) as unknown;
+  }
+  if (type === "spring" && typeof value === "object" && value !== null && !Array.isArray(value)) {
+    return value as unknown;
+  }
+  if (type === "springTF" && typeof value === "object" && value !== null && !Array.isArray(value)) {
+    return expandSpringTF(value as Record<string, unknown>);
   }
   if (type === "typography" && typeof value === "object" && value !== null) {
     return toRNTextStyle(value as Record<string, unknown>);
@@ -232,7 +272,8 @@ emit(
   "index.ts",
   `export * from "./base";\n` +
     `export * from "./semantic";\n` +
-    `export * from "./text-styles";\n`,
+    `export * from "./text-styles";\n` +
+    `export * from "./springFromTF";\n`,
 );
 
 console.log(
