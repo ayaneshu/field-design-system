@@ -1,9 +1,18 @@
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+  type SharedValue,
+} from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Icon } from "@field-ds/icons";
 import {
+  SEARCHBAR_PRESS_SCALE,
   SearchBar,
   Switch as FieldSwitch,
   Toggle as FieldToggle,
@@ -13,6 +22,12 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import {
+  SEARCH_AXIS_MS,
+  SEARCH_PRESS_IN_MS,
+  SEARCH_PRESS_OUT_START_MS,
+  searchBarPressMotionTimeline,
+} from "./motionTimelines/searchBarPressMotionTimeline";
 import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
 
@@ -31,6 +46,21 @@ export function SearchBarScreen({ navigation }: Props) {
   const [showRight, setShowRight] = useState(false);
   const [showRightTwo, setShowRightTwo] = useState(false);
   const [value, setValue] = useState("");
+
+  const playhead = useSharedValue(0);
+  const reducedMotion = useReducedMotion();
+
+  const triggerPlay = useCallback(() => {
+    if (reducedMotion) {
+      playhead.value = 1;
+      return;
+    }
+    playhead.value = 0;
+    playhead.value = withTiming(1, {
+      duration: SEARCH_AXIS_MS,
+      easing: Easing.linear,
+    });
+  }, [playhead, reducedMotion]);
 
   const trailingIconSize = size === "H48" ? 24 : 20;
 
@@ -147,6 +177,11 @@ export function SearchBarScreen({ navigation }: Props) {
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/SearchBar/SearchBar.tsx"
       sidebar={componentsSidebar("SearchBar")}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
+      motionTimeline={{
+        ...searchBarPressMotionTimeline,
+        playhead,
+        preview: <PressInPreview playhead={playhead} onPlay={triggerPlay} />,
+      }}
     >
       <DetailSection
         heading="Playground"
@@ -225,6 +260,74 @@ export function SearchBarScreen({ navigation }: Props) {
       <DetailSection heading="States" preview={statesPreview} />
       <DetailSection heading="Patterns" preview={patternsPreview} />
     </PageScaffold>
+  );
+}
+
+/**
+ * Live preview of the SearchBar press interaction, scale-driven by the same
+ * `playhead` shared value as the timesheet cursor so the line and the visible
+ * scale always agree.
+ */
+function PressInPreview({
+  playhead,
+  onPlay,
+}: {
+  playhead: SharedValue<number>;
+  onPlay: () => void;
+}) {
+  const shell = useShell();
+
+  const previewStyle = useAnimatedStyle(() => {
+    const t = playhead.value * SEARCH_AXIS_MS;
+    let scale = 1;
+    if (t < SEARCH_PRESS_IN_MS) {
+      scale =
+        1 + (SEARCHBAR_PRESS_SCALE - 1) * (t / SEARCH_PRESS_IN_MS);
+    } else if (t < SEARCH_PRESS_OUT_START_MS) {
+      scale = SEARCHBAR_PRESS_SCALE;
+    } else {
+      const u =
+        (t - SEARCH_PRESS_OUT_START_MS) /
+        Math.max(1, SEARCH_AXIS_MS - SEARCH_PRESS_OUT_START_MS);
+      scale = SEARCHBAR_PRESS_SCALE + (1 - SEARCHBAR_PRESS_SCALE) * u;
+    }
+    return { transform: [{ scale }] };
+  });
+
+  return (
+    <View style={{ alignItems: "center", gap: space["12"] }}>
+      <Text
+        style={[
+          textStyles.Body_B11_SemiBold,
+          {
+            color: shell.textTertiary,
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          },
+        ]}
+      >
+        Live preview
+      </Text>
+      <Pressable
+        onPress={onPlay}
+        accessibilityRole="button"
+        accessibilityLabel="Play press interaction"
+      >
+        <Animated.View style={[{ width: 280 }, previewStyle]}>
+          <View pointerEvents="none">
+            <SearchBar size="H48" />
+          </View>
+        </Animated.View>
+      </Pressable>
+      <Text
+        style={[
+          textStyles.Body_B11_Regular,
+          { color: shell.textMuted, textAlign: "center" },
+        ]}
+      >
+        tap to play · scale → {SEARCHBAR_PRESS_SCALE}
+      </Text>
+    </View>
   );
 }
 

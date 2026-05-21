@@ -1,9 +1,11 @@
 import { Pressable, type StyleProp, type ViewStyle } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { Icon, type IconName } from "@field-ds/icons";
 import { colour, radius, space } from "@field-ds/tokens";
 
 import { PRESS_TRANSITION } from "./sizing";
+import { usePressScale } from "./usePressScale";
 
 // Maps to Figma M-IconButton (1051:10843). Circular, icon-only, two heights.
 // Three emphasis levels (Default / Ghost / Action) × three states (Default /
@@ -95,6 +97,7 @@ export type IconButtonProps = {
  *   <IconButton icon="system-arrow-right" accessibilityLabel="Next" />
  *   <IconButton icon="system-plus" emphasis="action" accessibilityLabel="Add" />
  */
+
 export function IconButton({
   icon,
   size = "H40",
@@ -108,22 +111,26 @@ export function IconButton({
   const e = EMPHASIS[emphasis];
   const fg = disabled ? e.fgDisabled : e.fg;
 
+  const press = usePressScale(disabled);
+
   return (
-    <Pressable
-      onPress={disabled ? undefined : onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      accessibilityLabel={accessibilityLabel}
-      // @ts-expect-error — dataSet on Pressable on web
-      dataSet={{
-        component: "IconButton",
-        emphasis,
-        size,
-        state: disabled ? "disabled" : "default",
-      }}
-      style={({ pressed }) => [
-        {
+    <Animated.View style={[press.animatedStyle, style]}>
+      <Pressable
+        onPress={disabled ? undefined : onPress}
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
+        disabled={disabled}
+        accessibilityRole="button"
+        accessibilityState={{ disabled }}
+        accessibilityLabel={accessibilityLabel}
+        // @ts-expect-error — dataSet on Pressable on web
+        dataSet={{
+          component: "IconButton",
+          emphasis,
+          size,
+          state: disabled ? "disabled" : "default",
+        }}
+        style={({ pressed }) => ({
           width: box.size,
           height: box.size,
           padding: box.padding,
@@ -142,11 +149,10 @@ export function IconButton({
               ? e.borderPressed
               : e.border,
           ...PRESS_TRANSITION,
-        },
-        style,
-      ]}
-    >
-      <Icon name={icon} size={box.iconSize} color={fg} />
-    </Pressable>
+        })}
+      >
+        <Icon name={icon} size={box.iconSize} color={fg} />
+      </Pressable>
+    </Animated.View>
   );
 }

@@ -23,7 +23,9 @@ type ComponentEntry = {
 // Alphabetised by display name.
 const COMPONENTS: ComponentEntry[] = [
   { route: "Accordion", name: "Accordion", illustration: AccordionIllustration },
+  { route: "ActionBar", name: "Action Bar", illustration: ActionBarIllustration },
   { route: "BottomNav", name: "BottomNav", illustration: BottomNavIllustration },
+  { route: "BottomSheet", name: "BottomSheet", illustration: BottomSheetIllustration },
   { route: "Checkbox", name: "Checkbox", illustration: CheckboxIllustration },
   { route: "Divider", name: "Divider", illustration: DividerIllustration },
   {
@@ -404,6 +406,95 @@ function AccordionIllustration({ tone }: { tone: string }) {
         </View>
         <View style={{ height: STROKE, backgroundColor: tone, opacity: 0.18 }} />
         <Header titleWidth={56} expanded={false} />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function ActionBarIllustration({ tone }: { tone: string }) {
+  // A caption / placeholder line above a full-width CTA pill — the canonical
+  // single-layout ActionBar.
+  return (
+    <IlloFrame>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 16,
+          gap: 8,
+        }}
+      >
+        <LabelBar width={96} alpha={0.35} tone={tone} />
+        <View
+          style={{
+            width: "82%",
+            height: 18,
+            borderRadius: 8,
+            backgroundColor: tone,
+            opacity: 0.85,
+          }}
+        />
+      </View>
+    </IlloFrame>
+  );
+}
+
+function BottomSheetIllustration({ tone }: { tone: string }) {
+  // A grabber bar above a rounded sheet card, plus a hint of a primary CTA
+  // pinned to the bottom — mirrors the floating-12px-inset chrome.
+  return (
+    <IlloFrame>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "flex-end" }}>
+        <View
+          style={{
+            width: 28,
+            height: 3,
+            borderRadius: 9999,
+            backgroundColor: tone,
+            opacity: 0.45,
+            marginBottom: 6,
+          }}
+        />
+        <View
+          style={{
+            width: "82%",
+            height: 76,
+            borderRadius: 12,
+            borderWidth: STROKE,
+            borderColor: tone,
+            opacity: 0.9,
+            paddingHorizontal: 10,
+            paddingTop: 12,
+            justifyContent: "space-between",
+            paddingBottom: 8,
+          }}
+        >
+          <View style={{ gap: 4 }}>
+            <LabelBar width={56} alpha={0.55} tone={tone} />
+            <LabelBar width={88} alpha={0.35} tone={tone} />
+            <LabelBar width={72} alpha={0.35} tone={tone} />
+          </View>
+          <View
+            style={{
+              height: 14,
+              borderRadius: 6,
+              backgroundColor: tone,
+              opacity: 0.85,
+            }}
+          />
+        </View>
+        <View
+          style={{
+            width: 38,
+            height: 2,
+            borderRadius: 9999,
+            backgroundColor: tone,
+            opacity: 0.35,
+            marginTop: 8,
+            marginBottom: 4,
+          }}
+        />
       </View>
     </IlloFrame>
   );

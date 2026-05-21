@@ -18,6 +18,11 @@ import {
   Toggle,
 } from "../components/playground-controls";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import { buttonPressMotionTimeline } from "./motionTimelines/buttonPressMotionTimeline";
+import {
+  ButtonPressPreview,
+  useButtonPressMotion,
+} from "./motionTimelines/useButtonPressMotion";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "NeutralButton">;
@@ -38,6 +43,8 @@ export function NeutralButtonScreen({ navigation }: Props) {
   const [disabled, setDisabled] = useState(false);
   const [iconLeft, setIconLeft] = useState<IconName | null>(null);
   const [iconRight, setIconRight] = useState<IconName | null>(null);
+
+  const press = useButtonPressMotion();
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -77,6 +84,15 @@ export function NeutralButtonScreen({ navigation }: Props) {
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Button/NeutralButton.tsx"
       sidebar={componentsSidebar("NeutralButton")}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
+      motionTimeline={{
+        ...buttonPressMotionTimeline,
+        playhead: press.playhead,
+        preview: (
+          <ButtonPressPreview playhead={press.playhead} onPlay={press.triggerPlay}>
+            <NeutralButton label="Schedule" size="H48" />
+          </ButtonPressPreview>
+        ),
+      }}
     >
       <DetailSection
         heading="Playground"

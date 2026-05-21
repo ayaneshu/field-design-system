@@ -18,6 +18,11 @@ import {
   Toggle,
 } from "../components/playground-controls";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import { buttonPressMotionTimeline } from "./motionTimelines/buttonPressMotionTimeline";
+import {
+  ButtonPressPreview,
+  useButtonPressMotion,
+} from "./motionTimelines/useButtonPressMotion";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "RoundButton">;
@@ -36,6 +41,8 @@ export function RoundButtonScreen({ navigation }: Props) {
   const [iconRight, setIconRight] = useState<IconName | null>(null);
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
+
+  const press = useButtonPressMotion();
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -74,6 +81,15 @@ export function RoundButtonScreen({ navigation }: Props) {
       version="V0.1"
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Button/RoundButton.tsx"
       sidebar={componentsSidebar("RoundButton")}
+      motionTimeline={{
+        ...buttonPressMotionTimeline,
+        playhead: press.playhead,
+        preview: (
+          <ButtonPressPreview playhead={press.playhead} onPlay={press.triggerPlay}>
+            <RoundButton label="Filter" size="H40" />
+          </ButtonPressPreview>
+        ),
+      }}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
     >
       <DetailSection

@@ -6,28 +6,33 @@ import {
   type ViewStyle,
 } from "react-native";
 import Animated, {
-  Easing,
+  Extrapolation,
+  interpolate,
   interpolateColor,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
-  withTiming,
+  withSpring,
 } from "react-native-reanimated";
 
-import { colour, radius, space } from "@field-ds/tokens";
+import { colour, motion, radius, space } from "@field-ds/tokens";
 
 // Figma: M-Toggle — binary on/off thumb-slide.
 //   H16 compact · H20 standard · H24 prominent.
 // Pair with a visible label; the component renders no text of its own.
-
-const APPLE_EASE = Easing.bezier(0.32, 0.72, 0, 1);
-const SLIDE_DURATION = 220;
 
 const SIZE_CFG = {
   H16: { trackW: 28, trackH: 16, thumb: space["12"], shadowRadius: 3.84 },
   H20: { trackW: 34, trackH: 20, thumb: space["16"], shadowRadius: 4.8 },
   H24: { trackW: 42, trackH: 24, thumb: space["20"], shadowRadius: 4.8 },
 } as const;
+
+/** Mid-slide peak width multiplier — the thumb widens as it travels, then
+ *  returns to its square footprint at the destination. Animating `width`
+ *  (not `scaleX`) keeps the rounded-pill corners crisp at every frame. */
+const THUMB_PEAK_W_MULT = 1.3;
+/** Touch-down feedback on the whole track. */
+const TRACK_PRESS_SCALE = 0.98;
 
 const PADDING = space["2"];
 
@@ -51,7 +56,10 @@ export type ToggleProps = {
  *
  *   <Toggle defaultOn={false} onChange={setEnabled} accessibilityLabel="Notifications" />
  *
- * Honors `useReducedMotion()` by snapping instead of sliding.
+ * The thumb slides on `motion.spring.springLight` (shared with M-Switch),
+ * its width briefly widens mid-travel to give the move weight, and the
+ * whole track scales down to `TRACK_PRESS_SCALE` while held. Honours
+ * `useReducedMotion()` by snapping instead of animating.
  */
 export function Toggle({
   on: controlledOn,
@@ -72,19 +80,35 @@ export function Toggle({
   const travel = cfg.trackW - PADDING * 2 - cfg.thumb;
   const reducedMotion = useReducedMotion();
 
+  /** 0 ↔ 1 while flipping — drives translateX, width morph, and track colour. */
   const progress = useSharedValue(value ? 1 : 0);
 
   useEffect(() => {
     const target = value ? 1 : 0;
     if (reducedMotion) {
       progress.value = target;
-    } else {
-      progress.value = withTiming(target, {
-        duration: SLIDE_DURATION,
-        easing: APPLE_EASE,
-      });
+      return;
     }
-  }, [value, progress, reducedMotion]);
+    progress.value = withSpring(target, motion.spring.springLight);
+  }, [value, reducedMotion, progress]);
+
+  /** Touch-down feedback for the whole track. */
+  const pressScale = useSharedValue(1);
+  const handlePressIn = () => {
+    if (disabled) return;
+    if (reducedMotion) {
+      pressScale.value = TRACK_PRESS_SCALE;
+      return;
+    }
+    pressScale.value = withSpring(TRACK_PRESS_SCALE, motion.spring.springLight);
+  };
+  const handlePressOut = () => {
+    if (reducedMotion) {
+      pressScale.value = 1;
+      return;
+    }
+    pressScale.value = withSpring(1, motion.spring.springLight);
+  };
 
   const trackOnColor = disabled
     ? colour.surface.muted
@@ -94,23 +118,35 @@ export function Toggle({
     ? colour.surface.tertiary
     : colour.surface.primary;
 
-  const trackAnimatedStyle = useAnimatedStyle(
-    () => ({
-      backgroundColor: interpolateColor(
-        progress.value,
-        [0, 1],
-        [trackOffColor, trackOnColor],
-      ),
-    }),
-    [trackOffColor, trackOnColor],
-  );
-
   const direction = I18nManager.isRTL ? -1 : 1;
+
+  const trackAnimatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      [trackOffColor, trackOnColor],
+    ),
+    transform: [{ scale: pressScale.value }],
+  }));
+
   const thumbAnimatedStyle = useAnimatedStyle(
-    () => ({
-      transform: [{ translateX: progress.value * travel * direction }],
-    }),
-    [travel, direction],
+    () => {
+      const p = progress.value;
+      // Width morph: rounded square → wider rounded rectangle (pill) → square.
+      // Border-radius stays at `radius.rounded`, so the corners stay perfect
+      // half-circles at every width.
+      const width = interpolate(
+        p,
+        [0, 0.5, 1],
+        [cfg.thumb, cfg.thumb * THUMB_PEAK_W_MULT, cfg.thumb],
+        Extrapolation.CLAMP,
+      );
+      return {
+        width,
+        transform: [{ translateX: p * travel * direction }],
+      };
+    },
+    [travel, direction, cfg.thumb],
   );
 
   const handlePress = () => {
@@ -123,6 +159,8 @@ export function Toggle({
   return (
     <Pressable
       onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       disabled={disabled}
       accessibilityRole="switch"
       accessibilityState={{ checked: value, disabled }}
@@ -147,7 +185,6 @@ export function Toggle({
         <Animated.View
           style={[
             {
-              width: cfg.thumb,
               height: cfg.thumb,
               borderRadius: radius.rounded,
               backgroundColor: thumbColor,

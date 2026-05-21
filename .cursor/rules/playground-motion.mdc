@@ -1,0 +1,11 @@
+---
+description: Component playground Motion specs tab — stubs and authoring
+globs: apps/playground/src/screens/**/*.tsx,apps/playground/src/components/PageScaffold.tsx,apps/playground/src/screens/motionTimelines/**/*.ts
+---
+
+When you add or edit a Field DS **component detail screen** (`apps/playground/src/screens/*Screen.tsx`):
+
+- **`PageScaffold` + `repoUrl`** opens the Design / Develop / **Motion specs** tabs. Omitting **`motionTimeline`** still shows a full **stub timesheet** via `createDefaultComponentMotionTimeline(title)` (`apps/playground/src/screens/motionTimelines/createDefaultComponentMotionTimeline.ts`).
+- Hand-author **`motionTimeline`** when the shipped component defines real transitions: add a sibling file next to Toggle’s pattern (`toggleFlipMotionTimeline.ts`) and pass **`motionTimeline={...}`** on `PageScaffold` to replace the stub.
+- Prefer **`tokenRows`** — **motion-only**: timing/easing tokens plus semantic tokens read by **animated** properties (e.g. interpolate endpoints). Omit static layout/fills that do not change with the driver. **`MotionTimesheet`** renders a **Motion driver · u** note below that table unless `progressDriverNote=""`.
+- **`motionSpecs`** remains the escape hatch for a fully custom Motion tab layout (rare).

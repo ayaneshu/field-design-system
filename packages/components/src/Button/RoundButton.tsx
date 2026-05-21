@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { Icon, type IconName } from "@field-ds/icons";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@field-ds/tokens";
 
 import { PRESS_TRANSITION, noFauxBold } from "./sizing";
+import { usePressScale } from "./usePressScale";
 
 // Pill-shaped neutral CTA — white surface, neutral 1px border, fully rounded.
 // Maps to Figma M-NeutralRoundButton (1304:266). Two heights only.
@@ -87,9 +89,20 @@ export function RoundButton({
       ? "textStyles.Action_A14_SemiBold"
       : "textStyles.Action_A12_SemiBold";
 
+  const press = usePressScale(isInert);
+
   return (
+    <Animated.View
+      style={[
+        press.animatedStyle,
+        { alignSelf: fullWidth ? "stretch" : "flex-start" },
+        style,
+      ]}
+    >
     <Pressable
       onPress={isInert ? undefined : onPress}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
       disabled={isInert}
       accessibilityRole="button"
       accessibilityState={{ disabled: isInert, busy: loading }}
@@ -100,27 +113,24 @@ export function RoundButton({
         size,
         state: disabled ? "disabled" : loading ? "loader" : "default",
       }}
-      style={({ pressed }) => [
-        {
-          minHeight: spec.height,
-          maxHeight: spec.height,
-          paddingHorizontal: spec.paddingX,
-          paddingVertical: spec.paddingY,
-          borderRadius: radius.rounded,
-          alignSelf: fullWidth ? "stretch" : "flex-start",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: spec.gap,
-          backgroundColor: pressed && !isInert
-            ? colour.surface.secondary
-            : colour.surface.primary,
-          borderWidth: 1,
-          borderColor: colour.border.primary,
-          ...PRESS_TRANSITION,
-        },
-        style,
-      ]}
+      style={({ pressed }) => ({
+        minHeight: spec.height,
+        maxHeight: spec.height,
+        paddingHorizontal: spec.paddingX,
+        paddingVertical: spec.paddingY,
+        borderRadius: radius.rounded,
+        alignSelf: fullWidth ? "stretch" : "flex-start",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: spec.gap,
+        backgroundColor: pressed && !isInert
+          ? colour.surface.secondary
+          : colour.surface.primary,
+        borderWidth: 1,
+        borderColor: colour.border.primary,
+        ...PRESS_TRANSITION,
+      })}
     >
       {({ pressed }) => {
         const fg = disabled
@@ -177,12 +187,27 @@ export function RoundButton({
                   justifyContent: "center",
                 }}
               >
-                <ActivityIndicator size="small" color={fg} />
+                <View
+                  style={[
+                    {
+                      width: spec.spinnerSize,
+                      height: spec.spinnerSize,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    },
+                    // Web: kill inline baseline descent under the SVG so the
+                    // rotation centroid actually sits on the wrapper's center.
+                    { lineHeight: 0 } as unknown as ViewStyle,
+                  ]}
+                >
+                  <ActivityIndicator size={spec.spinnerSize} color={fg} />
+                </View>
               </View>
             ) : null}
           </>
         );
       }}
     </Pressable>
+    </Animated.View>
   );
 }

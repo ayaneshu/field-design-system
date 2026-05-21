@@ -629,6 +629,111 @@
       "$value": "{base.number.9999}"
     }
   },
+  "motion": {
+    "duration": {
+      "instant": {
+        "$type": "dimension",
+        "$value": "40ms"
+      },
+      "xs": {
+        "$type": "dimension",
+        "$value": "100ms"
+      },
+      "sm": {
+        "$type": "dimension",
+        "$value": "160ms"
+      },
+      "base": {
+        "$type": "dimension",
+        "$value": "200ms"
+      },
+      "recede": {
+        "$type": "dimension",
+        "$value": "180ms"
+      },
+      "emphasized": {
+        "$type": "dimension",
+        "$value": "220ms"
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": "260ms"
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": "320ms"
+      }
+    },
+    "delay": {
+      "stagger": {
+        "$type": "dimension",
+        "$value": "25ms"
+      },
+      "beat": {
+        "$type": "dimension",
+        "$value": "120ms"
+      }
+    },
+    "easing": {
+      "standard": {
+        "$type": "cubicBezier",
+        "$value": [0.32, 0.72, 0, 1]
+      },
+      "loft": {
+        "$type": "cubicBezier",
+        "$value": [0.22, 1, 0.36, 1]
+      },
+      "accelerate": {
+        "$type": "cubicBezier",
+        "$value": [0.4, 0, 1, 1]
+      },
+      "decelerate": {
+        "$type": "cubicBezier",
+        "$value": [0, 0, 0.2, 1]
+      },
+      "easeInOut": {
+        "$type": "cubicBezier",
+        "$value": [0.6, 0, 0.4, 1]
+      }
+    },
+    "spring": {
+      "interaction": {
+        "$type": "springTF",
+        "$value": {
+          "tension": 220,
+          "friction": 18
+        }
+      },
+      "snappy": {
+        "$type": "springTF",
+        "$value": {
+          "tension": 280,
+          "friction": 22
+        }
+      },
+      "springLight": {
+        "$type": "springTF",
+        "$value": {
+          "tension": 300,
+          "friction": 28
+        }
+      },
+      "springHeavy": {
+        "$type": "springTF",
+        "$value": {
+          "tension": 320,
+          "friction": 32
+        }
+      },
+      "springBouncy": {
+        "$type": "springTF",
+        "$value": {
+          "tension": 280,
+          "friction": 18
+        }
+      }
+    }
+  },
   "Icon_Color": {
     "$type": "color",
     "$value": "#1d2539"

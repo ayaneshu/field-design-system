@@ -8,7 +8,6 @@ import {
   type ViewStyle,
 } from "react-native";
 import Animated, {
-  Easing,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
@@ -16,7 +15,9 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon } from "@field-ds/icons";
-import { colour, radius, space, textStyles } from "@field-ds/tokens";
+import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
+
+import { fieldEasingStandard } from "../fieldMotion";
 
 // Sizes lifted from the Figma component spec — every value is a token reference.
 const HEADER_MIN_HEIGHT = space["44"];          // header.height = 44
@@ -27,11 +28,7 @@ const HEADER_GAP = space["8"];                  // gap between title block and c
 const PADDING = space["12"];                    // header & body padding
 const CONTAINER_RADIUS = radius["12"];          // outer container radius
 
-// iOS-style ease-out — the curve Apple uses across UIKit content reveals.
-// Tuned for an accordion: feels deliberate, lands cleanly, no overshoot.
-const APPLE_EASE = Easing.bezier(0.32, 0.72, 0, 1);
-const OPEN_DURATION = 320;
-const CLOSE_DURATION = 260;
+// Open/close timing from `motion.duration` — accordion closes slightly quicker.
 
 export type AccordionProps = {
   title: string;
@@ -62,8 +59,7 @@ export type AccordionProps = {
  *      the edge as content emerges from under the header.
  *   5. Chevron rotates with the same progress driver, keeping motion in sync.
  *
- * Easing: cubic-bezier(0.32, 0.72, 0, 1) — Apple's preferred ease-out.
- *   320ms on open, 260ms on close (closes a touch quicker, also Apple's pattern).
+ * Easing follows `motion.easing.standard` — motion.duration.{xl|lg}.
  */
 export function Accordion({
   title,
@@ -86,8 +82,10 @@ export function Accordion({
 
   useEffect(() => {
     progress.value = withTiming(expanded ? 1 : 0, {
-      duration: expanded ? OPEN_DURATION : CLOSE_DURATION,
-      easing: APPLE_EASE,
+      duration: expanded
+        ? motion.duration.xl
+        : motion.duration.lg,
+      easing: fieldEasingStandard,
     });
   }, [expanded, progress]);
 

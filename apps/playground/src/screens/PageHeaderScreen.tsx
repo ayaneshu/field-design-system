@@ -101,6 +101,14 @@ export function PageHeaderScreen({ navigation }: Props) {
           }
           searchValue={searchValue}
           onSearchChangeText={setSearchValue}
+          onSearchPillPress={
+            type === "search-pill" || type === "search-pill-wide"
+              ? () =>
+                  setType((t) =>
+                    t === "search-pill" ? "search-pill-wide" : "search-pill",
+                  )
+              : undefined
+          }
           trailing={TRAILING_BY_TYPE[type]}
         />
       </PhoneFrame>
@@ -202,6 +210,7 @@ export function PageHeaderScreen({ navigation }: Props) {
     </PageScaffold>
   );
 }
+
 
 // ─────────── Local building blocks ───────────
 
@@ -331,7 +340,7 @@ function DSTextInput({
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={colour["text-n-icon"].muted}
-        // @ts-expect-error — outlineStyle is web-only and supported by RN-Web
+        // @ts-expect-error — outlineStyle is web-only and supported by RN-Web, so keeping it 'none' in this case.
         style={[
           textStyles.Body_B14_SemiBold,
           {

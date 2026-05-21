@@ -205,5 +205,72 @@ export const radius = {
 } as const;
 export type Radius = typeof radius;
 
+export const motion = {
+  duration: {
+    instant: 40,
+    xs: 100,
+    sm: 160,
+    base: 200,
+    recede: 180,
+    emphasized: 220,
+    lg: 260,
+    xl: 320,
+  },
+  delay: {
+    stagger: 25,
+    beat: 120,
+  },
+  easing: {
+    standard: [0.32, 0.72, 0, 1],
+    loft: [0.22, 1, 0.36, 1],
+    accelerate: [0.4, 0, 1, 1],
+    decelerate: [0, 0, 0.2, 1],
+    easeInOut: [0.6, 0, 0.4, 1],
+  },
+  spring: {
+    interaction: {
+      stiffness: 220,
+      damping: 18,
+      mass: 1,
+      overshootClamping: false,
+      restDisplacementThreshold: 0.01,
+      restSpeedThreshold: 0.01,
+    },
+    snappy: {
+      stiffness: 280,
+      damping: 22,
+      mass: 1,
+      overshootClamping: false,
+      restDisplacementThreshold: 0.01,
+      restSpeedThreshold: 0.01,
+    },
+    springLight: {
+      stiffness: 300,
+      damping: 28,
+      mass: 1,
+      overshootClamping: false,
+      restDisplacementThreshold: 0.01,
+      restSpeedThreshold: 0.01,
+    },
+    springHeavy: {
+      stiffness: 320,
+      damping: 32,
+      mass: 1,
+      overshootClamping: false,
+      restDisplacementThreshold: 0.01,
+      restSpeedThreshold: 0.01,
+    },
+    springBouncy: {
+      stiffness: 280,
+      damping: 18,
+      mass: 1,
+      overshootClamping: false,
+      restDisplacementThreshold: 0.01,
+      restSpeedThreshold: 0.01,
+    },
+  },
+} as const;
+export type Motion = typeof motion;
+
 export const Icon_Color = "#1d2539" as const;
 export type IconColor = typeof Icon_Color;

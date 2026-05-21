@@ -26,10 +26,11 @@ import Animated, {
   useReducedMotion,
   useSharedValue,
   withTiming,
-  Easing,
 } from "react-native-reanimated";
 
-import { colour, radius, space, textStyles } from "@field-ds/tokens";
+import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
+
+import { fieldEasingStandard } from "../fieldMotion";
 
 // Figma: M-InputTextarea (1092:212)
 //   Multi-line input with an external label. State derived from focus,
@@ -38,9 +39,6 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 const DEFAULT_MIN_HEIGHT = 180;
 const BORDER_RADIUS = radius["12"];
 const HELPER_GAP = space["6"];
-
-const APPLE_EASE = Easing.bezier(0.32, 0.72, 0, 1);
-const COLOUR_DURATION = 160;
 
 // Web-only style additions to suppress the browser's default focus outline
 // (typed loosely so RN's TS doesn't reject the unknown keys).
@@ -138,8 +136,8 @@ export const InputTextarea = forwardRef<TextInput, InputTextareaProps>(
 
     useEffect(() => {
       focusProgress.value = withTiming(isFocused ? 1 : 0, {
-        duration: reducedMotion ? 0 : COLOUR_DURATION,
-        easing: APPLE_EASE,
+        duration: reducedMotion ? 0 : motion.duration.sm,
+        easing: fieldEasingStandard,
       });
     }, [isFocused, reducedMotion, focusProgress]);
 

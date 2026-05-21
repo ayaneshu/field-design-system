@@ -55,7 +55,9 @@ export const linking: LinkingOptions<RootStackParamList> = {
       IconButton: "components/button/icon",
       // All other components flatten under /components/*.
       Accordion: "components/accordion",
+      ActionBar: "components/action-bar",
       BottomNav: "components/bottom-nav",
+      BottomSheet: "components/bottom-sheet",
       Checkbox: "components/checkbox",
       Divider: "components/divider",
       FilterChip: "components/filter-chip",

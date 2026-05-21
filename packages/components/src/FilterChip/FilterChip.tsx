@@ -1,8 +1,17 @@
+import { useEffect } from "react";
 import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import Animated, {
+  Easing,
+  interpolateColor,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import type { ReactNode } from "react";
 
 import { Icon, type IconName } from "@field-ds/icons";
-import { colour, radius, space, textStyles } from "@field-ds/tokens";
+import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
 
 // Maps to Figma M-FilterChip (1391:41). Height-36 filter / sort chip.
 //   - content="label"  → preferences-style chip ("Filter ▼"). Independent
@@ -14,21 +23,29 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 // Pressed visuals come from Pressable's `pressed` flag — there is no
 // Pressed prop. `disabled` and `added` are exposed as standalone booleans
 // so the runtime API maps cleanly to common filter-bar behaviour.
-//
-// Tokens (resolved through @field-ds/tokens):
-//   - radius/8                    rounded corners
-//   - space/10, space/8           padding (x, y)
-//   - space/4                     gap between cluster items
-//   - colour.surface.primary      Default / Added background
-//   - colour.surface.secondary    Pressed / Disabled background
-//   - colour.border.subtle        Default / Pressed / Disabled border
-//   - colour.border.extrabold     Added border (1px black-ish hairline)
-//   - colour.text-n-icon.primary  Default / Pressed / Added foreground
-//   - colour.text-n-icon.muted    Disabled foreground
 
 const HEIGHT = 36;
 const SLOT_SIZE = 20;
 const ICON_SIZE = 16;
+
+// ─── Motion tokens for the default ↔ added state transition ───
+// Opacity / colour use easeInOut for symmetric phasing; the shape-size +
+// translate lane uses the `loft` curve (gentle out, settled finish) so the
+// chip resize and cross slide-in feel less mechanical than a pure linear.
+const TE = motion.easing.easeInOut;
+const TRANSITION_EASING = Easing.bezier(TE[0], TE[1], TE[2], TE[3]);
+const SE = motion.easing.loft;
+const SHAPE_EASING = Easing.bezier(SE[0], SE[1], SE[2], SE[3]);
+/** Duration of the FilterChip default ↔ added morph. */
+export const FILTER_CHIP_TRANSITION_MS = motion.duration.xl;
+/** Easing token reference for the chip resize + cross slide-in. */
+export const FILTER_CHIP_SHAPE_EASING_TOKEN = "motion.easing.easeInOut" as const;
+/** Reserved max width for the count text when fully expanded. */
+export const FILTER_CHIP_COUNT_MAX_W = 40;
+/** Reserved width for the divider + clear-cross zone when fully expanded. */
+export const FILTER_CHIP_CLEAR_ZONE_W = 40;
+/** Offset from which the cross icon slides in (px, leftward). */
+export const FILTER_CHIP_CLEAR_TRANSLATE_FROM = -12;
 
 export type FilterChipContent = "label" | "slot";
 
@@ -75,8 +92,6 @@ type Surface = {
   fgToken: string;
 };
 
-// Default / Pressed / Disabled all share the subtle border. Added is the
-// only state that swaps to the extrabold (near-black) hairline.
 const SURFACE_DEFAULT: Surface = {
   bg: colour.surface.primary,
   bgPressed: colour.surface.secondary,
@@ -105,14 +120,14 @@ const SURFACE_ADDED: Surface = {
  * M-FilterChip — height-36 filter / sort chip.
  *
  *   <FilterChip label="Filter" onPress={openSheet} />
- *   <FilterChip label="Sort" iconLeft="system-sort" />
  *   <FilterChip label="Filter" count="(4)" added onPress={openSheet} onClear={clearAll} />
  *   <FilterChip content="slot" onPress={openSheet}>
  *     <Image source={brandLogo} style={{ width: 20, height: 20 }} />
  *   </FilterChip>
  *
- * `disabled` removes interactivity and applies the muted treatment. Prefer
- * hiding the chip entirely when the action is never available in context.
+ * The default ↔ added transition tweens border colour, count opacity / width,
+ * and the clear-cross slide-in over `motion.duration.base` ·
+ * `motion.easing.standard`. Honours `useReducedMotion()` by snapping.
  */
 export function FilterChip({
   content = "label",
@@ -137,6 +152,65 @@ export function FilterChip({
       : SURFACE_DEFAULT;
 
   const stateName = disabled ? "disabled" : added ? "added" : "default";
+  const isAddedActive = added && !disabled;
+
+  // ─── State transition drivers ───
+  // `progress` → opacity + border colour (easeInOut).
+  // `shapeProgress` → width morph + cross translateX (loft easing) so the
+  //                    resize and slide-in feel softer than the colour fade.
+  const progress = useSharedValue(isAddedActive ? 1 : 0);
+  const shapeProgress = useSharedValue(isAddedActive ? 1 : 0);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    const target = isAddedActive ? 1 : 0;
+    if (reducedMotion) {
+      progress.value = target;
+      shapeProgress.value = target;
+      return;
+    }
+    progress.value = withTiming(target, {
+      duration: FILTER_CHIP_TRANSITION_MS,
+      easing: TRANSITION_EASING,
+    });
+    shapeProgress.value = withTiming(target, {
+      duration: FILTER_CHIP_TRANSITION_MS,
+      easing: SHAPE_EASING,
+    });
+  }, [isAddedActive, reducedMotion, progress, shapeProgress]);
+
+  // Border fades subtle → extrabold across the transition. Disabled state
+  // always stays on the static subtle border (no animation).
+  const animatedBorderStyle = useAnimatedStyle(() => ({
+    borderColor: disabled
+      ? colour.border.subtle
+      : interpolateColor(
+          progress.value,
+          [0, 1],
+          [colour.border.subtle, colour.border.extrabold],
+        ),
+  }));
+
+  // Count text: opacity follows the colour driver; width / margin follow the
+  // softer shape driver so the resize reads as a separate gesture.
+  const animatedCountStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    maxWidth: shapeProgress.value * FILTER_CHIP_COUNT_MAX_W,
+    marginLeft: shapeProgress.value * space["4"],
+  }));
+
+  // Clear zone (divider + cross): opacity follows the colour driver; width +
+  // slide-in follow the shape driver.
+  const animatedClearStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    maxWidth: shapeProgress.value * FILTER_CHIP_CLEAR_ZONE_W,
+    transform: [
+      {
+        translateX:
+          (1 - shapeProgress.value) * FILTER_CHIP_CLEAR_TRANSLATE_FROM,
+      },
+    ],
+  }));
 
   const labelText = (
     <Text
@@ -152,19 +226,14 @@ export function FilterChip({
     </Text>
   );
 
-  const countText =
-    added && count ? (
-      <Text
-        numberOfLines={1}
-        // @ts-expect-error — dataSet on Text on web
-        dataSet={{
-          tokenTextStyle: "Action_A14_SemiBold",
-          tokenColor: surface.fgToken,
-        }}
-        style={[textStyles.Action_A14_SemiBold, { color: surface.fg }]}
-      >
-        {count}
-      </Text>
+  const leftIcon =
+    showIconLeft && content === "label" ? (
+      <Icon name={iconLeft} size={ICON_SIZE} color={surface.fg} />
+    ) : null;
+
+  const rightIcon =
+    showIconRight && content === "label" ? (
+      <Icon name={iconRight} size={ICON_SIZE} color={surface.fg} />
     ) : null;
 
   const slotChild = (
@@ -181,20 +250,8 @@ export function FilterChip({
     </View>
   );
 
-  const leftIcon =
-    showIconLeft && content === "label" ? (
-      <Icon name={iconLeft} size={ICON_SIZE} color={surface.fg} />
-    ) : null;
-
-  const rightIcon =
-    showIconRight && content === "label" ? (
-      <Icon name={iconRight} size={ICON_SIZE} color={surface.fg} />
-    ) : null;
-
-  // Single-Pressable layout covers every state except label+added (which
-  // splits into body + clear-cross zones). Slot+added just swaps the border
-  // colour — there's no clear affordance on the slot variant.
-  if (!added || content === "slot") {
+  // ─── Slot variant: single Pressable; only the border animates. ───
+  if (content === "slot") {
     return (
       <Pressable
         onPress={disabled ? undefined : onPress}
@@ -203,66 +260,60 @@ export function FilterChip({
         accessibilityState={{ disabled }}
         accessibilityLabel={accessibilityLabel ?? label}
         // @ts-expect-error — dataSet on Pressable on web
-        dataSet={{
-          component: "FilterChip",
-          content,
-          state: stateName,
-        }}
+        dataSet={{ component: "FilterChip", content, state: stateName }}
         style={({ pressed }) => [
           {
-            minHeight: HEIGHT,
-            maxHeight: HEIGHT,
-            paddingHorizontal: space["10"],
-            paddingVertical: space["8"],
-            borderRadius: radius["8"],
-            borderWidth: 1,
-            borderColor: surface.border,
-            backgroundColor:
-              pressed && !disabled ? surface.bgPressed : surface.bg,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
             alignSelf: "flex-start",
-            gap: content === "slot" ? 0 : space["4"],
           },
           style,
         ]}
       >
-        {content === "slot" ? slotChild : (
-          <>
-            {leftIcon}
-            {labelText}
-            {rightIcon}
-          </>
+        {({ pressed }) => (
+          <Animated.View
+            style={[
+              {
+                minHeight: HEIGHT,
+                maxHeight: HEIGHT,
+                paddingHorizontal: space["10"],
+                paddingVertical: space["8"],
+                borderRadius: radius["8"],
+                borderWidth: 1,
+                backgroundColor:
+                  pressed && !disabled ? surface.bgPressed : surface.bg,
+                alignItems: "center",
+                justifyContent: "center",
+              },
+              animatedBorderStyle,
+            ]}
+          >
+            {slotChild}
+          </Animated.View>
         )}
       </Pressable>
     );
   }
 
-  // Added state: the chip splits into two side-by-side hit zones inside a
-  // single bordered View. Two Pressables let `onPress` and `onClear` fire
-  // independently — and avoid nesting <button> inside <button> on web.
+  // ─── Label variant: unified animated layout ───
+  // The body Pressable owns `onPress`; the clear group (divider + cross) owns
+  // `onClear`. When `added` is false the clear group collapses to width 0,
+  // keeping it out of the hit-test region.
   return (
-    <View
-      // @ts-expect-error — dataSet on View on web
-      dataSet={{
-        component: "FilterChip",
-        content,
-        state: stateName,
-      }}
+    <Animated.View
+      // @ts-expect-error — dataSet on Animated.View on web
+      dataSet={{ component: "FilterChip", content, state: stateName }}
       style={[
         {
           minHeight: HEIGHT,
           maxHeight: HEIGHT,
           borderRadius: radius["8"],
           borderWidth: 1,
-          borderColor: surface.border,
           backgroundColor: surface.bg,
           flexDirection: "row",
           alignItems: "center",
           alignSelf: "flex-start",
           overflow: "hidden",
         },
+        animatedBorderStyle,
         style,
       ]}
     >
@@ -280,47 +331,68 @@ export function FilterChip({
           alignSelf: "stretch",
           paddingHorizontal: space["10"],
           paddingVertical: space["8"],
-          gap: space["4"],
           backgroundColor:
             pressed && !disabled ? surface.bgPressed : "transparent",
         })}
       >
-        {leftIcon}
+        {leftIcon ? (
+          <View style={{ marginRight: space["4"] }}>{leftIcon}</View>
+        ) : null}
         {labelText}
-        {countText}
-        {rightIcon}
+        <Animated.View style={[{ overflow: "hidden" }, animatedCountStyle]}>
+          <Text
+            numberOfLines={1}
+            style={[textStyles.Action_A14_SemiBold, { color: surface.fg }]}
+          >
+            {count ?? ""}
+          </Text>
+        </Animated.View>
+        {rightIcon ? (
+          <View style={{ marginLeft: space["4"] }}>{rightIcon}</View>
+        ) : null}
       </Pressable>
 
-      <View
-        style={{
-          width: 1,
-          height: 14,
-          backgroundColor: colour.border.subtle,
-          borderRadius: radius["2"],
-          marginHorizontal: space["2"],
-        }}
-      />
-
-      <Pressable
-        onPress={disabled ? undefined : onClear}
-        disabled={disabled}
-        accessibilityRole="button"
-        accessibilityState={{ disabled }}
-        accessibilityLabel="Clear filters"
-        hitSlop={6}
-        // @ts-expect-error — dataSet on Pressable on web
-        dataSet={{ component: "FilterChip.Clear" }}
-        style={({ pressed }) => ({
-          alignItems: "center",
-          justifyContent: "center",
-          alignSelf: "stretch",
-          paddingHorizontal: space["8"],
-          backgroundColor:
-            pressed && !disabled ? surface.bgPressed : "transparent",
-        })}
+      <Animated.View
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            alignSelf: "stretch",
+            overflow: "hidden",
+          },
+          animatedClearStyle,
+        ]}
       >
-        <Icon name="system-cross" size={ICON_SIZE} color={surface.fg} />
-      </Pressable>
-    </View>
+        <View
+          style={{
+            width: 1,
+            height: 14,
+            backgroundColor: colour.border.subtle,
+            borderRadius: radius["2"],
+            marginHorizontal: space["2"],
+          }}
+        />
+        <Pressable
+          onPress={disabled ? undefined : onClear}
+          disabled={disabled || !isAddedActive}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: disabled || !isAddedActive }}
+          accessibilityLabel="Clear filters"
+          hitSlop={6}
+          // @ts-expect-error — dataSet on Pressable on web
+          dataSet={{ component: "FilterChip.Clear" }}
+          style={({ pressed }) => ({
+            alignItems: "center",
+            justifyContent: "center",
+            alignSelf: "stretch",
+            paddingHorizontal: space["8"],
+            backgroundColor:
+              pressed && !disabled ? surface.bgPressed : "transparent",
+          })}
+        >
+          <Icon name="system-cross" size={ICON_SIZE} color={surface.fg} />
+        </Pressable>
+      </Animated.View>
+    </Animated.View>
   );
 }

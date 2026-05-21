@@ -22,6 +22,11 @@ import {
   Toggle,
 } from "../components/playground-controls";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import { buttonPressMotionTimeline } from "./motionTimelines/buttonPressMotionTimeline";
+import {
+  ButtonPressPreview,
+  useButtonPressMotion,
+} from "./motionTimelines/useButtonPressMotion";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "IconButton">;
@@ -39,6 +44,8 @@ export function IconButtonScreen({ navigation }: Props) {
   const [emphasis, setEmphasis] = useState<IconButtonEmphasis>("default");
   const [icon, setIcon] = useState<IconName>("system-arrow-right");
   const [disabled, setDisabled] = useState(false);
+
+  const press = useButtonPressMotion();
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -100,6 +107,20 @@ export function IconButtonScreen({ navigation }: Props) {
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Button/IconButton.tsx"
       sidebar={componentsSidebar("IconButton")}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
+      motionTimeline={{
+        ...buttonPressMotionTimeline,
+        playhead: press.playhead,
+        preview: (
+          <ButtonPressPreview playhead={press.playhead} onPlay={press.triggerPlay}>
+            <IconButton
+              icon="system-arrow-right"
+              accessibilityLabel="Press preview"
+              size="H40"
+              emphasis="action"
+            />
+          </ButtonPressPreview>
+        ),
+      }}
     >
       <DetailSection
         heading="Playground"
