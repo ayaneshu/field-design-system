@@ -13,6 +13,8 @@ export type RootStackParamList = {
   Patterns: undefined;
   Illustrations: undefined;
   Accordion: undefined;
+  ActionBar: undefined;
+  BottomSheet: undefined;
   Checkbox: undefined;
   Divider: undefined;
   FilterChip: undefined;

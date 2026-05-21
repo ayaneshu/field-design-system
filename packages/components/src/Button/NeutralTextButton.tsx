@@ -1,4 +1,5 @@
 import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { Icon, type IconName } from "@field-ds/icons";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@field-ds/tokens";
 
 import { PRESS_TRANSITION, noFauxBold } from "./sizing";
+import { usePressScale } from "./usePressScale";
 
 // Maps to Figma M-TextButtonNeutral (1363:245).
 // Two sizes per Figma:
@@ -86,9 +88,16 @@ export function NeutralTextButton({
   const spec = TEXT_SIZE[size];
   const fg = disabled ? FG_DISABLED : FG;
 
+  const press = usePressScale(disabled);
+
   return (
+    <Animated.View
+      style={[press.animatedStyle, { alignSelf: "flex-start" }, style]}
+    >
     <Pressable
       onPress={disabled ? undefined : onPress}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
       disabled={disabled}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
@@ -100,23 +109,20 @@ export function NeutralTextButton({
         size,
         state: disabled ? "disabled" : "default",
       }}
-      style={({ pressed }) => [
-        {
-          minHeight: spec.height,
-          maxHeight: spec.height,
-          paddingHorizontal: spec.paddingX,
-          paddingVertical: spec.paddingY,
-          borderRadius: spec.radius,
-          alignSelf: "flex-start",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: spec.gap,
-          backgroundColor: pressed && !disabled ? BG_PRESSED : "transparent",
-          ...PRESS_TRANSITION,
-        },
-        style,
-      ]}
+      style={({ pressed }) => ({
+        minHeight: spec.height,
+        maxHeight: spec.height,
+        paddingHorizontal: spec.paddingX,
+        paddingVertical: spec.paddingY,
+        borderRadius: spec.radius,
+        alignSelf: "flex-start",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: spec.gap,
+        backgroundColor: pressed && !disabled ? BG_PRESSED : "transparent",
+        ...PRESS_TRANSITION,
+      })}
     >
       <View
         style={{
@@ -147,5 +153,6 @@ export function NeutralTextButton({
         ) : null}
       </View>
     </Pressable>
+    </Animated.View>
   );
 }

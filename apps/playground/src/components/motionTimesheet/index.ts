@@ -1,4 +1,4 @@
-export { MotionTimesheet, DEFAULT_PROGRESS_DRIVER_NOTE } from "./MotionTimesheet";
+export { MotionTimesheet } from "./MotionTimesheet";
 export type {
   MotionTimesheetBarKind,
   MotionTimesheetProps,

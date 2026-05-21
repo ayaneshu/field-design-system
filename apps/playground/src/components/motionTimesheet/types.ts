@@ -3,6 +3,9 @@
  * explicit millisecond axis. Token strings in captions surface design-system paths.
  */
 
+import type { ReactNode } from "react";
+import type { SharedValue } from "react-native-reanimated";
+
 export type MotionTimesheetBarKind =
   | "solid"
   | /** rising wedge L→R (linear‑in‑u metaphor) */ "linearRamp"
@@ -46,4 +49,16 @@ export type MotionTimesheetProps = {
   /** Vertical ticks + labels — default every 100ms. */
   tickMs?: number;
   rows: MotionTimesheetRowModel[];
+  /**
+   * Component preview rendered to the right of the timeline — usually a
+   * miniature of the component in the state this sheet documents (e.g. the
+   * button caught mid-press for the Press interaction sheet).
+   */
+  preview?: ReactNode;
+  /**
+   * Normalised 0..1 playback head, shared between the preview animation and a
+   * vertical line drawn over the timesheet. Mirrors an After Effects timeline
+   * cursor — drive it from a loop in the consuming screen.
+   */
+  playhead?: SharedValue<number>;
 };

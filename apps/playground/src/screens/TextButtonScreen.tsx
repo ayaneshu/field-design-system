@@ -18,6 +18,11 @@ import {
   Toggle,
 } from "../components/playground-controls";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import { buttonPressMotionTimeline } from "./motionTimelines/buttonPressMotionTimeline";
+import {
+  ButtonPressPreview,
+  useButtonPressMotion,
+} from "./motionTimelines/useButtonPressMotion";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "TextButton">;
@@ -37,6 +42,8 @@ export function TextButtonScreen({ navigation }: Props) {
     "system-arrow-right",
   );
   const [disabled, setDisabled] = useState(false);
+
+  const press = useButtonPressMotion();
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -77,6 +84,15 @@ export function TextButtonScreen({ navigation }: Props) {
       version="V0.1"
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Button/TextButton.tsx"
       sidebar={componentsSidebar("TextButton")}
+      motionTimeline={{
+        ...buttonPressMotionTimeline,
+        playhead: press.playhead,
+        preview: (
+          <ButtonPressPreview playhead={press.playhead} onPlay={press.triggerPlay}>
+            <TextButton label="View all" />
+          </ButtonPressPreview>
+        ),
+      }}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
     >
       <DetailSection

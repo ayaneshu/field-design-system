@@ -21,6 +21,11 @@ import {
   Toggle,
 } from "../components/playground-controls";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import { buttonPressMotionTimeline } from "./motionTimelines/buttonPressMotionTimeline";
+import {
+  ButtonPressPreview,
+  useButtonPressMotion,
+} from "./motionTimelines/useButtonPressMotion";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "NeutralTextButton">;
@@ -38,6 +43,8 @@ export function NeutralTextButtonScreen({ navigation }: Props) {
   const [iconLeft, setIconLeft] = useState<IconName | null>(null);
   const [iconRight, setIconRight] = useState<IconName | null>(null);
   const [disabled, setDisabled] = useState(false);
+
+  const press = useButtonPressMotion();
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -78,6 +85,15 @@ export function NeutralTextButtonScreen({ navigation }: Props) {
       version="V0.1"
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Button/NeutralTextButton.tsx"
       sidebar={componentsSidebar("NeutralTextButton")}
+      motionTimeline={{
+        ...buttonPressMotionTimeline,
+        playhead: press.playhead,
+        preview: (
+          <ButtonPressPreview playhead={press.playhead} onPlay={press.triggerPlay}>
+            <NeutralTextButton label="Dismiss" />
+          </ButtonPressPreview>
+        ),
+      }}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
     >
       <DetailSection

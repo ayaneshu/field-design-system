@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Text, View, type LayoutChangeEvent } from "react-native";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import Svg, { Line, Polygon, Rect, Text as SvgText } from "react-native-svg";
 
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
@@ -11,23 +12,19 @@ import type {
   MotionTimesheetTokenRow,
 } from "./types";
 
-const LABEL_W = 118;
-/** Token column grows with layout but stays readable on narrow viewports. */
-const TOKEN_COL_MIN_W = 200;
-/** Timeline track minimum width before layout measures the flex slot. */
-const TRACK_MIN_LAYOUT_W = 160;
-/** Table column flex share vs timeline row (chart expands with remaining width). */
-const TOKEN_COL_FLEX = 1;
-const TIMELINE_ROW_FLEX = 2;
-const ROW_H = 60;
-const AXIS_H = 40;
-const ROW_INSET_Y = 8;
-/** Insets caption RN text from SVG bar edges + spine strip so glyphs are not clipped. */
-const BAR_CAPTION_PAD_X = space["12"];
-
-/** Stock explanation of **`u`** — used when `progressDriverNote` is omitted on `MotionTimesheet`. */
-export const DEFAULT_PROGRESS_DRIVER_NOTE =
-  "u is normalized progress for this interaction: 0 at the starting pose and 1 at the ending pose. In code it matches the animated value driven by withTiming (or equivalent)—often named progress and shared across interpolators. Duration and easing tokens control how u advances on the clock (milliseconds). Captions such as linear·u mean that property maps linearly to u while u runs; temporal easing shapes how quickly those changes read on screen, not necessarily the mapping curve in u-space.";
+const LABEL_W = 132;
+const TRACK_MIN_LAYOUT_W = 320;
+const ROW_H = 44;
+const AXIS_H = 32;
+const ROW_INSET_Y = 6;
+/** Visual floor for the timeline grid — keeps sparse sheets from looking squashed. */
+const GRID_MIN_H = 200;
+/** Width of the playhead line drawn on top of the chart while the preview plays. */
+const PLAYHEAD_W = 2;
+/** Minimum horizontal gap between bar end and caption start. */
+const CAPTION_GUTTER = space["8"];
+/** Threshold (as % of track width) under which we render the caption AFTER the bar instead of inside it. */
+const CAPTION_OUTSIDE_THRESHOLD_PCT = 35;
 
 function MotionTimesheetTokenTable({ rows }: { rows: MotionTimesheetTokenRow[] }) {
   const shell = useShell();
@@ -98,17 +95,23 @@ export function MotionTimesheet({
   intro,
   tokenRows,
   tokenSummary,
-  progressDriverNote,
   axisMaxMs,
   tickMs = 100,
   rows,
+  preview,
+  playhead,
 }: MotionTimesheetProps) {
   const shell = useShell();
   const axisCeil = computeAxisCeil(rows, axisMaxMs, tickMs);
-  const [trackPx, setTrackPx] = useState(320);
+  const [trackPx, setTrackPx] = useState(TRACK_MIN_LAYOUT_W);
 
-  const gridH = rows.length * ROW_H;
+  const rowsH = rows.length * ROW_H;
+  const gridH = Math.max(rowsH, GRID_MIN_H);
   const totalH = gridH + AXIS_H;
+
+  const playheadStyle = useAnimatedStyle(() => ({
+    left: (playhead?.value ?? 0) * trackPx,
+  }), [trackPx]);
 
   const msToX = (ms: number) =>
     Math.max(0, Math.min(trackPx, (ms / axisCeil) * trackPx));
@@ -123,15 +126,14 @@ export function MotionTimesheet({
   const hasTokenBlock =
     (tokenRows?.length ?? 0) > 0 || (tokenSummary !== undefined && tokenSummary.length > 0);
 
-  const resolvedDriverNote =
-    progressDriverNote === undefined
-      ? DEFAULT_PROGRESS_DRIVER_NOTE
-      : progressDriverNote.length > 0
-        ? progressDriverNote
-        : null;
-
   return (
-    <View style={{ gap: space["16"], width: "100%", alignSelf: "stretch" }}>
+    <View
+      style={{
+        gap: space["16"],
+        width: "100%",
+        alignSelf: "stretch",
+      }}
+    >
       <Text style={[textStyles.Heading_H28_Bold, { color: shell.textPrimary }]}>
         {heading}
       </Text>
@@ -145,53 +147,20 @@ export function MotionTimesheet({
         style={{
           flexDirection: "row",
           alignItems: "flex-start",
-          gap: space["16"],
+          gap: space["72"],
           width: "100%",
         }}
       >
-        {hasTokenBlock ? (
-          <View
-            style={{
-              flex: TOKEN_COL_FLEX,
-              minWidth: TOKEN_COL_MIN_W,
-              flexShrink: 1,
-              gap: space["12"],
-            }}
-          >
-            {tokenRows?.length ? (
-              <MotionTimesheetTokenTable rows={tokenRows} />
-            ) : tokenSummary ? (
-              <Text style={[textStyles.Body_B12_Regular, { color: shell.textTertiary, lineHeight: 18 }]}>
-                <Text style={[textStyles.Body_B12_SemiBold, { color: shell.textSecondary }]}>
-                  Tokens ·{" "}
-                </Text>
-                {tokenSummary}
-              </Text>
-            ) : null}
-            {resolvedDriverNote ? (
-              <View style={{ gap: space["6"] }}>
-                <Text style={[textStyles.Body_B12_SemiBold, { color: shell.textSecondary }]}>
-                  Motion driver · u
-                </Text>
-                <Text
-                  style={[textStyles.Body_B12_Regular, { color: shell.textTertiary, lineHeight: 18 }]}
-                >
-                  {resolvedDriverNote}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-        ) : null}
-
-        <View
-          style={{
-            flex: TIMELINE_ROW_FLEX,
-            flexDirection: "row",
-            alignItems: "flex-start",
-            gap: space["12"],
-            minWidth: 0,
-          }}
-        >
+        <View style={{ flex: 1, minWidth: 0, gap: space["16"] }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "flex-start",
+          gap: space["12"],
+          width: "100%",
+          minWidth: 0,
+        }}
+      >
         <View style={{ width: LABEL_W, paddingTop: 0 }}>
           {rows.map((row) => (
             <View
@@ -259,7 +228,7 @@ export function MotionTimesheet({
                     y={y0}
                     width={bw}
                     height={barH}
-                    rx={6}
+                    rx={5}
                     fill={barBase}
                     opacity={
                       row.barKind === "linearRamp" || row.barKind === "peakRamp" ? 0.22 : 0.38
@@ -295,7 +264,7 @@ export function MotionTimesheet({
                     x2={sx0 + 2}
                     y2={y0 + barH}
                     stroke={spine}
-                    strokeWidth={4}
+                    strokeWidth={3}
                   />,
                 );
                 return out;
@@ -309,7 +278,7 @@ export function MotionTimesheet({
                   x1={msToX(t)}
                   y1={gridH}
                   x2={msToX(t)}
-                  y2={gridH + 7}
+                  y2={gridH + 5}
                   stroke={shell.border}
                   strokeWidth={1}
                 />
@@ -320,9 +289,9 @@ export function MotionTimesheet({
                   key={`lb-${t}`}
                   fill={shell.textSecondary}
                   fontFamily="system-ui , -apple-system, sans-serif"
-                  fontSize={11}
+                  fontSize={10}
                   x={Math.min(msToX(t), trackPx - 20)}
-                  y={gridH + 24}
+                  y={gridH + 18}
                   opacity={1}
                 >
                   {`${t}`}
@@ -332,13 +301,16 @@ export function MotionTimesheet({
                 fill={shell.textTertiary}
                 fontFamily="system-ui , -apple-system, sans-serif"
                 fontSize={10}
-                x={Math.max(trackPx - 42, msToX(axisCeil) - 38)}
-                y={gridH + AXIS_H - 8}
+                x={Math.max(trackPx - 36, msToX(axisCeil) - 32)}
+                y={gridH + AXIS_H - 6}
               >
                 ms
               </SvgText>
             </Svg>
 
+            {/* Captions — rendered as native Text, never inside SVG, so they
+                never truncate to the bar's width. Short bars get their caption
+                *after* the bar end; wide bars keep the caption inside. */}
             <View
               pointerEvents="none"
               style={{
@@ -350,28 +322,33 @@ export function MotionTimesheet({
               }}
             >
               {rows.map((row, i) => {
-                const leftPct = (row.startMs / axisCeil) * 100;
                 const widePct = ((row.endMs - row.startMs) / axisCeil) * 100;
-                const top = i * ROW_H + ROW_INSET_Y + 6;
+                const renderOutside = widePct < CAPTION_OUTSIDE_THRESHOLD_PCT;
+                const endPct = (row.endMs / axisCeil) * 100;
+                const startPct = (row.startMs / axisCeil) * 100;
+                const top = i * ROW_H + (ROW_H - 14) / 2;
+
+                const leftPct = renderOutside ? endPct : startPct;
+                const availPct = renderOutside ? 100 - endPct : widePct;
+
                 return (
                   <View
                     key={`cap-${row.label}-${row.startMs}`}
                     style={{
                       position: "absolute",
                       left: `${leftPct}%` as `${number}%`,
-                      width: `${Math.min(Math.max(widePct, 6), 100)}%` as `${number}%`,
+                      width: `${Math.max(availPct, 12)}%` as `${number}%`,
                       top,
-                      maxHeight: ROW_H - ROW_INSET_Y * 2 - 10,
-                      paddingLeft: BAR_CAPTION_PAD_X,
-                      paddingRight: space["8"],
+                      paddingLeft: renderOutside ? CAPTION_GUTTER : space["8"],
+                      paddingRight: space["4"],
                     }}
                   >
                     <Text
-                      numberOfLines={2}
+                      numberOfLines={1}
                       style={[
                         textStyles.Body_B11_Regular,
                         {
-                          color: spine,
+                          color: renderOutside ? shell.textSecondary : spine,
                           fontWeight: "500",
                           lineHeight: 14,
                         },
@@ -383,10 +360,62 @@ export function MotionTimesheet({
                 );
               })}
             </View>
+
+            {playhead ? (
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  {
+                    position: "absolute",
+                    top: 0,
+                    width: PLAYHEAD_W,
+                    height: gridH,
+                    backgroundColor: colour.surface["action-extrabold"],
+                    borderRadius: PLAYHEAD_W / 2,
+                  },
+                  playheadStyle,
+                ]}
+              />
+            ) : null}
           </View>
         </View>
       </View>
+
+      {hasTokenBlock ? (
+        <View style={{ width: "100%" }}>
+          {tokenRows?.length ? (
+            <MotionTimesheetTokenTable rows={tokenRows} />
+          ) : tokenSummary ? (
+            <Text style={[textStyles.Body_B12_Regular, { color: shell.textTertiary, lineHeight: 18 }]}>
+              <Text style={[textStyles.Body_B12_SemiBold, { color: shell.textSecondary }]}>
+                Tokens ·{" "}
+              </Text>
+              {tokenSummary}
+            </Text>
+          ) : null}
+        </View>
+      ) : null}
+        </View>
+
+        {preview ? (
+          <View
+            style={{
+              flex: 1,
+              minWidth: 0,
+              alignSelf: "stretch",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: space["16"],
+              borderWidth: 1,
+              borderColor: shell.border,
+              borderRadius: radius["8"],
+              backgroundColor: shell.sidebarBg,
+            }}
+          >
+            {preview}
+          </View>
+        ) : null}
+      </View>
     </View>
-  </View>
   );
 }

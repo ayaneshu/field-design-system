@@ -1,5 +1,11 @@
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { Text, View } from "react-native";
+import {
+  Easing,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
@@ -12,6 +18,10 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import {
+  RATING_INPUT_AXIS_MS,
+  ratingInputFillMotionTimeline,
+} from "./motionTimelines/ratingInputFillMotionTimeline";
 import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
 
@@ -31,8 +41,25 @@ const FEEDBACK_LABELS = [
 export function RatingInputScreen({ navigation }: Props) {
   const [rating, setRating] = useState(0);
   const [size, setSize] = useState<RatingInputSize>(28);
-  const [emojis, setEmojis] = useState(true);
+  const [emojis, setEmojis] = useState(false);
   const [disabled, setDisabled] = useState(false);
+
+  // Motion-spec preview state.
+  const [previewRating, setPreviewRating] = useState(0);
+  const playhead = useSharedValue(0);
+  const reducedMotion = useReducedMotion();
+
+  const triggerPlay = useCallback(() => {
+    if (reducedMotion) {
+      playhead.value = 1;
+      return;
+    }
+    playhead.value = 0;
+    playhead.value = withTiming(1, {
+      duration: RATING_INPUT_AXIS_MS,
+      easing: Easing.linear,
+    });
+  }, [playhead, reducedMotion]);
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -124,6 +151,19 @@ export function RatingInputScreen({ navigation }: Props) {
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/RatingInput/RatingInput.tsx"
       sidebar={componentsSidebar("RatingInput")}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
+      motionTimeline={{
+        ...ratingInputFillMotionTimeline,
+        playhead,
+        preview: (
+          <FillPreview
+            rating={previewRating}
+            onRate={(next) => {
+              setPreviewRating(next);
+              triggerPlay();
+            }}
+          />
+        ),
+      }}
     >
       <DetailSection
         heading="Playground"
@@ -156,6 +196,46 @@ export function RatingInputScreen({ navigation }: Props) {
 
       <DetailSection heading="States" preview={statesPreview} />
     </PageScaffold>
+  );
+}
+
+/**
+ * Live preview for the RatingInput fill-sweep timesheet. Tapping a star
+ * commits the rating + triggers the playhead so the cursor sweeps in sync
+ * with the per-star fade + bounce.
+ */
+function FillPreview({
+  rating,
+  onRate,
+}: {
+  rating: number;
+  onRate: (next: number) => void;
+}) {
+  const shell = useShell();
+  return (
+    <View style={{ alignItems: "center", gap: space["12"] }}>
+      <Text
+        style={[
+          textStyles.Body_B11_SemiBold,
+          {
+            color: shell.textTertiary,
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          },
+        ]}
+      >
+        Live preview
+      </Text>
+      <RatingInput value={rating} onChange={onRate} size={32} />
+      <Text
+        style={[
+          textStyles.Body_B11_Regular,
+          { color: shell.textMuted, textAlign: "center" },
+        ]}
+      >
+        tap a star to play
+      </Text>
+    </View>
   );
 }
 

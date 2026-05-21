@@ -1,5 +1,11 @@
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
+import {
+  Easing,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Switch, Toggle as FieldToggle, type SwitchSize } from "@field-ds/components";
@@ -7,6 +13,10 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import {
+  SWITCH_AXIS_MS,
+  switchSlotMotionTimeline,
+} from "./motionTimelines/switchSlotMotionTimeline";
 import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
 
@@ -37,6 +47,21 @@ export function SwitchScreen({ navigation }: Props) {
   const [size, setSize] = useState<SwitchSize>("H40");
   const [slotCount, setSlotCount] = useState<2 | 3 | 4>(2);
   const [disabled, setDisabled] = useState(false);
+
+  const playhead = useSharedValue(0);
+  const reducedMotion = useReducedMotion();
+
+  const triggerPlay = useCallback(() => {
+    if (reducedMotion) {
+      playhead.value = 1;
+      return;
+    }
+    playhead.value = 0;
+    playhead.value = withTiming(1, {
+      duration: SWITCH_AXIS_MS,
+      easing: Easing.linear,
+    });
+  }, [playhead, reducedMotion]);
 
   const options =
     slotCount === 2 ? ON_OFF : slotCount === 3 ? RANGE : TSHIRT;
@@ -125,6 +150,11 @@ export function SwitchScreen({ navigation }: Props) {
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Switch/Switch.tsx"
       sidebar={componentsSidebar("Switch")}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
+      motionTimeline={{
+        ...switchSlotMotionTimeline,
+        playhead,
+        preview: <SwitchSlotPreview onPlay={triggerPlay} />,
+      }}
     >
       <DetailSection
         heading="Playground"
@@ -162,6 +192,50 @@ export function SwitchScreen({ navigation }: Props) {
       <DetailSection heading="Sizes" preview={sizesPreview} />
       <DetailSection heading="States" preview={statesPreview} />
     </PageScaffold>
+  );
+}
+
+/**
+ * Live preview of the Switch slot transition. Tapping a slot fires both the
+ * Switch's own `withSpring(motion.spring.springLight)` and the playhead sweep
+ * across the timesheet so the cursor and the visible thumb position stay
+ * in sync.
+ */
+function SwitchSlotPreview({ onPlay }: { onPlay: () => void }) {
+  const shell = useShell();
+  const [value, setValue] = useState<string>("off");
+
+  const handleChange = (next: string) => {
+    setValue(next);
+    onPlay();
+  };
+
+  return (
+    <View style={{ alignItems: "center", gap: space["12"] }}>
+      <Text
+        style={[
+          textStyles.Body_B11_SemiBold,
+          {
+            color: shell.textTertiary,
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          },
+        ]}
+      >
+        Live preview
+      </Text>
+      <View style={{ width: 240 }}>
+        <Switch options={ON_OFF} value={value} onChange={handleChange} />
+      </View>
+      <Text
+        style={[
+          textStyles.Body_B11_Regular,
+          { color: shell.textMuted, textAlign: "center" },
+        ]}
+      >
+        tap a slot
+      </Text>
+    </View>
   );
 }
 

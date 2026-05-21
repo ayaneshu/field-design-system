@@ -719,6 +719,10 @@ export function MotionContent({
     Object.entries(motion.duration) as [keyof typeof motion.duration, number][]
   ).sort(([a], [b]) => String(a).localeCompare(String(b)));
 
+  const delayEntries = (
+    Object.entries(motion.delay) as [keyof typeof motion.delay, number][]
+  ).sort(([a], [b]) => String(a).localeCompare(String(b)));
+
   const easingEntries = (
     Object.entries(motion.easing) as [
       keyof typeof motion.easing,
@@ -785,6 +789,29 @@ export function MotionContent({
                 <DurationPreviewLoop ms={ms} />
               }
               onCopy={() => copy(`motion.duration.${String(k)}`, `duration.${String(k)}`)}
+            />
+          ))}
+        </View>
+      </Section>
+
+      <Section heading="Delay">
+        {!narrow ? <TableHeaderRow /> : null}
+        <View>
+          {delayEntries.map(([k, ms], i) => (
+            <MotionDataRow
+              key={k}
+              narrow={narrow}
+              isFirst={i === 0}
+              tokenLabel={`motion.delay.${String(k)}`}
+              valueNode={
+                <Text style={[textStyles.Body_B14_Medium, { color: shell.textPrimary }]}>
+                  {ms} ms
+                </Text>
+              }
+              visual={<DurationPreviewLoop ms={ms} />}
+              onCopy={() =>
+                copy(`motion.delay.${String(k)}`, `delay.${String(k)}`)
+              }
             />
           ))}
         </View>

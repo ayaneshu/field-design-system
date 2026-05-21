@@ -7,10 +7,13 @@ import {
   type ViewStyle,
 } from "react-native";
 import Animated, {
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useReducedMotion,
   useSharedValue,
+  withDelay,
+  withSequence,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
@@ -38,6 +41,20 @@ import { fieldEasingStandard } from "../fieldMotion";
 // team to consider adding `text-n-icon.yellow-bold`.
 
 const STAR_COUNT = 5;
+
+// ─── Motion constants for the per-star fill animation ───
+/** Total number of stars in a RatingInput. */
+export const RATING_STAR_COUNT = STAR_COUNT;
+/** Opacity cross-fade duration (filled ↔ outline ↔ emoji). */
+export const RATING_FADE_MS = motion.duration.base;
+/** Per-star delay applied to every animated property. */
+export const RATING_STAGGER_MS = motion.delay.stagger;
+/** Bounce ramp-up duration (1 → peak). */
+export const RATING_BOUNCE_RAMP_MS = motion.duration.xs;
+/** Peak scale reached at the top of the bounce. */
+export const RATING_BOUNCE_PEAK_SCALE = 1.15;
+/** Token reference for the spring that settles the bounce. */
+export const RATING_BOUNCE_SPRING = motion.spring.springLight;
 
 const SIZE_PX = { 20: 20, 28: 28, 32: 32 } as const;
 const GAP = { 20: space["4"], 28: space["6"], 32: space["8"] } as const;
@@ -77,7 +94,7 @@ export function RatingInput({
   defaultValue = 0,
   onChange,
   size = 28,
-  emojis = true,
+  emojis = false,
   emoji = "😊",
   disabled = false,
   accessibilityLabel,
@@ -177,39 +194,102 @@ function Star({ index, mode, size, emoji, disabled, onPress }: StarProps) {
   const outlineTarget = useDerivedValue(() => (mode === "outline" ? 1 : 0), [mode]);
   const emojiTarget = useDerivedValue(() => (mode === "emoji" ? 1 : 0), [mode]);
 
+  // Direction-aware stagger:
+  //   fill (outline → filled) sweeps left → right — star 1 leads
+  //   un-fill (filled → outline) sweeps right → left — star 5 leads
   const fadeDuration = reducedMotion ? 0 : motion.duration.base;
+  const fillDelay = reducedMotion
+    ? 0
+    : (index - 1) * motion.delay.stagger;
+  const unfillDelay = reducedMotion
+    ? 0
+    : (RATING_STAR_COUNT - index) * motion.delay.stagger;
+
+  // Standalone opacity shared values — driven explicitly by the reaction
+  // below so we can pick the right per-star delay based on direction.
+  const filledOpacity = useSharedValue(mode === "filled" ? 1 : 0);
+  const outlineOpacity = useSharedValue(mode === "outline" ? 1 : 0);
+  const emojiOpacity = useSharedValue(mode === "emoji" ? 1 : 0);
+
+  useAnimatedReaction(
+    () => ({
+      filled: filledTarget.value,
+      outline: outlineTarget.value,
+      emoji: emojiTarget.value,
+    }),
+    (curr, prev) => {
+      if (prev === null) return;
+      if (reducedMotion) {
+        filledOpacity.value = curr.filled;
+        outlineOpacity.value = curr.outline;
+        emojiOpacity.value = curr.emoji;
+        return;
+      }
+      // `filledTarget` dropping is the cleanest signal that this star is
+      // being un-filled — switch the stagger to right → left for the whole
+      // cross-fade so all three layers stay aligned.
+      const isUnfill = curr.filled < prev.filled;
+      const delay = isUnfill ? unfillDelay : fillDelay;
+      const timing = {
+        duration: fadeDuration,
+        easing: fieldEasingStandard,
+      } as const;
+      filledOpacity.value = withDelay(delay, withTiming(curr.filled, timing));
+      outlineOpacity.value = withDelay(delay, withTiming(curr.outline, timing));
+      emojiOpacity.value = withDelay(delay, withTiming(curr.emoji, timing));
+    },
+    [fillDelay, unfillDelay, fadeDuration, reducedMotion],
+  );
 
   const filledStyle = useAnimatedStyle(
-    () => ({
-      opacity: withTiming(filledTarget.value, {
-        duration: fadeDuration,
-        easing: fieldEasingStandard,
-      }),
-    }),
-    [filledTarget, fadeDuration],
+    () => ({ opacity: filledOpacity.value }),
+    [filledOpacity],
   );
   const outlineStyle = useAnimatedStyle(
-    () => ({
-      opacity: withTiming(outlineTarget.value, {
-        duration: fadeDuration,
-        easing: fieldEasingStandard,
-      }),
-    }),
-    [outlineTarget, fadeDuration],
+    () => ({ opacity: outlineOpacity.value }),
+    [outlineOpacity],
   );
   const emojiStyle = useAnimatedStyle(
-    () => ({
-      opacity: withTiming(emojiTarget.value, {
-        duration: fadeDuration,
-        easing: fieldEasingStandard,
-      }),
-    }),
-    [emojiTarget, fadeDuration],
+    () => ({ opacity: emojiOpacity.value }),
+    [emojiOpacity],
+  );
+
+  // Subtle scale bounce that fires whenever the star transitions into the
+  // "filled" mode (no bounce on un-fill). Up over `motion.duration.xs` to
+  // `BOUNCE_PEAK_SCALE`, then springs back via `motion.spring.springLight`.
+  // Honours the same per-star stagger as the opacity tweens so the pops
+  // sweep left → right. Combined multiplicatively with the press scale so
+  // touchdown feedback and the bounce can coexist — bumped above 1.02 so
+  // the pop cuts through the concurrent press-release scaling.
+  const bounceScale = useSharedValue(1);
+  const BOUNCE_PEAK_SCALE = RATING_BOUNCE_PEAK_SCALE;
+
+  useAnimatedReaction(
+    () => filledTarget.value,
+    (curr, prev) => {
+      if (reducedMotion) return;
+      if (curr === 1 && (prev === null || prev < 1)) {
+        // Bounce only on fill-in, so it follows the fill (left → right) stagger.
+        bounceScale.value = withDelay(
+          fillDelay,
+          withSequence(
+            withTiming(BOUNCE_PEAK_SCALE, {
+              duration: motion.duration.xs,
+              easing: fieldEasingStandard,
+            }),
+            withSpring(1, motion.spring.springLight),
+          ),
+        );
+      }
+    },
+    [fillDelay, reducedMotion],
   );
 
   const containerStyle = useAnimatedStyle(
-    () => ({ transform: [{ scale: pressScale.value }] }),
-    [pressScale],
+    () => ({
+      transform: [{ scale: pressScale.value * bounceScale.value }],
+    }),
+    [pressScale, bounceScale],
   );
 
   const filledColor = disabled

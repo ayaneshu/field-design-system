@@ -18,6 +18,8 @@ import { ComponentsListScreen } from "./src/screens/ComponentsListScreen";
 import { PatternsScreen } from "./src/screens/PatternsScreen";
 import { IllustrationsScreen } from "./src/screens/IllustrationsScreen";
 import { AccordionScreen } from "./src/screens/AccordionScreen";
+import { ActionBarScreen } from "./src/screens/ActionBarScreen";
+import { BottomSheetScreen } from "./src/screens/BottomSheetScreen";
 import { PrimaryButtonScreen } from "./src/screens/PrimaryButtonScreen";
 import { SecondaryButtonScreen } from "./src/screens/SecondaryButtonScreen";
 import { SecondaryNeutralButtonScreen } from "./src/screens/SecondaryNeutralButtonScreen";
@@ -177,6 +179,8 @@ function ThemedNavigationShell() {
         <RootStack.Screen name="Patterns" component={PatternsScreen} />
         <RootStack.Screen name="Illustrations" component={IllustrationsScreen} />
         <RootStack.Screen name="Accordion" component={AccordionScreen} />
+        <RootStack.Screen name="ActionBar" component={ActionBarScreen} />
+        <RootStack.Screen name="BottomSheet" component={BottomSheetScreen} />
         <RootStack.Screen
           name="PrimaryButton"
           component={PrimaryButtonScreen}

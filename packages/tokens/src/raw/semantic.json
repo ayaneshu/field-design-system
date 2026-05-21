@@ -664,6 +664,16 @@
         "$value": "320ms"
       }
     },
+    "delay": {
+      "stagger": {
+        "$type": "dimension",
+        "$value": "25ms"
+      },
+      "beat": {
+        "$type": "dimension",
+        "$value": "120ms"
+      }
+    },
     "easing": {
       "standard": {
         "$type": "cubicBezier",
@@ -713,6 +723,13 @@
         "$value": {
           "tension": 320,
           "friction": 32
+        }
+      },
+      "springBouncy": {
+        "$type": "springTF",
+        "$value": {
+          "tension": 280,
+          "friction": 18
         }
       }
     }

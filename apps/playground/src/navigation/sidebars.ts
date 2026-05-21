@@ -46,7 +46,9 @@ export function componentsSidebar(activeKey: string): SidebarItem[] {
   return [
     { key: ALL_KEY, label: "Components", dividerAfter: true },
     { key: "Accordion", label: "Accordion", active: activeKey === "Accordion" },
+    { key: "ActionBar", label: "ActionBar", active: activeKey === "ActionBar" },
     { key: "BottomNav", label: "BottomNav", active: activeKey === "BottomNav" },
+    { key: "BottomSheet", label: "BottomSheet", active: activeKey === "BottomSheet" },
     {
       key: BUTTON_GROUP_KEY,
       label: "Button",

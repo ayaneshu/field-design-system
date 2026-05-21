@@ -19,9 +19,25 @@ import {
   type TextInputSubmitEditingEventData,
   type ViewStyle,
 } from "react-native";
+import Animated, {
+  Easing,
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import { Icon } from "@field-ds/icons";
-import { colour, radius, space, textStyles } from "@field-ds/tokens";
+import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
+
+// Cubic Bézier tokens are `motion.easing.*`; Reanimated expects `Easing.bezier`(…).
+const se = motion.easing.standard;
+const PRESS_EASING = Easing.bezier(se[0], se[1], se[2], se[3]);
+/** Touchdown scale used by the SearchBar press interaction. */
+export const SEARCHBAR_PRESS_SCALE = 0.98;
+const PRESS_SCALE_DOWN = SEARCHBAR_PRESS_SCALE;
 
 // Figma: M-SearchBar (892:244)
 //   H48 (full-size, 24px icons) for home/category screens; H44 (compact,
@@ -165,6 +181,43 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
     const hasValue = value.length > 0;
     const spec = SIZE_SPEC[size];
 
+    const reducedMotion = useReducedMotion();
+    // 0 (released) ↔ 1 (pressed) driver — interpolated to scale 1 → PRESS_SCALE_DOWN.
+    const press = useSharedValue(0);
+
+    const containerAnimatedStyle = useAnimatedStyle(() => {
+      const scale = interpolate(
+        press.value,
+        [0, 1],
+        [1, PRESS_SCALE_DOWN],
+        Extrapolation.CLAMP,
+      );
+      return { transform: [{ scale }] };
+    });
+
+    const handlePressIn = useCallback(() => {
+      if (!editable) return;
+      if (reducedMotion) {
+        press.value = 1;
+        return;
+      }
+      press.value = withTiming(1, {
+        duration: motion.duration.sm,
+        easing: PRESS_EASING,
+      });
+    }, [editable, reducedMotion, press]);
+
+    const handlePressOut = useCallback(() => {
+      if (reducedMotion) {
+        press.value = 0;
+        return;
+      }
+      press.value = withTiming(0, {
+        duration: motion.duration.sm,
+        easing: PRESS_EASING,
+      });
+    }, [reducedMotion, press]);
+
     const handleFocus = useCallback(
       (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
         setIsFocused(true);
@@ -258,11 +311,13 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
     return (
       <Pressable
         onPress={focusInput}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         accessible={false}
         // @ts-expect-error — web-only style hook on Pressable
         style={Platform.OS === "web" ? { cursor: editable ? "text" : "default" } : undefined}
       >
-        <View
+        <Animated.View
           style={[
             styles.container,
             {
@@ -273,6 +328,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
             },
             elevation ? ELEVATION_STYLE : null,
             style,
+            containerAnimatedStyle,
           ]}
           // @ts-expect-error — dataSet on web only
           dataSet={{ component: "SearchBar", size }}
@@ -344,7 +400,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
               {iconRightTwo}
             </View>
           )}
-        </View>
+        </Animated.View>
       </Pressable>
     );
   },

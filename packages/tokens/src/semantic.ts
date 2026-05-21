@@ -216,6 +216,10 @@ export const motion = {
     lg: 260,
     xl: 320,
   },
+  delay: {
+    stagger: 25,
+    beat: 120,
+  },
   easing: {
     standard: [0.32, 0.72, 0, 1],
     loft: [0.22, 1, 0.36, 1],
@@ -251,6 +255,14 @@ export const motion = {
     springHeavy: {
       stiffness: 320,
       damping: 32,
+      mass: 1,
+      overshootClamping: false,
+      restDisplacementThreshold: 0.01,
+      restSpeedThreshold: 0.01,
+    },
+    springBouncy: {
+      stiffness: 280,
+      damping: 18,
       mass: 1,
       overshootClamping: false,
       restDisplacementThreshold: 0.01,

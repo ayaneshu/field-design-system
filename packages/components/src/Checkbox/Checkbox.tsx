@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Pressable, type StyleProp, type ViewStyle } from "react-native";
 import Animated, {
   interpolate,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -11,6 +12,16 @@ import Svg, { Path } from "react-native-svg";
 import { colour, motion } from "@field-ds/tokens";
 
 import { fieldEasingStandard } from "../fieldMotion";
+
+const AnimatedPath = Animated.createAnimatedComponent(Path);
+
+// ─── Motion constants exposed for the motion timeline ───
+/** Duration of the check-in driver (outline → filled). */
+export const CHECKBOX_CHECK_IN_MS = motion.duration.emphasized;
+/** Duration of the uncheck-out driver (filled → outline). */
+export const CHECKBOX_RECEDE_MS = motion.duration.recede;
+/** Delay before the tick begins drawing (after the box has landed). */
+export const CHECKBOX_TICK_DELAY_MS = motion.delay.beat;
 
 // Figma: M-Checkbox — three sizes, three visual states.
 //   H24 default · H20 dense lists · H16 compact tables only.
@@ -28,8 +39,12 @@ const OUTLINE_D =
 const FILL_BOX_D =
   "M21.0337 6.22225C20.8212 4.5185 19.4812 3.17975 17.7775 2.966C13.9437 2.48725 10.0562 2.48725 6.22249 2.966C4.51874 3.1785 3.17999 4.5185 2.96624 6.22225C2.48749 10.056 2.48749 13.9435 2.96624 17.7773C3.17874 19.481 4.51874 20.8198 6.22249 21.0335C8.13874 21.2735 10.07 21.3935 12 21.3935C13.93 21.3935 15.8612 21.2735 17.7775 21.0335C19.4812 20.821 20.82 19.481 21.0337 17.7773C21.5125 13.9435 21.5125 10.056 21.0337 6.22225Z";
 
-const FILL_CHECK_D =
-  "M16.03 10.0298L11.03 15.0298C10.89 15.1698 10.6987 15.2498 10.5 15.2498C10.3012 15.2498 10.11 15.171 9.96999 15.0298L7.96999 13.0298C7.67749 12.7373 7.67749 12.2623 7.96999 11.9685C8.26249 11.676 8.73749 11.676 9.02999 11.9685L10.5 13.4385L14.97 8.9685C15.2625 8.676 15.7375 8.676 16.0312 8.9685C16.3237 9.261 16.3237 9.736 16.0312 10.0298H16.03Z";
+// Stroke path traced down the centreline of the Figma check glyph. Drawn as
+// a stroke (not a filled shape) so we can run a trim-path animation via
+// `strokeDashoffset`. Path length is precomputed from the two segments
+// (8,12 → 10.5,14.5 → 16,9.5 ≈ 3.54 + 7.43 ≈ 10.97 in viewBox units).
+const CHECK_STROKE_D = "M 8 12 L 10.5 14.5 L 16 9.5";
+const CHECK_PATH_LENGTH = 11;
 
 export type CheckboxProps = {
   /** Controlled selected state. Omit to use uncontrolled mode with `defaultSelected`. */
@@ -80,27 +95,36 @@ export function Checkbox({
     });
   }, [selected, progress]);
 
+  // Fraction of the check-in driver that the tick waits before it starts
+  // drawing — token-driven (`motion.delay.beat / motion.duration.emphasized`)
+  // so any change to either token propagates without touching the component.
+  const TICK_START_FRACTION =
+    motion.delay.beat / motion.duration.emphasized;
+
   // Outline ring fades out as the fill box swells in.
   // Explicit dep array — Reanimated requires it on web without the Babel plugin.
   const outlineStyle = useAnimatedStyle(() => ({
     opacity: interpolate(progress.value, [0, 0.6], [1, 0], "clamp"),
   }), [progress]);
 
-  // Filled box scales from 70% → 100% with a snappy fade.
+  // Filled box opacity-only fade-in — no scale, the box appears in place.
   const fillStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 0.4], [0, 1], "clamp"),
-    transform: [
-      { scale: interpolate(progress.value, [0, 1], [0.7, 1], "clamp") },
-    ],
+    opacity: interpolate(progress.value, [0, 0.5], [0, 1], "clamp"),
   }), [progress]);
 
-  // Tick lands a beat after the box, scaling in from the centre.
-  const checkStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0.35, 0.85], [0, 1], "clamp"),
-    transform: [
-      { scale: interpolate(progress.value, [0.35, 1], [0.6, 1], "clamp") },
-    ],
-  }), [progress]);
+  // Tick is opacity-stable; the line is drawn via `strokeDashoffset`. With
+  // `strokeDasharray = CHECK_PATH_LENGTH`, an offset equal to the length
+  // hides the path and 0 reveals it fully — same effect as After Effects'
+  // trim-path. The draw waits `motion.delay.beat` (≈55% of the
+  // check-in driver) so the box appears first, then the tick draws on top.
+  const checkAnimatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: interpolate(
+      progress.value,
+      [TICK_START_FRACTION, 1],
+      [CHECK_PATH_LENGTH, 0],
+      "clamp",
+    ),
+  }), [progress, TICK_START_FRACTION]);
 
   const fillColor = selected
     ? disabled
@@ -184,16 +208,24 @@ export function Checkbox({
         </Svg>
       </Animated.View>
 
-      {/* Tick (lands a beat after the box) */}
+      {/* Tick — stroke path that "draws itself" via strokeDashoffset (trim
+          path animation). Rounded caps/joints so the corners read clean
+          at every size. */}
       <Animated.View
         pointerEvents="none"
-        style={[
-          { position: "absolute", width: px, height: px },
-          checkStyle,
-        ]}
+        style={{ position: "absolute", width: px, height: px }}
       >
         <Svg width={px} height={px} viewBox="0 0 24 24" fill="none">
-          <Path d={FILL_CHECK_D} fill={colour.surface.primary} />
+          <AnimatedPath
+            d={CHECK_STROKE_D}
+            stroke={colour.surface.primary}
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+            strokeDasharray={CHECK_PATH_LENGTH}
+            animatedProps={checkAnimatedProps}
+          />
         </Svg>
       </Animated.View>
     </Pressable>

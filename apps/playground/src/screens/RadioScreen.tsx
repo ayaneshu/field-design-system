@@ -1,5 +1,11 @@
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
+import {
+  Easing,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import {
@@ -12,6 +18,10 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import {
+  RADIO_AXIS_MS,
+  radioSelectMotionTimeline,
+} from "./motionTimelines/radioSelectMotionTimeline";
 import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
 
@@ -27,6 +37,23 @@ export function RadioScreen({ navigation }: Props) {
   const [disabled, setDisabled] = useState(false);
 
   const [pick, setPick] = useState<Speed>("standard");
+
+  // Motion-spec preview state.
+  const [previewSelected, setPreviewSelected] = useState(false);
+  const playhead = useSharedValue(0);
+  const reducedMotion = useReducedMotion();
+
+  const triggerPlay = useCallback(() => {
+    if (reducedMotion) {
+      playhead.value = 1;
+      return;
+    }
+    playhead.value = 0;
+    playhead.value = withTiming(1, {
+      duration: RADIO_AXIS_MS,
+      easing: Easing.linear,
+    });
+  }, [playhead, reducedMotion]);
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -131,6 +158,19 @@ export function RadioScreen({ navigation }: Props) {
       version="V0.1"
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Radio.tsx"
       sidebar={componentsSidebar("Radio")}
+      motionTimeline={{
+        ...radioSelectMotionTimeline,
+        playhead,
+        preview: (
+          <SelectPreview
+            selected={previewSelected}
+            onToggle={() => {
+              setPreviewSelected((prev) => !prev);
+              triggerPlay();
+            }}
+          />
+        ),
+      }}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
     >
       <DetailSection
@@ -164,6 +204,54 @@ export function RadioScreen({ navigation }: Props) {
 
       <DetailSection heading="Single-select group" preview={groupPreview} />
     </PageScaffold>
+  );
+}
+
+/**
+ * Live preview for the Radio select-transition timesheet. Tapping the radio
+ * toggles it + triggers the playhead so the cursor sweeps in sync with the
+ * visible morph.
+ */
+function SelectPreview({
+  selected,
+  onToggle,
+}: {
+  selected: boolean;
+  onToggle: () => void;
+}) {
+  const shell = useShell();
+  return (
+    <View style={{ alignItems: "center", gap: space["12"] }}>
+      <Text
+        style={[
+          textStyles.Body_B11_SemiBold,
+          {
+            color: shell.textTertiary,
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          },
+        ]}
+      >
+        Live preview
+      </Text>
+      <Pressable
+        onPress={onToggle}
+        accessibilityRole="button"
+        accessibilityLabel="Play radio select transition"
+      >
+        <View pointerEvents="none">
+          <Radio selected={selected} size="H24" />
+        </View>
+      </Pressable>
+      <Text
+        style={[
+          textStyles.Body_B11_Regular,
+          { color: shell.textMuted, textAlign: "center" },
+        ]}
+      >
+        tap to play
+      </Text>
+    </View>
   );
 }
 

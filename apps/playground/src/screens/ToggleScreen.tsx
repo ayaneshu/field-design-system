@@ -1,5 +1,11 @@
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { Text, View } from "react-native";
+import {
+  Easing,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Toggle, type ToggleSize } from "@field-ds/components";
@@ -9,7 +15,10 @@ import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
 import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
-import { toggleFlipMotionTimeline } from "./motionTimelines/toggleFlipMotionTimeline";
+import {
+  TOGGLE_AXIS_MS,
+  toggleFlipMotionTimeline,
+} from "./motionTimelines/toggleFlipMotionTimeline";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Toggle">;
 
@@ -20,6 +29,21 @@ export function ToggleScreen({ navigation }: Props) {
   const [on, setOn] = useState(false);
   const [size, setSize] = useState<ToggleSize>("H20");
   const [disabled, setDisabled] = useState(false);
+
+  const playhead = useSharedValue(0);
+  const reducedMotion = useReducedMotion();
+
+  const triggerPlay = useCallback(() => {
+    if (reducedMotion) {
+      playhead.value = 1;
+      return;
+    }
+    playhead.value = 0;
+    playhead.value = withTiming(1, {
+      duration: TOGGLE_AXIS_MS,
+      easing: Easing.linear,
+    });
+  }, [playhead, reducedMotion]);
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -99,7 +123,11 @@ export function ToggleScreen({ navigation }: Props) {
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/Toggle/Toggle.tsx"
       sidebar={componentsSidebar("Toggle")}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
-      motionTimeline={toggleFlipMotionTimeline}
+      motionTimeline={{
+        ...toggleFlipMotionTimeline,
+        playhead,
+        preview: <ToggleOnPreview onPlay={triggerPlay} />,
+      }}
       motionFooter={
         <Text style={[textStyles.Body_B14_Regular, { color: shell.textTertiary, maxWidth: 640 }]}>
           Reduced motion: <Text style={textStyles.Body_B14_SemiBold}>useReducedMotion()</Text> assigns u
@@ -131,6 +159,53 @@ export function ToggleScreen({ navigation }: Props) {
       <DetailSection heading="Sizes" preview={sizesPreview} />
       <DetailSection heading="States" preview={statesPreview} />
     </PageScaffold>
+  );
+}
+
+/**
+ * Live preview of the Toggle flip. Toggling fires both the Toggle's own
+ * `withTiming(motion.duration.lg)` animation and the playhead sweep across
+ * the timesheet over the same window, so the cursor and the visible
+ * thumb / track changes always agree.
+ */
+function ToggleOnPreview({ onPlay }: { onPlay: () => void }) {
+  const shell = useShell();
+  const [on, setOn] = useState(false);
+
+  const handleChange = (next: boolean) => {
+    setOn(next);
+    onPlay();
+  };
+
+  return (
+    <View style={{ alignItems: "center", gap: space["12"] }}>
+      <Text
+        style={[
+          textStyles.Body_B11_SemiBold,
+          {
+            color: shell.textTertiary,
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          },
+        ]}
+      >
+        Live preview
+      </Text>
+      <Toggle
+        on={on}
+        onChange={handleChange}
+        size="H20"
+        accessibilityLabel="Live preview toggle"
+      />
+      <Text
+        style={[
+          textStyles.Body_B11_Regular,
+          { color: shell.textMuted, textAlign: "center" },
+        ]}
+      >
+        tap to flip
+      </Text>
+    </View>
   );
 }
 

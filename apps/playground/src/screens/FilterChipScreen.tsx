@@ -1,5 +1,11 @@
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { Image, Text, TextInput, View } from "react-native";
+import {
+  Easing,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import Svg, { Circle, Path } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -15,6 +21,10 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 import { Dropdown, type DropdownOption } from "../components/Dropdown";
 import { DetailSection, PageScaffold } from "../components/PageScaffold";
 import { componentsSidebar, navigateFromSidebar } from "../navigation/sidebars";
+import {
+  FILTER_CHIP_AXIS_MS,
+  filterChipAddedMotionTimeline,
+} from "./motionTimelines/filterChipAddedMotionTimeline";
 import { useShell } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
 
@@ -52,6 +62,25 @@ export function FilterChipScreen({ navigation }: Props) {
 
   // Interactive demo state.
   const [activeCount, setActiveCount] = useState(4);
+
+  // Motion-spec preview state.
+  const playhead = useSharedValue(0);
+  const reducedMotion = useReducedMotion();
+  const [previewAdded, setPreviewAdded] = useState(false);
+
+  // Playhead sweeps linearly over the full axis (longest lane = spring settle)
+  // so the cursor lines up with the slowest visible lane on the timesheet.
+  const triggerPlay = useCallback(() => {
+    if (reducedMotion) {
+      playhead.value = 1;
+      return;
+    }
+    playhead.value = 0;
+    playhead.value = withTiming(1, {
+      duration: FILTER_CHIP_AXIS_MS,
+      easing: Easing.linear,
+    });
+  }, [playhead, reducedMotion]);
 
   const playgroundPreview = (
     <PreviewSurface tall>
@@ -224,6 +253,23 @@ export function FilterChipScreen({ navigation }: Props) {
       repoUrl="https://github.com/ayaneshu/field-design-system/tree/main/packages/components/src/FilterChip/FilterChip.tsx"
       sidebar={componentsSidebar("FilterChip")}
       onSidebarSelect={(key) => navigateFromSidebar(navigation, key)}
+      motionTimeline={{
+        ...filterChipAddedMotionTimeline,
+        playhead,
+        preview: (
+          <AddedPreview
+            added={previewAdded}
+            onAdd={() => {
+              setPreviewAdded(true);
+              triggerPlay();
+            }}
+            onClear={() => {
+              setPreviewAdded(false);
+              triggerPlay();
+            }}
+          />
+        ),
+      }}
     >
       <DetailSection
         heading="Playground"
@@ -287,6 +333,55 @@ export function FilterChipScreen({ navigation }: Props) {
 
       <DetailSection heading="Interactive" preview={interactivePreview} />
     </PageScaffold>
+  );
+}
+
+/**
+ * Live preview for the FilterChip default ↔ added timesheet. Tapping the
+ * chip body flips into the added state and triggers the playhead sweep;
+ * tapping the clear cross flips it back. Both transitions share the same
+ * tokens with the timesheet so the cursor and the visible morph agree.
+ */
+function AddedPreview({
+  added,
+  onAdd,
+  onClear,
+}: {
+  added: boolean;
+  onAdd: () => void;
+  onClear: () => void;
+}) {
+  const shell = useShell();
+  return (
+    <View style={{ alignItems: "center", gap: space["12"] }}>
+      <Text
+        style={[
+          textStyles.Body_B11_SemiBold,
+          {
+            color: shell.textTertiary,
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          },
+        ]}
+      >
+        Live preview
+      </Text>
+      <FilterChip
+        label="Filter"
+        count="(4)"
+        added={added}
+        onPress={onAdd}
+        onClear={onClear}
+      />
+      <Text
+        style={[
+          textStyles.Body_B11_Regular,
+          { color: shell.textMuted, textAlign: "center" },
+        ]}
+      >
+        tap chip to add · cross to clear
+      </Text>
+    </View>
   );
 }
 
