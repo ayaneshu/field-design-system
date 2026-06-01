@@ -1,15 +1,29 @@
 import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  type SharedValue,
+} from "react-native-reanimated";
 import { useNavigation, type NavigationProp } from "@react-navigation/native";
 
 import { colour, space } from "@field-ds/tokens";
 
 import { Logo } from "./Logo";
-import { ThemeToggle } from "./ThemeToggle";
 import { useTheme } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
 
 type Variant = "light" | "yellow" | "dark";
-type ActiveTab = "Foundations" | "Components" | "Patterns" | null;
+type ActiveTab = "Foundations" | "Components" | "Patterns" | "I need" | null;
+
+/** Shared header height per breakpoint — also used by screens to pad content
+ *  down beneath the floating header. */
+export const HEADER_HEIGHT_COMPACT = 64;
+export const HEADER_HEIGHT_FULL = 92;
+export function headerHeightFor(width: number): number {
+  return width < 720 ? HEADER_HEIGHT_COMPACT : HEADER_HEIGHT_FULL;
+}
 
 /**
  * Persistent top nav — logo + "noon" wordmark on the left, route links and
@@ -21,9 +35,18 @@ type ActiveTab = "Foundations" | "Components" | "Patterns" | null;
 export function TopHeader({
   variant = "light",
   active = null,
+  transparent = false,
+  scrollY,
 }: {
   variant?: Variant;
   active?: ActiveTab;
+  /** Drop the header's background fill so whatever sits behind it (e.g. the
+      home page's watercolour backdrop) shows through. Text colours stay
+      themed. */
+  transparent?: boolean;
+  /** When provided, the header floats with a transparent fill that fades to a
+      white bar (with a hairline + soft shadow) as the page scrolls. */
+  scrollY?: SharedValue<number>;
 }) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { width } = useWindowDimensions();
@@ -32,17 +55,29 @@ export function TopHeader({
   const horizontalPad = width >= 1100 ? 60 : width >= 720 ? 32 : 20;
   const headerHeight = isCompact ? 64 : 92;
 
+  // Scroll-driven background. `floating` headers start transparent and fade in
+  // a white bar over the first ~56px of scroll.
+  const floating = !!scrollY;
+  const fallbackScroll = useSharedValue(0);
+  const sy = scrollY ?? fallbackScroll;
+  const floatingBgStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(sy.value, [0, 56], [0, 1], Extrapolation.CLAMP),
+  }));
+
   // The home page uses fixed-colour hero variants (yellow / dark navy) that
   // shouldn't flip with the global theme. Other pages defer to the theme.
   const isYellow = variant === "yellow";
   const isFixedDark = variant === "dark";
   const isThemed = !isYellow && !isFixedDark;
 
-  const bg = isYellow
-    ? colour.surface["brand-primary"]
-    : isFixedDark
+  const bg =
+    floating || transparent
       ? "transparent"
-      : shell.headerBg;
+      : isYellow
+        ? colour.surface["brand-primary"]
+        : isFixedDark
+          ? "transparent"
+          : shell.headerBg;
   const brandColor = isFixedDark
     ? "#f4f6fb"
     : isThemed
@@ -81,6 +116,26 @@ export function TopHeader({
         position: "relative",
       }}
     >
+      {/* Scroll-driven white bar — fades in behind the content as you scroll. */}
+      {floating ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: shell.headerBg,
+              borderBottomWidth: 1,
+              borderBottomColor: shell.border,
+            },
+            floatingBgStyle,
+          ]}
+        />
+      ) : null}
+
       {/* Left: logo + brand mark + noon wordmark */}
       <Pressable
         onPress={() => navigation.navigate("Home" as never)}
@@ -166,9 +221,14 @@ export function TopHeader({
           compact={isCompact}
           onPress={() => navigation.navigate("Patterns" as never)}
         />
-        {/* Theme toggle — hidden on the fixed-colour hero variants because
-            those views are intentionally fixed in their own palette. */}
-        {isThemed ? <ThemeToggle /> : null}
+        <NavLink
+          label="I need"
+          isActive={active === "I need"}
+          idleColor={navIdleColor}
+          activeColor={navActiveColor}
+          compact={isCompact}
+          onPress={() => navigation.navigate("INeed" as never)}
+        />
       </View>
     </View>
   );
