@@ -8,13 +8,18 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from "react-native-reanimated";
 
 import { Icon } from "@field-ds/icons";
 import { Switch as FieldSwitch } from "@field-ds/components";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { MotionTimesheet, type MotionTimesheetProps } from "./motionTimesheet";
-import { TopHeader } from "./TopHeader";
+import { Reveal } from "./Reveal";
+import { TopHeader, headerHeightFor } from "./TopHeader";
 import { createDefaultComponentMotionTimeline } from "../screens/motionTimelines/createDefaultComponentMotionTimeline";
 import { useTheme } from "../theme/ThemeContext";
 
@@ -70,9 +75,10 @@ export function PageScaffold({
   motionTimeline,
   motionFooter,
   motionSpecs,
+  heroImage,
   children,
 }: {
-  topNavActive?: "Foundations" | "Components" | "Patterns" | null;
+  topNavActive?: "Foundations" | "Components" | "Patterns" | "I need" | null;
   title: string;
   /** Short description rendered under the title. Only renders on
    * component-style pages (i.e. when `version` or `repoUrl` is set). */
@@ -93,13 +99,24 @@ export function PageScaffold({
   motionFooter?: ReactNode;
   /** Full override for Motion specs tab layout (advanced). */
   motionSpecs?: ReactNode;
+  /** Optional full-bleed sky image shown behind the (transparent) header and
+   *  title at the top of the page, fading to white. Web-only. */
+  heroImage?: string;
   children: ReactNode;
 }) {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const { shell } = useTheme();
   const showSidebar = width >= SIDEBAR_BREAKPOINT;
   const horizontalPad = width >= 1100 ? 60 : width >= 720 ? 32 : 20;
   const railGap = width >= 1100 ? 60 : width >= 720 ? 32 : space["32"];
+  const headerHeight = headerHeightFor(width);
+
+  // Scroll position drives the header background (transparent → white bar).
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler((e) => {
+    scrollY.value = e.contentOffset.y;
+  });
+  const bandHeight = width >= 1100 ? 560 : width >= 720 ? 460 : 380;
 
   // Component-style pages get the subtitle / version pill / Design-Develop
   // tabs treatment. Foundations pages (no version, no repoUrl) keep the
@@ -114,18 +131,35 @@ export function PageScaffold({
 
   return (
     <View style={{ flex: 1, backgroundColor: shell.pageBg }}>
-      {/* Persistent header — lives outside the scrollable page so it stays
-          fixed at the top on every screen. */}
-      <TopHeader variant="light" active={topNavActive ?? null} />
-
-      <ScrollView
+      <Animated.ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: space["72"] }}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
       >
+        {/* Optional sky backdrop behind the transparent header + title. */}
+        {heroImage && Platform.OS === "web" ? (
+          <View
+            pointerEvents="none"
+            // @ts-expect-error web-only background-image props
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: bandHeight,
+              backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.55) 46%, #ffffff 88%), url(${heroImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "top center",
+              backgroundRepeat: "no-repeat",
+            }}
+          />
+        ) : null}
+
         <View
           style={{
             paddingHorizontal: horizontalPad,
-            paddingTop: 24,
+            paddingTop: headerHeight + 24,
             flexDirection: showSidebar ? "row" : "column",
             gap: showSidebar ? railGap : space["24"],
             // In row mode (desktop), keep the sticky sidebar from being
@@ -142,8 +176,10 @@ export function PageScaffold({
 
         <View style={{ flex: 1, minWidth: 0, alignSelf: "stretch" }}>
           {/* Title row — constrained title block on the left, optional rightSlot
-              (view toggle / download button / etc.) on the right. */}
-          <View
+              (view toggle / download button / etc.) on the right. Staggered:
+              the title rises in first (index 0), the body follows (index 1). */}
+          <Reveal
+            index={0}
             style={{
               flexDirection: "row",
               alignItems: "flex-start",
@@ -192,8 +228,9 @@ export function PageScaffold({
                 {rightSlot}
               </View>
             ) : null}
-          </View>
+          </Reveal>
 
+          <Reveal index={1}>
           {isComponentStyle ? (
             <>
               <View
@@ -228,9 +265,20 @@ export function PageScaffold({
           ) : (
             children
           )}
+          </Reveal>
           </View>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
+
+      {/* Floating header — fixed on top, transparent at the first fold and
+          fading to a white bar as the page scrolls. */}
+      <View
+        pointerEvents="box-none"
+        // @ts-expect-error zIndex on web keeps the header above content
+        style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 20 }}
+      >
+        <TopHeader variant="light" active={topNavActive ?? null} scrollY={scrollY} />
+      </View>
     </View>
   );
 }
@@ -409,7 +457,8 @@ function Sidebar({
         flexShrink: 0,
         // @ts-expect-error sticky on web
         position: "sticky",
-        top: SIDEBAR_VERTICAL_INSET,
+        // Sticks below the floating header.
+        top: headerHeight + SIDEBAR_VERTICAL_INSET,
         alignSelf: "flex-start",
         // Cap to the visible viewport so a long item list scrolls inside the
         // sidebar instead of pushing past the screen edges.

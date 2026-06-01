@@ -16,6 +16,8 @@ import { HomeScreen } from "./src/screens/HomeScreen";
 import { FoundationsScreen } from "./src/screens/FoundationsScreen";
 import { ComponentsListScreen } from "./src/screens/ComponentsListScreen";
 import { PatternsScreen } from "./src/screens/PatternsScreen";
+import { INeedScreen } from "./src/screens/INeedScreen";
+import { INeedRequestsScreen } from "./src/screens/INeedRequestsScreen";
 import { IllustrationsScreen } from "./src/screens/IllustrationsScreen";
 import { AccordionScreen } from "./src/screens/AccordionScreen";
 import { ActionBarScreen } from "./src/screens/ActionBarScreen";
@@ -132,7 +134,7 @@ export default function App() {
   if (!loaded) return null;
 
   return (
-    <ThemeProvider initial="light">
+    <ThemeProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
           <ThemedNavigationShell />
@@ -142,12 +144,12 @@ export default function App() {
   );
 }
 
-/** Inner shell: reads the theme so the nav theme + status bar can flip. */
+/** Inner shell: reads the (always-light) shell tokens for the nav theme. */
 function ThemedNavigationShell() {
-  const { mode, shell } = useTheme();
+  const { shell } = useTheme();
 
   const navTheme: Theme = {
-    dark: mode === "dark",
+    dark: false,
     colors: {
       primary: colour["text-n-icon"].action,
       background: shell.pageBg,
@@ -166,7 +168,7 @@ function ThemedNavigationShell() {
 
   return (
     <NavigationContainer theme={navTheme} linking={linking}>
-      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <StatusBar style="dark" />
       <RootStack.Navigator
         screenOptions={{
           headerShown: false,
@@ -177,6 +179,8 @@ function ThemedNavigationShell() {
         <RootStack.Screen name="Foundations" component={FoundationsScreen} />
         <RootStack.Screen name="Components" component={ComponentsListScreen} />
         <RootStack.Screen name="Patterns" component={PatternsScreen} />
+        <RootStack.Screen name="INeed" component={INeedScreen} />
+        <RootStack.Screen name="INeedRequests" component={INeedRequestsScreen} />
         <RootStack.Screen name="Illustrations" component={IllustrationsScreen} />
         <RootStack.Screen name="Accordion" component={AccordionScreen} />
         <RootStack.Screen name="ActionBar" component={ActionBarScreen} />

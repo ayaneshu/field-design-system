@@ -1,9 +1,7 @@
 import {
   createContext,
-  useCallback,
   useContext,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
 
@@ -52,24 +50,6 @@ const LIGHT: ShellTokens = {
   previewIslandBorder: colour.border.subtle,
 };
 
-const DARK: ShellTokens = {
-  pageBg: "#000000",
-  headerBg: "#000000",
-  sidebarBg: "#0c0c0c",
-  sidebarRowActiveBg: "rgba(244,246,251,0.08)",
-  sidebarRowHoverBg: "rgba(244,246,251,0.04)",
-  sidebarDivider: "rgba(244,246,251,0.12)",
-  textPrimary: "#f4f6fb",
-  textSecondary: "rgba(244,246,251,0.75)",
-  textTertiary: "rgba(244,246,251,0.55)",
-  textMuted: "rgba(244,246,251,0.4)",
-  border: "rgba(244,246,251,0.12)",
-  // Preview surfaces stay LIGHT in dark mode so the M-Components inside
-  // (which use the system's light tokens) keep rendering correctly.
-  previewIslandBg: colour.surface.primary,
-  previewIslandBorder: "rgba(0,0,0,0.06)",
-};
-
 type ThemeContextValue = {
   mode: ThemeMode;
   setMode: (next: ThemeMode) => void;
@@ -81,24 +61,22 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({
   children,
-  initial = "light",
 }: {
   children: ReactNode;
+  /** @deprecated Dark mode was removed — the playground is always light. */
   initial?: ThemeMode;
 }) {
-  const [mode, setMode] = useState<ThemeMode>(initial);
-  const toggle = useCallback(
-    () => setMode((m) => (m === "light" ? "dark" : "light")),
-    [],
-  );
+  // Dark mode has been removed from the playground. The shell is permanently
+  // light; `toggle`/`setMode` are retained as no-ops so existing consumers of
+  // `useTheme()` keep working without changes.
   const value = useMemo<ThemeContextValue>(
     () => ({
-      mode,
-      setMode,
-      toggle,
-      shell: mode === "dark" ? DARK : LIGHT,
+      mode: "light",
+      setMode: () => {},
+      toggle: () => {},
+      shell: LIGHT,
     }),
-    [mode, toggle],
+    [],
   );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
