@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -12,6 +13,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { space } from "@field-ds/tokens";
 
 import { ParticleImageField } from "../components/ParticleImageField";
+import { Reveal } from "../components/Reveal";
 import { TopHeader } from "../components/TopHeader";
 import { useTheme } from "../theme/ThemeContext";
 import type { RootStackParamList } from "../navigation/types";
@@ -223,15 +225,38 @@ export function HomeScreen({ navigation }: Props) {
           overflow: "hidden",
         }}
       >
-        <TopHeader active={null} />
+        {/* Watercolour landscape backdrop — light mode only. It fades to white
+            at the top so it blends into the page background, with the field
+            anchored to the bottom. Sits behind all content (first child →
+            painted first). */}
+        {mode === "light" ? (
+          Platform.OS === "web" ? (
+            <View
+              pointerEvents="none"
+              // @ts-expect-error web-only background-image props
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                backgroundImage: "url(/home-bg.png)",
+                backgroundSize: "cover",
+                backgroundPosition: "bottom center",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
+          ) : (
+            <Image
+              source={{ uri: "/home-bg.png" }}
+              resizeMode="cover"
+              pointerEvents="none"
+              style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
+            />
+          )
+        ) : null}
 
-        {/* Divider directly under the header. */}
-        <View
-          style={{
-            height: 1,
-            backgroundColor: palette.divider,
-          }}
-        />
+        <TopHeader active={null} transparent />
 
         {/* Title block — anchored top-left under the header. The title
             itself needs to receive hover events for the bloom effect, so
@@ -246,17 +271,21 @@ export function HomeScreen({ navigation }: Props) {
             alignItems: "flex-start",
           }}
         >
-          <View>
-            <MetalTitle
-              line="field"
-              width={width}
-              textRef={titleRef}
-              onMouseEnter={onTitleEnter}
-              onMouseLeave={onTitleLeave}
-              onMouseMove={onTitleMove}
-            />
-            <SubTitle line="design system" fontSize={subtitleSize} />
-          </View>
+          {/* index 0 — fade only (offset disabled): a translateY here would
+              shift the measured title rect that the hover bloom relies on. */}
+          <Reveal index={0} offset={false}>
+            <View>
+              <MetalTitle
+                line="field"
+                width={width}
+                textRef={titleRef}
+                onMouseEnter={onTitleEnter}
+                onMouseLeave={onTitleLeave}
+                onMouseMove={onTitleMove}
+              />
+              <SubTitle line="design system" fontSize={subtitleSize} />
+            </View>
+          </Reveal>
 
           {/* Hidden probes — measured at the title font size so we can
               compute the subtitle size that makes "design system" render
@@ -274,7 +303,8 @@ export function HomeScreen({ navigation }: Props) {
 
           {/* Version + horizontal rule — locked to the same width as the
               "design system" line above so the rule never overshoots. */}
-          <View
+          <Reveal
+            index={1}
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -301,20 +331,24 @@ export function HomeScreen({ navigation }: Props) {
                 backgroundColor: palette.divider,
               }}
             />
-          </View>
+          </Reveal>
         </View>
 
         {/* Spacer pushes the nav row to the lower part of the screen. */}
         <View style={{ flex: 1, minHeight: 80 }} />
 
         {/* Bottom — full-width 3-column nav with cursor-nav blur on hover. */}
-        <CursorNav
-          entries={ENTRIES}
-          width={width}
-          horizontalPad={horizontalPad}
-          onPress={(key) => navigation.navigate(key as never)}
-        />
+        <Reveal index={2}>
+          <CursorNav
+            entries={ENTRIES}
+            width={width}
+            horizontalPad={horizontalPad}
+            onPress={(key) => navigation.navigate(key as never)}
+          />
+        </Reveal>
 
+        {/* Divider + footer rise in last. */}
+        <Reveal index={3}>
         {/* Divider above the footer. */}
         <View
           style={{
@@ -360,6 +394,7 @@ export function HomeScreen({ navigation }: Props) {
             curated by noon
           </Text>
         </View>
+        </Reveal>
       </View>
 
       {/* Inverted-mode bloom — works in both modes. The veil renders the
