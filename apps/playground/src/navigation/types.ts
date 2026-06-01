@@ -11,6 +11,8 @@ export type RootStackParamList = {
   Foundations: { section?: FoundationsSection } | undefined;
   Components: undefined;
   Patterns: undefined;
+  INeed: undefined;
+  INeedRequests: undefined;
   Illustrations: undefined;
   Accordion: undefined;
   ActionBar: undefined;

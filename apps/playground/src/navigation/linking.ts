@@ -43,6 +43,9 @@ export const linking: LinkingOptions<RootStackParamList> = {
       Illustrations: "illustrations",
       Components: "components",
       Patterns: "patterns",
+      // "I need…" — the Field DS request collector (ported from the Next.js app).
+      INeed: "i-need",
+      INeedRequests: "i-need/requests",
       // Buttons grouped under /components/button/* to mirror the sidebar's
       // collapsible Button section.
       PrimaryButton: "components/button/primary",
