@@ -474,15 +474,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    ...textStyles.Heading_H16_Bold,
+    ...textStyles.H16_Bold,
     color: colour["text-n-icon"].primary,
   },
   titleCentered: {
-    ...textStyles.Body_B16_SemiBold,
+    ...textStyles.B16_SemiBold,
     color: colour["text-n-icon"].primary,
   },
   subtitle: {
-    ...textStyles.Body_B12_Regular,
+    ...textStyles.B12_Regular,
     color: colour["text-n-icon"].secondary,
   },
 
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    ...textStyles.Body_B14_Regular,
+    ...textStyles.B14_Regular,
     color: colour["text-n-icon"].primary,
     padding: 0,
   },
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
     backgroundColor: colour.surface.secondary,
   },
   searchPillText: {
-    ...textStyles.Body_B12_Medium,
+    ...textStyles.B12_Medium,
     color: colour["text-n-icon"].secondary,
     flexShrink: 1,
   },
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   addressLabel: {
-    ...textStyles.Body_B16_SemiBold,
+    ...textStyles.B16_SemiBold,
     color: colour["text-n-icon"].primary,
   },
 
@@ -569,11 +569,11 @@ const styles = StyleSheet.create({
     gap: space["4"],
   },
   crumbHead: {
-    ...textStyles.Body_B14_SemiBold,
+    ...textStyles.B14_SemiBold,
     color: colour["text-n-icon"].primary,
   },
   crumbPath: {
-    ...textStyles.Body_B14_Regular,
+    ...textStyles.B14_Regular,
     color: colour["text-n-icon"].secondary,
     flexShrink: 1,
   },

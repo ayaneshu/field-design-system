@@ -36,13 +36,13 @@ const SIZE_CFG = {
     track: space["40"],
     thumb: space["32"],
     padding: space["4"],
-    textStyle: textStyles.Body_B12_SemiBold,
+    textStyle: textStyles.B12_SemiBold,
   },
   H48: {
     track: space["48"],
     thumb: space["40"],
     padding: space["4"],
-    textStyle: textStyles.Body_B14_SemiBold,
+    textStyle: textStyles.B14_SemiBold,
   },
 } as const;
 

@@ -23,7 +23,7 @@ export type ButtonSizeSpec = {
   iconSize: number;
   spinnerSize: number;
   text: FieldTextStyle;
-  // Token name (e.g. "textStyles.Action_A14_SemiBold") emitted as a dataSet
+  // Token name (e.g. "textStyles.A14_SemiBold") emitted as a dataSet
   // attribute for the design-system audit tooling.
   textStyleName: string;
 };
@@ -40,8 +40,8 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     gap: space["8"],
     iconSize: 24,
     spinnerSize: 24,
-    text: textStyles.Action_A17_SemiBold,
-    textStyleName: "textStyles.Action_A17_SemiBold",
+    text: textStyles.A17_SemiBold,
+    textStyleName: "textStyles.A17_SemiBold",
   },
   H52: {
     height: 52,
@@ -51,8 +51,8 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     gap: space["8"],
     iconSize: 24,
     spinnerSize: 24,
-    text: textStyles.Action_A16_SemiBold,
-    textStyleName: "textStyles.Action_A16_SemiBold",
+    text: textStyles.A16_SemiBold,
+    textStyleName: "textStyles.A16_SemiBold",
   },
   H48: {
     height: 48,
@@ -62,8 +62,8 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     gap: space["6"],
     iconSize: 20,
     spinnerSize: 20,
-    text: textStyles.Action_A14_SemiBold,
-    textStyleName: "textStyles.Action_A14_SemiBold",
+    text: textStyles.A14_SemiBold,
+    textStyleName: "textStyles.A14_SemiBold",
   },
   // Default H40 = Primary footprint (12px padding, gap 4, radius 8, 16px icon).
   // Other variants override via BUTTON_SIZE_H40_OVERRIDES.
@@ -75,8 +75,8 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     gap: space["4"],
     iconSize: 16,
     spinnerSize: 16,
-    text: textStyles.Action_A12_SemiBold,
-    textStyleName: "textStyles.Action_A12_SemiBold",
+    text: textStyles.A12_SemiBold,
+    textStyleName: "textStyles.A12_SemiBold",
   },
   H36: {
     height: 36,
@@ -86,8 +86,8 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     gap: space["4"],
     iconSize: 16,
     spinnerSize: 16,
-    text: textStyles.Action_A12_SemiBold,
-    textStyleName: "textStyles.Action_A12_SemiBold",
+    text: textStyles.A12_SemiBold,
+    textStyleName: "textStyles.A12_SemiBold",
   },
   H32: {
     height: 32,
@@ -97,8 +97,8 @@ export const BUTTON_SIZE: Record<ButtonSize, ButtonSizeSpec> = {
     gap: space["4"],
     iconSize: 16,
     spinnerSize: 16,
-    text: textStyles.Action_A12_SemiBold,
-    textStyleName: "textStyles.Action_A12_SemiBold",
+    text: textStyles.A12_SemiBold,
+    textStyleName: "textStyles.A12_SemiBold",
   },
 };
 
@@ -117,8 +117,8 @@ const BUTTON_SIZE_H40_OVERRIDES: Partial<
     gap: space["6"],
     iconSize: 20,
     spinnerSize: 18,
-    text: textStyles.Action_A12_SemiBold,
-    textStyleName: "textStyles.Action_A12_SemiBold",
+    text: textStyles.A12_SemiBold,
+    textStyleName: "textStyles.A12_SemiBold",
   },
   "secondary-neutral": {
     height: 40,
@@ -128,8 +128,8 @@ const BUTTON_SIZE_H40_OVERRIDES: Partial<
     gap: space["6"],
     iconSize: 20,
     spinnerSize: 18,
-    text: textStyles.Action_A14_SemiBold,
-    textStyleName: "textStyles.Action_A14_SemiBold",
+    text: textStyles.A14_SemiBold,
+    textStyleName: "textStyles.A14_SemiBold",
   },
   neutral: {
     height: 40,
@@ -139,8 +139,8 @@ const BUTTON_SIZE_H40_OVERRIDES: Partial<
     gap: space["6"],
     iconSize: 20,
     spinnerSize: 20,
-    text: textStyles.Action_A14_SemiBold,
-    textStyleName: "textStyles.Action_A14_SemiBold",
+    text: textStyles.A14_SemiBold,
+    textStyleName: "textStyles.A14_SemiBold",
   },
 };
 

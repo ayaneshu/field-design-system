@@ -123,7 +123,7 @@ export const CustomLeading: Story = {
         >
           <Text
             style={[
-              textStyles.Body_B12_Bold,
+              textStyles.B12_Bold,
               { color: colour.surface.primary },
             ]}
           >

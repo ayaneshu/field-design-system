@@ -63,7 +63,7 @@ export function ToggleScreen({ navigation }: Props) {
         <PreviewSurface key={s}>
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",
@@ -129,9 +129,9 @@ export function ToggleScreen({ navigation }: Props) {
         preview: <ToggleOnPreview onPlay={triggerPlay} />,
       }}
       motionFooter={
-        <Text style={[textStyles.Body_B14_Regular, { color: shell.textTertiary, maxWidth: 640 }]}>
-          Reduced motion: <Text style={textStyles.Body_B14_SemiBold}>useReducedMotion()</Text> assigns u
-          instantly; thumb <Text style={textStyles.Body_B14_SemiBold}>scaleX</Text> stays at 1.
+        <Text style={[textStyles.B14_Regular, { color: shell.textTertiary, maxWidth: 640 }]}>
+          Reduced motion: <Text style={textStyles.B14_SemiBold}>useReducedMotion()</Text> assigns u
+          instantly; thumb <Text style={textStyles.B14_SemiBold}>scaleX</Text> stays at 1.
         </Text>
       }
     >
@@ -181,7 +181,7 @@ function ToggleOnPreview({ onPlay }: { onPlay: () => void }) {
     <View style={{ alignItems: "center", gap: space["12"] }}>
       <Text
         style={[
-          textStyles.Body_B11_SemiBold,
+          textStyles.B11_SemiBold,
           {
             color: shell.textTertiary,
             textTransform: "uppercase",
@@ -199,7 +199,7 @@ function ToggleOnPreview({ onPlay }: { onPlay: () => void }) {
       />
       <Text
         style={[
-          textStyles.Body_B11_Regular,
+          textStyles.B11_Regular,
           { color: shell.textMuted, textAlign: "center" },
         ]}
       >
@@ -246,7 +246,7 @@ function StateRow({ label, children }: { label: string; children: ReactNode }) {
     >
       <Text
         style={[
-          textStyles.Body_B11_SemiBold,
+          textStyles.B11_SemiBold,
           {
             color: colour["text-n-icon"].tertiary,
             textTransform: "uppercase",
@@ -289,7 +289,7 @@ function PropLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B16_Medium,
+        textStyles.B16_Medium,
         { color: shell.textPrimary, minWidth: 96 },
       ]}
     >
@@ -315,7 +315,7 @@ function SizeSelector({
             key={s}
             onPress={() => onChange(s)}
             style={[
-              textStyles.Body_B12_SemiBold,
+              textStyles.B12_SemiBold,
               {
                 paddingHorizontal: space["12"],
                 paddingVertical: space["6"],

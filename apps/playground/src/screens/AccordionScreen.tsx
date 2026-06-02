@@ -173,7 +173,7 @@ export function AccordionScreen({ navigation }: Props) {
         >
           <Text
             style={[
-              textStyles.Body_B12_SemiBold,
+              textStyles.B12_SemiBold,
               { color: colour["text-n-icon"].action },
             ]}
           >
@@ -249,7 +249,7 @@ function PropLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B16_Medium,
+        textStyles.B16_Medium,
         {
           color: shell.textPrimary,
           minWidth: 96,
@@ -305,7 +305,7 @@ function DSTextInput({
         multiline={multiline}
         // @ts-expect-error — outlineStyle is web-only and supported by RN-Web
         style={[
-          textStyles.Body_B14_SemiBold,
+          textStyles.B14_SemiBold,
           {
             color: colour["text-n-icon"].primary,
             paddingTop: 0,

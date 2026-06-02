@@ -37,12 +37,12 @@ export function CopyToast({ message }: { message: string | null }) {
             elevation: 6,
           }}
         >
-          <Text style={[textStyles.Body_B12_SemiBold, { color: colour["text-n-icon"]["on-surface-bold"] }]}>
+          <Text style={[textStyles.B12_SemiBold, { color: colour["text-n-icon"]["on-surface-bold"] }]}>
             Copied
           </Text>
           <Text
             style={[
-              textStyles.Body_B12_SemiBold,
+              textStyles.B12_SemiBold,
               { color: colour["text-n-icon"]["on-surface-bold"], opacity: 0.7 },
             ]}
           >

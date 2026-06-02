@@ -303,7 +303,7 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
         <View style={styles.labelRow}>
           <Text
             style={[
-              textStyles.Body_B12_Medium,
+              textStyles.B12_Medium,
               { color: externalLabelColour },
             ]}
             numberOfLines={1}
@@ -313,7 +313,7 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
           {required && (
             <Text
               style={[
-                textStyles.Body_B12_Medium,
+                textStyles.B12_Medium,
                 { color: colour["text-n-icon"].error, marginLeft: space["2"] },
               ]}
             >
@@ -393,8 +393,8 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
                     styles.input,
                     { height: INLINE_INPUT_HEIGHT },
                     hasValue
-                      ? textStyles.Body_B14_SemiBold
-                      : textStyles.Body_B14_Regular,
+                      ? textStyles.B14_SemiBold
+                      : textStyles.B14_Regular,
                     { color: valueTextColour },
                     WEB_INPUT_RESET,
                   ]}
@@ -422,8 +422,8 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
               style={[
                 styles.input,
                 hasValue
-                  ? textStyles.Body_B14_Medium
-                  : textStyles.Body_B14_Regular,
+                  ? textStyles.B14_Medium
+                  : textStyles.B14_Regular,
                 { color: valueTextColour, textAlignVertical: "center" },
                 WEB_INPUT_RESET,
               ]}
@@ -440,7 +440,7 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
           {helperVisible ? (
             <Text
               style={[
-                textStyles.Body_B12_Regular,
+                textStyles.B12_Regular,
                 { color: helperColour, flex: 1 },
               ]}
             >
@@ -452,7 +452,7 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
           {counterVisible && (
             <Text
               style={[
-                textStyles.Body_B11_Regular,
+                textStyles.B11_Regular,
                 {
                   color: colour["text-n-icon"].muted,
                   marginLeft: space["8"],

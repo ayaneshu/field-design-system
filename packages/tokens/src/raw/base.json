@@ -599,6 +599,10 @@
         "$type": "dimension",
         "$value": "12px"
       },
+      "13": {
+        "$type": "dimension",
+        "$value": "13px"
+      },
       "14": {
         "$type": "dimension",
         "$value": "14px"

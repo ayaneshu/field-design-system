@@ -149,7 +149,7 @@ export function ActionBar({
       >
         <Text
           style={[
-            textStyles.Body_B12_Medium,
+            textStyles.B12_Medium,
             { color: colour["text-n-icon"].tertiary, textAlign: "center" },
           ]}
         >

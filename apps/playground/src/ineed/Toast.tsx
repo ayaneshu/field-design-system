@@ -66,11 +66,11 @@ export function ToastStack({ toasts }: { toasts: ToastItem[] }) {
                 : { elevation: 10 }),
             }}
           >
-            <Text style={[ts("Body_B14_SemiBold"), { color: "#ffffff" }]}>{it.title}</Text>
+            <Text style={[ts("B14_SemiBold"), { color: "#ffffff" }]}>{it.title}</Text>
             {it.description ? (
               <Text
                 style={[
-                  ts("Body_B12_Regular"),
+                  ts("B12_Regular"),
                   { color: "rgba(255,255,255,0.7)", marginTop: 3 },
                 ]}
               >

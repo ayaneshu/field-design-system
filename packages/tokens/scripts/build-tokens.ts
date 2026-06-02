@@ -228,7 +228,7 @@ emit("semantic.ts", semanticBody);
 // ----- text-styles.ts -----
 
 const textResolved = resolveTopLevel(textStyles);
-// Flatten: { Heading: { H40: { Bold: <style> } } } → { Heading_H40_Bold: <style> }
+// Flatten: { H40: { Bold: <style> } } → { H40_Bold: <style> }
 const flat: Record<string, unknown> = {};
 function flatten(obj: Record<string, unknown>, prefix: string[] = []) {
   for (const [k, v] of Object.entries(obj)) {

@@ -118,7 +118,7 @@ function Caption({ children }: { children: React.ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B11_SemiBold,
+        textStyles.B11_SemiBold,
         {
           color: colour["text-n-icon"].tertiary,
           textTransform: "uppercase",

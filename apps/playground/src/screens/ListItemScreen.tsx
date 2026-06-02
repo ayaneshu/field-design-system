@@ -70,7 +70,7 @@ export function ListItemScreen({ navigation }: Props) {
           >
             <Text
               style={[
-                textStyles.Body_B12_Bold,
+                textStyles.B12_Bold,
                 { color: colour.surface.primary },
               ]}
             >
@@ -339,7 +339,7 @@ export function ListItemScreen({ navigation }: Props) {
         >
           <Text
             style={[
-              textStyles.Body_B12_SemiBold,
+              textStyles.B12_SemiBold,
               { color: colour["text-n-icon"].action },
             ]}
           >
@@ -413,7 +413,7 @@ function PropLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B16_Medium,
+        textStyles.B16_Medium,
         {
           color: shell.textPrimary,
           minWidth: 96,
@@ -466,7 +466,7 @@ function DSTextInput({
         placeholderTextColor={colour["text-n-icon"].muted}
         // @ts-expect-error — outlineStyle is web-only and supported by RN-Web
         style={[
-          textStyles.Body_B14_SemiBold,
+          textStyles.B14_SemiBold,
           {
             color: colour["text-n-icon"].primary,
             paddingTop: 0,

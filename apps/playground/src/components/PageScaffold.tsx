@@ -207,7 +207,7 @@ export function PageScaffold({
               {isComponentStyle && subtitle ? (
                 <Text
                   style={[
-                    textStyles.Body_B16_Regular,
+                    textStyles.B16_Regular,
                     {
                       color: shell.textTertiary,
                       marginTop: space["16"],
@@ -313,9 +313,9 @@ export function DetailSection({
   const left = (
     <View style={{ flex: split ? 1 : undefined, minWidth: 0 }}>
       <Text
-        // SemiBold (600) over the H24 size — Heading_H24_Bold reads too
+        // SemiBold (600) over the H24 size — H24_Bold reads too
         // heavy as a section divider next to the prominent title above. The
-        // numeric values mirror Heading_H24_Bold so leading + tracking stay
+        // numeric values mirror H24_Bold so leading + tracking stay
         // in sync; we override the family + weight to drop a notch.
         style={{
           fontFamily: "Noontree-SemiBold",
@@ -648,7 +648,7 @@ function VersionPill({ label }: { label: string }) {
     >
       <Text
         style={[
-          textStyles.Body_B14_SemiBold,
+          textStyles.B14_SemiBold,
           { color: shell.textSecondary },
         ]}
       >
@@ -785,7 +785,7 @@ function DevelopPanel({ repoUrl }: { repoUrl: string }) {
         <View style={{ flex: 2 }}>
           <Text
             style={[
-              textStyles.Body_B16_SemiBold,
+              textStyles.B16_SemiBold,
               { color: shell.textPrimary },
             ]}
           >
@@ -795,7 +795,7 @@ function DevelopPanel({ repoUrl }: { repoUrl: string }) {
         <View style={{ flex: 2 }}>
           <Text
             style={[
-              textStyles.Body_B16_Regular,
+              textStyles.B16_Regular,
               { color: shell.textSecondary },
             ]}
           >
@@ -819,7 +819,7 @@ function DevelopPanel({ repoUrl }: { repoUrl: string }) {
           >
             <Text
               style={[
-                textStyles.Body_B16_SemiBold,
+                textStyles.B16_SemiBold,
                 { color: colour["text-n-icon"].action },
               ]}
             >
@@ -843,7 +843,7 @@ function ColumnLabel({
 }) {
   return (
     <View style={{ flex }}>
-      <Text style={[textStyles.Body_B14_Regular, { color }]}>{children}</Text>
+      <Text style={[textStyles.B14_Regular, { color }]}>{children}</Text>
     </View>
   );
 }

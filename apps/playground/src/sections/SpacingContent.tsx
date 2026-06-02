@@ -55,7 +55,7 @@ export function SpacingContent({
           ink, capped at ~640px so it doesn't run wide. */}
       <Text
         style={[
-          textStyles.Body_B16_Regular,
+          textStyles.B16_Regular,
           {
             color: shell.textTertiary,
             maxWidth: 640,
@@ -67,7 +67,7 @@ export function SpacingContent({
         every component. Tap any token to copy{" "}
         <Text
           style={[
-            textStyles.Body_B16_SemiBold,
+            textStyles.B16_SemiBold,
             { color: shell.textSecondary },
           ]}
         >
@@ -95,7 +95,7 @@ export function SpacingContent({
       <Section heading="Negative tokens">
         <Text
           style={[
-            textStyles.Body_B14_Regular,
+            textStyles.B14_Regular,
             {
               color: shell.textTertiary,
               marginBottom: space["20"],
@@ -134,7 +134,7 @@ function Section({
     <View style={{ marginTop: space["56"] }}>
       <Text
         style={[
-          textStyles.Heading_H24_Bold,
+          textStyles.H24_Bold,
           { color: shell.textPrimary, marginBottom: space["24"] },
         ]}
       >
@@ -148,7 +148,7 @@ function Section({
 function ColumnHeaders() {
   const shell = useShell();
   const headerStyle = [
-    textStyles.Body_B11_SemiBold,
+    textStyles.B11_SemiBold,
     {
       color: shell.textTertiary,
       textTransform: "uppercase" as const,
@@ -211,7 +211,7 @@ function SpaceRow({
     >
       <Text
         style={[
-          textStyles.Heading_H16_Bold,
+          textStyles.H16_Bold,
           {
             color: shell.textPrimary,
             width: 160,
@@ -223,7 +223,7 @@ function SpaceRow({
       </Text>
       <Text
         style={[
-          textStyles.Body_B14_Regular,
+          textStyles.B14_Regular,
           {
             color: shell.textSecondary,
             width: 120,

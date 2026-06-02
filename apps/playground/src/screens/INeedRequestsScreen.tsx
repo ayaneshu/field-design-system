@@ -224,7 +224,7 @@ export function INeedRequestsScreen({ navigation }: Props) {
           {state === "loading" ? (
             <View style={{ paddingVertical: 64, alignItems: "center", gap: 14 }}>
               <ActivityIndicator color={TEXT.action} />
-              <Text style={[textStyles.Body_B14_Regular, { color: TEXT.tertiary }]}>
+              <Text style={[textStyles.B14_Regular, { color: TEXT.tertiary }]}>
                 Loading requests…
               </Text>
             </View>
@@ -249,7 +249,7 @@ export function INeedRequestsScreen({ navigation }: Props) {
                 <RequestsTable rows={filtered} />
               </Reveal>
 
-              <Text style={[textStyles.Body_B12_Regular, { color: TEXT.muted }]}>
+              <Text style={[textStyles.B12_Regular, { color: TEXT.muted }]}>
                 Showing {filtered.length} of {rows.length} · Status & assignee are managed in the
                 Google Sheet
               </Text>
@@ -303,7 +303,7 @@ function BackButton({ onPress }: { onPress: () => void }) {
       })}
     >
       <Icon name="system-arrow-left" size={20} color={TEXT.primary} />
-      <Text style={[textStyles.Action_A14_SemiBold, { color: TEXT.primary }]}>Back</Text>
+      <Text style={[textStyles.A14_SemiBold, { color: TEXT.primary }]}>Back</Text>
     </Pressable>
   );
 }
@@ -353,8 +353,8 @@ function CountCard({
           : null),
       })}
     >
-      <Text style={[textStyles.Heading_H24_Bold, { color: TEXT.primary }]}>{value}</Text>
-      <Text style={[textStyles.Body_B16_Regular, { color: TEXT.muted, flex: 1 }]}>{label}</Text>
+      <Text style={[textStyles.H24_Bold, { color: TEXT.primary }]}>{value}</Text>
+      <Text style={[textStyles.B16_Regular, { color: TEXT.muted, flex: 1 }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -380,13 +380,13 @@ function Notice({
       }}
     >
       <View style={{ gap: 4 }}>
-        <Text style={[textStyles.Body_B16_SemiBold, { color: TEXT.error }]}>{title}</Text>
-        <Text style={[textStyles.Body_B14_Regular, { color: TEXT.secondary }]}>{children}</Text>
+        <Text style={[textStyles.B16_SemiBold, { color: TEXT.error }]}>{title}</Text>
+        <Text style={[textStyles.B14_Regular, { color: TEXT.secondary }]}>{children}</Text>
       </View>
       <Pressable onPress={onRetry} style={{ alignSelf: "flex-start" }}>
         <Text
           style={[
-            textStyles.Body_B14_SemiBold,
+            textStyles.B14_SemiBold,
             { color: TEXT.action, textDecorationLine: Platform.OS === "web" ? "underline" : "none" },
           ]}
         >

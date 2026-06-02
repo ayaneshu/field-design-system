@@ -183,7 +183,7 @@ function BottomNavItem({
     : colour["text-n-icon"].tertiary;
   // Filled variant is guaranteed at the type level via BottomNavIconName.
   const iconName = (active ? `${tab.icon}-filled` : tab.icon) as IconName;
-  const label = active ? textStyles.Body_B11_Bold : textStyles.Body_B11_Medium;
+  const label = active ? textStyles.B11_Bold : textStyles.B11_Medium;
 
   // Selection driver: 0 = inactive, 1 = active. Drives the highlight scale-in,
   // a subtle icon "pop", and label fade — same curve as motion.easing.standard
@@ -272,7 +272,7 @@ function BottomNavItem({
         <Text
           numberOfLines={1}
           dataSet={{
-            tokenTextStyle: active ? "Body_B11_Bold" : "Body_B11_Medium",
+            tokenTextStyle: active ? "B11_Bold" : "B11_Medium",
             tokenColor: active
               ? "colour.text-n-icon.action"
               : "colour.text-n-icon.tertiary",

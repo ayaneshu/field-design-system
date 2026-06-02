@@ -113,4 +113,4 @@ See the per-component files (`PrimaryButton.tsx`, `SecondaryButton.tsx`, `Second
 - `colour.text-n-icon.muted` — disabled label / icon
 - `radius.6` / `radius.8` / `radius.10` / `radius.12` / `radius.rounded` — corner per height
 - `space.4` … `space.24` — gap + padding per height
-- `textStyles.Action_A12_SemiBold` … `Action_A17_SemiBold` — label per height
+- `textStyles.A12_SemiBold` … `A17_SemiBold` — label per height

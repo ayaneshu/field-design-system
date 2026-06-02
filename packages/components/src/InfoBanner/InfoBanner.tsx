@@ -29,7 +29,7 @@ import { base, colour, radius, space, textStyles } from "@field-ds/tokens";
 //   radius      radius.rounded / radius["6"]
 //   padding     space["8"] / space["6"] / space["4"]
 //   gap         space["4"] / space["2"]
-//   typography  textStyles.Body_B11_Medium (small) / Body_B12_Medium (large)
+//   typography  textStyles.B11_Medium (small) / B12_Medium (large)
 
 export type InfoBannerColor =
   | "green"
@@ -123,8 +123,8 @@ type Geometry = {
   paddingVertical: number;
   gap: number;
   iconSize: number;
-  textStyle: typeof textStyles.Body_B11_Medium | typeof textStyles.Body_B12_Medium;
-  textStyleName: "Body_B11_Medium" | "Body_B12_Medium";
+  textStyle: typeof textStyles.B11_Medium | typeof textStyles.B12_Medium;
+  textStyleName: "B11_Medium" | "B12_Medium";
 };
 
 // Small variants use asymmetric horizontal padding — the icon hugs the left
@@ -140,8 +140,8 @@ function geometryFor(size: InfoBannerSize, shape: InfoBannerShape): Geometry {
       paddingVertical: space["4"],
       gap: space["2"],
       iconSize: 14,
-      textStyle: textStyles.Body_B11_Medium,
-      textStyleName: "Body_B11_Medium",
+      textStyle: textStyles.B11_Medium,
+      textStyleName: "B11_Medium",
     };
   }
   if (size === "small" && shape === "rectangular") {
@@ -152,8 +152,8 @@ function geometryFor(size: InfoBannerSize, shape: InfoBannerShape): Geometry {
       paddingVertical: space["4"],
       gap: space["2"],
       iconSize: 14,
-      textStyle: textStyles.Body_B11_Medium,
-      textStyleName: "Body_B11_Medium",
+      textStyle: textStyles.B11_Medium,
+      textStyleName: "B11_Medium",
     };
   }
   if (size === "large" && shape === "rounded") {
@@ -164,8 +164,8 @@ function geometryFor(size: InfoBannerSize, shape: InfoBannerShape): Geometry {
       paddingVertical: space["8"],
       gap: space["4"],
       iconSize: 18,
-      textStyle: textStyles.Body_B12_Medium,
-      textStyleName: "Body_B12_Medium",
+      textStyle: textStyles.B12_Medium,
+      textStyleName: "B12_Medium",
     };
   }
   return {
@@ -175,8 +175,8 @@ function geometryFor(size: InfoBannerSize, shape: InfoBannerShape): Geometry {
     paddingVertical: space["6"],
     gap: space["4"],
     iconSize: 18,
-    textStyle: textStyles.Body_B12_Medium,
-    textStyleName: "Body_B12_Medium",
+    textStyle: textStyles.B12_Medium,
+    textStyleName: "B12_Medium",
   };
 }
 

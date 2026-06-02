@@ -112,7 +112,7 @@ export function TypographyDownloadButton({
       />
       <Text
         style={[
-          textStyles.Body_B14_SemiBold,
+          textStyles.B14_SemiBold,
           {
             color: onLight
               ? colour["text-n-icon"].primary
@@ -144,10 +144,14 @@ export function TypographyContent({
   const shell = useShell();
 
   const groups = useMemo(() => {
+    // Style names are flat (e.g. "H40_Bold", "B14_Regular", "A12_Bold"); the
+    // leading letter encodes the family — H → Heading, B → Body, A → Action.
+    const famOf = (n: string): Family =>
+      n[0] === "H" ? "Heading" : n[0] === "B" ? "Body" : "Action";
     const all = (Object.keys(textStyles) as TextStyleName[]).sort((a, b) => {
       const order = (n: TextStyleName) => {
-        const fam = n.split("_")[0];
-        const m = n.match(/_[HBA](\d+)/);
+        const fam = famOf(n);
+        const m = n.match(/^[HBA](\d+)/);
         const size = m ? parseInt(m[1], 10) : 0;
         const famIdx = fam === "Heading" ? 0 : fam === "Body" ? 1 : 2;
         return famIdx * 1_000_000 - size;
@@ -158,8 +162,7 @@ export function TypographyContent({
     });
     const g: Record<Family, TextStyleName[]> = { Heading: [], Body: [], Action: [] };
     for (const n of all) {
-      const fam = n.split("_")[0] as Family;
-      if (g[fam]) g[fam].push(n);
+      g[famOf(n)].push(n);
     }
     return g;
   }, []);
@@ -194,7 +197,7 @@ export function TypographyContent({
         />
         <Text
           style={[
-            textStyles.Body_B14_Regular,
+            textStyles.B14_Regular,
             {
               color: shell.textTertiary,
               marginTop: space["20"],
@@ -218,7 +221,7 @@ export function TypographyContent({
       <View style={{ marginTop: space["72"] }}>
         <Text
           style={[
-            textStyles.Body_B11_SemiBold,
+            textStyles.B11_SemiBold,
             {
               color: shell.textTertiary,
               textTransform: "uppercase",
@@ -236,7 +239,7 @@ export function TypographyContent({
           placeholderTextColor={shell.textMuted}
           // @ts-expect-error — outlineStyle is web-only
           style={[
-            textStyles.Body_B14_Regular,
+            textStyles.B14_Regular,
             {
               color: shell.textPrimary,
               paddingHorizontal: space["16"],
@@ -281,7 +284,7 @@ export function TypographyContent({
             >
               <Text
                 style={[
-                  textStyles.Body_B14_SemiBold,
+                  textStyles.B14_SemiBold,
                   {
                     color: active
                       ? colour["text-n-icon"].primary
@@ -292,7 +295,7 @@ export function TypographyContent({
                 {f}{" "}
                 <Text
                   style={[
-                    textStyles.Body_B12_Regular,
+                    textStyles.B12_Regular,
                     {
                       color: active
                         ? colour["text-n-icon"].tertiary
@@ -317,7 +320,7 @@ export function TypographyContent({
           >
             <Text
               style={[
-                textStyles.Heading_H24_Bold,
+                textStyles.H24_Bold,
                 {
                   color: shell.textPrimary,
                   marginBottom: space["20"],
@@ -406,7 +409,7 @@ function NoontreeBanner({ onDownloaded }: { onDownloaded?: () => void }) {
           />
           <Text
             style={[
-              textStyles.Body_B14_SemiBold,
+              textStyles.B14_SemiBold,
               { color: colour["text-n-icon"].primary },
             ]}
           >
@@ -572,7 +575,7 @@ function GlyphGroup({
     <View>
       <Text
         style={[
-          textStyles.Body_B16_Bold,
+          textStyles.B16_Bold,
           { color: shell.textPrimary, marginBottom: space["12"] },
         ]}
       >
@@ -821,7 +824,7 @@ function StyleRow({
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text
             style={[
-              textStyles.Body_B16_Bold,
+              textStyles.B16_Bold,
               { color: shell.textPrimary },
             ]}
           >
@@ -829,7 +832,7 @@ function StyleRow({
           </Text>
           <Text
             style={[
-              textStyles.Body_B11_Regular,
+              textStyles.B11_Regular,
               {
                 color: shell.textMuted,
                 marginTop: space["4"],
@@ -874,7 +877,7 @@ function Spec({ label, value }: { label: string; value: string }) {
     <View>
       <Text
         style={[
-          textStyles.Body_B11_Regular,
+          textStyles.B11_Regular,
           {
             color: shell.textTertiary,
           },
@@ -884,7 +887,7 @@ function Spec({ label, value }: { label: string; value: string }) {
       </Text>
       <Text
         style={[
-          textStyles.Body_B14_SemiBold,
+          textStyles.B14_SemiBold,
           {
             color: shell.textPrimary,
             marginTop: space["4"],
@@ -903,7 +906,7 @@ function SectionTitle({ children }: { children: string }) {
   return (
     <Text
       style={[
-        textStyles.Heading_H24_Bold,
+        textStyles.H24_Bold,
         { color: shell.textPrimary },
       ]}
     >
@@ -912,7 +915,7 @@ function SectionTitle({ children }: { children: string }) {
   );
 }
 
-/** "Heading_H40_Bold" → "H40 Bold" */
+/** "H40_Bold" → "H40 Bold" */
 function prettyName(name: string) {
   return name.replace(/^(Heading|Body|Action)_/, "").replace(/_/g, " ");
 }

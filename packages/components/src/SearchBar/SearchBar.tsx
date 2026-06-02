@@ -89,7 +89,7 @@ const SIZE_SPEC = {
     paddingVertical: space["12"],
     paddingHorizontal: space["12"],
     iconSize: 24,
-    textStyle: textStyles.Body_B14_Medium,
+    textStyle: textStyles.B14_Medium,
   },
   H44: {
     height: 44,
@@ -97,7 +97,7 @@ const SIZE_SPEC = {
     paddingVertical: space["10"],
     paddingHorizontal: space["12"],
     iconSize: 20,
-    textStyle: textStyles.Body_B12_Medium,
+    textStyle: textStyles.B12_Medium,
   },
 } as const;
 

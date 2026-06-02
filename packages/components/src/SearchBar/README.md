@@ -17,8 +17,8 @@ import { Icon } from "@field-ds/icons";
 
 <SearchBar
   elevation
-  iconRight={<Icon name="system-filter" size={24} />}
-  iconRightTwo={<Icon name="system-microphone" size={24} />}
+  iconRight={<Icon name="system-sort" size={24} />}
+  iconRightTwo={<Icon name="system-mic" size={24} />}
 />
 ```
 
@@ -49,7 +49,7 @@ and never accepted as a prop, mirroring `InputText`.
 
 | Surface  | Border        | Text                          | Caret                         | Radius / spacing                 | Type                |
 | -------- | ------------- | ----------------------------- | ----------------------------- | -------------------------------- | ------------------- |
-| `colour.surface.primary` | `colour.border.subtle` | `colour["text-n-icon"].primary` / `tertiary` | `colour.surface["action-bold"]` | `radius["12"]`, `space["8"\|"10"\|"12"]` | `Body_B14_Medium` (H48), `Body_B12_Medium` (H44) |
+| `colour.surface.primary` | `colour.border.subtle` | `colour["text-n-icon"].primary` / `tertiary` | `colour.surface["action-bold"]` | `radius["12"]`, `space["8"\|"10"\|"12"]` | `B14_Medium` (H48), `B12_Medium` (H44) |
 
 ## Storybook
 

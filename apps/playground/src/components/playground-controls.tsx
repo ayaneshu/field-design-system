@@ -41,7 +41,7 @@ export function SectionLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B11_SemiBold,
+        textStyles.B11_SemiBold,
         {
           color: colour["text-n-icon"].tertiary,
           textTransform: "uppercase",
@@ -88,7 +88,7 @@ export function PropLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B16_Medium,
+        textStyles.B16_Medium,
         { color: shell.textPrimary, minWidth: 96 },
       ]}
     >
@@ -145,7 +145,7 @@ export function SegmentedControl<T extends string>({
           >
             <Text
               style={[
-                textStyles.Body_B12_SemiBold,
+                textStyles.B12_SemiBold,
                 {
                   color: active ? shell.textPrimary : shell.textTertiary,
                 },

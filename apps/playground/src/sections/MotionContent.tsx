@@ -435,7 +435,7 @@ function SpringSparkline({
 function TableHeaderRow() {
   const shell = useShell();
   const headerStyle = [
-    textStyles.Body_B11_SemiBold,
+    textStyles.B11_SemiBold,
     {
       color: shell.textTertiary,
       textTransform: "uppercase" as const,
@@ -484,7 +484,7 @@ function MotionDataRow({
       {!narrow ? (
         <Text
           style={[
-            textStyles.Heading_H16_Bold,
+            textStyles.H16_Bold,
             { color: shell.textPrimary, width: COL_TOKEN_W, flexShrink: 0, fontVariant: ["tabular-nums"] },
           ]}
           numberOfLines={1}
@@ -503,7 +503,7 @@ function MotionDataRow({
       >
         {narrow ? (
           <Text
-            style={[textStyles.Heading_H16_Bold, { color: shell.textPrimary }]}
+            style={[textStyles.H16_Bold, { color: shell.textPrimary }]}
             numberOfLines={2}
           >
             {tokenLabel}
@@ -522,7 +522,7 @@ function MotionDataRow({
         {narrow ? (
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: shell.textTertiary,
                 marginBottom: space["4"],
@@ -574,7 +574,7 @@ function Section({
   const shell = useShell();
   return (
     <View style={{ marginTop: space["48"] }}>
-      <Text style={[textStyles.Heading_H24_Bold, { color: shell.textPrimary }]}>{heading}</Text>
+      <Text style={[textStyles.H24_Bold, { color: shell.textPrimary }]}>{heading}</Text>
       {intro}
       {children}
     </View>
@@ -617,10 +617,10 @@ function LiveMotionDemo() {
         overflow: "hidden",
       }}
     >
-      <Text style={[textStyles.Body_B14_SemiBold, { color: shell.textPrimary }]}>
+      <Text style={[textStyles.B14_SemiBold, { color: shell.textPrimary }]}>
         Try the tokens
       </Text>
-      <Text style={[textStyles.Body_B12_Regular, { color: shell.textTertiary, marginTop: space["4"] }]}>
+      <Text style={[textStyles.B12_Regular, { color: shell.textTertiary, marginTop: space["4"] }]}>
         Eased slide: motion.duration.emphasized × motion.easing.standard. Pop: motion.spring presets.
       </Text>
       <View
@@ -645,7 +645,7 @@ function LiveMotionDemo() {
               backgroundColor: colour.surface["action-bold"],
             }}
           >
-            <Text style={[textStyles.Body_B14_SemiBold, { color: colour.surface.primary }]}>
+            <Text style={[textStyles.B14_SemiBold, { color: colour.surface.primary }]}>
               Eased slide
             </Text>
           </Pressable>
@@ -676,7 +676,7 @@ function LiveMotionDemo() {
               backgroundColor: colour["text-n-icon"].secondary,
             }}
           >
-            <Text style={[textStyles.Body_B14_SemiBold, { color: colour.surface.primary }]}>
+            <Text style={[textStyles.B14_SemiBold, { color: colour.surface.primary }]}>
               Spring pop
             </Text>
           </Pressable>
@@ -737,7 +737,7 @@ export function MotionContent({
   const intro = (
     <Text
       style={[
-        textStyles.Body_B16_Regular,
+        textStyles.B16_Regular,
         {
           color: shell.textTertiary,
           maxWidth: 640,
@@ -746,15 +746,15 @@ export function MotionContent({
         },
       ]}
     >
-      In the <Text style={textStyles.Body_B16_SemiBold}>Duration</Text> table, each preview runs for exactly
+      In the <Text style={textStyles.B16_SemiBold}>Duration</Text> table, each preview runs for exactly
       that row&apos;s milliseconds: the knob crosses the track left→right in{" "}
-      <Text style={textStyles.Body_B16_SemiBold}>linear</Text> motion (constant speed), pauses (rest ~
+      <Text style={textStyles.B16_SemiBold}>linear</Text> motion (constant speed), pauses (rest ~
       {(DURATION_PREVIEW_HOLD_AT_END_MS / 1000).toFixed(2)}s before each snap), then snaps back left and
       repeats. There is no shared wall clock tying rows together.
       {" "}
       Bézier presets map to CSS and{" "}
-      <Text style={textStyles.Body_B16_SemiBold}>Easing.bezier</Text>; springs map to{" "}
-      <Text style={textStyles.Body_B16_SemiBold}>withSpring</Text>. Tap a row to copy the token path.
+      <Text style={textStyles.B16_SemiBold}>Easing.bezier</Text>; springs map to{" "}
+      <Text style={textStyles.B16_SemiBold}>withSpring</Text>. Tap a row to copy the token path.
       {narrow ? (
         <>
           {" "}
@@ -781,7 +781,7 @@ export function MotionContent({
               isFirst={i === 0}
               tokenLabel={`motion.duration.${String(k)}`}
               valueNode={
-                <Text style={[textStyles.Body_B14_Medium, { color: shell.textPrimary }]}>
+                <Text style={[textStyles.B14_Medium, { color: shell.textPrimary }]}>
                   {ms} ms
                 </Text>
               }
@@ -804,7 +804,7 @@ export function MotionContent({
               isFirst={i === 0}
               tokenLabel={`motion.delay.${String(k)}`}
               valueNode={
-                <Text style={[textStyles.Body_B14_Medium, { color: shell.textPrimary }]}>
+                <Text style={[textStyles.B14_Medium, { color: shell.textPrimary }]}>
                   {ms} ms
                 </Text>
               }
@@ -830,10 +830,10 @@ export function MotionContent({
                 tokenLabel={`motion.easing.${String(name)}`}
                 valueNode={
                   <View style={{ gap: space["6"] }}>
-                    <Text selectable style={[textStyles.Body_B12_Regular, { color: valueMuted }]}>
+                    <Text selectable style={[textStyles.B12_Regular, { color: valueMuted }]}>
                       {cssBezier(tup)}
                     </Text>
-                    <Text selectable style={[textStyles.Body_B12_Regular, { color: shell.textMuted }]}>
+                    <Text selectable style={[textStyles.B12_Regular, { color: shell.textMuted }]}>
                       [{tup.join(", ")}]
                     </Text>
                   </View>
@@ -864,13 +864,13 @@ export function MotionContent({
                 <View style={{ gap: space["6"] }}>
                   <Text
                     selectable
-                    style={[textStyles.Body_B12_Regular, { color: valueMuted }]}
+                    style={[textStyles.B12_Regular, { color: valueMuted }]}
                   >
                     {JSON.stringify(cfg)}
                   </Text>
                   <Text
                     selectable
-                    style={[textStyles.Body_B12_Regular, { color: shell.textMuted }]}
+                    style={[textStyles.B12_Regular, { color: shell.textMuted }]}
                   >
                     ~
                     {approximateSpringSettleMs({
@@ -896,25 +896,25 @@ export function MotionContent({
       </Section>
 
       <View style={{ marginTop: space["40"], paddingBottom: space["8"] }}>
-        <Text style={[textStyles.Heading_H20_Bold, { color: shell.textPrimary, marginBottom: space["12"] }]}>
+        <Text style={[textStyles.H20_Bold, { color: shell.textPrimary, marginBottom: space["12"] }]}>
           Legend
         </Text>
-        <Text style={[textStyles.Body_B12_Regular, { color: shell.textMuted, maxWidth: 640 }]}>
-          <Text style={textStyles.Body_B12_SemiBold}>Duration</Text>: knobs align with the left cap;
+        <Text style={[textStyles.B12_Regular, { color: shell.textMuted, maxWidth: 640 }]}>
+          <Text style={textStyles.B12_SemiBold}>Duration</Text>: knobs align with the left cap;
           each sweep lasts exactly that token&apos;s milliseconds with{" "}
-          <Text style={textStyles.Body_B12_SemiBold}>linear</Text> timing, then rests ~
+          <Text style={textStyles.B12_SemiBold}>linear</Text> timing, then rests ~
           {(DURATION_PREVIEW_HOLD_AT_END_MS / 1000).toFixed(2)}s and snaps left. Rows aren&apos;t phase-locked —
           timing differences are intentional.
           {"\n\n"}
-          <Text style={textStyles.Body_B12_SemiBold}>Easing</Text>: looping travel matches the same rhythm:
+          <Text style={textStyles.B12_SemiBold}>Easing</Text>: looping travel matches the same rhythm:
           fixed {EASING_MOVE_MS} ms left→right move with each row&apos;s cubic, hold, instant snap left
           (sparkline shows the easing curve shape).{" "}
-          <Text style={textStyles.Body_B12_SemiBold}>Spring</Text>: line follows a numerical damped path
+          <Text style={textStyles.B12_SemiBold}>Spring</Text>: line follows a numerical damped path
           from the JSON (illustrative vs the Reanimated spring solver); a bead traces it over time, pauses
           ~{(SPRING_HOLD_AT_END_MS / 1000).toFixed(2)}s, then snaps back to the start. The{" "}
-          <Text style={textStyles.Body_B12_SemiBold}>~N ms envelope settle</Text> line uses a continuous
+          <Text style={textStyles.B12_SemiBold}>~N ms envelope settle</Text> line uses a continuous
           mass–spring–damper estimate (amplitude → 1% of the step);{" "}
-          <Text style={textStyles.Body_B12_SemiBold}>withSpring</Text> itself stops on velocity/displacement
+          <Text style={textStyles.B12_SemiBold}>withSpring</Text> itself stops on velocity/displacement
           thresholds, so treat it as documentation—not an exact runtime duration.
         </Text>
       </View>

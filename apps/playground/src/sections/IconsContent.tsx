@@ -192,7 +192,7 @@ export function IconsContent({
             placeholderTextColor={colour["text-n-icon"].muted}
             // @ts-expect-error — outlineStyle is web-only
             style={[
-              textStyles.Body_B14_Regular,
+              textStyles.B14_Regular,
               {
                 flex: 1,
                 color: colour["text-n-icon"].primary,
@@ -208,7 +208,7 @@ export function IconsContent({
       {/* Count */}
       <Text
         style={[
-          textStyles.Body_B11_SemiBold,
+          textStyles.B11_SemiBold,
           {
             color: shell.textTertiary,
             textTransform: "uppercase",
@@ -276,7 +276,7 @@ function GridView({
           <Text
             numberOfLines={2}
             style={[
-              textStyles.Body_B11_Regular,
+              textStyles.B11_Regular,
               {
                 color: colour["text-n-icon"].tertiary,
                 textAlign: "center",
@@ -341,7 +341,7 @@ function ListView({
           </View>
           <Text
             style={[
-              textStyles.Body_B14_SemiBold,
+              textStyles.B14_SemiBold,
               { color: colour["text-n-icon"].primary, flex: 1 },
             ]}
           >
@@ -349,7 +349,7 @@ function ListView({
           </Text>
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",

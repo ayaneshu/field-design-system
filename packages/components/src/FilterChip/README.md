@@ -70,7 +70,7 @@ import { FilterChip } from "@field-ds/components";
 - `colour.border.extrabold` (Added border)
 - `colour.text-n-icon.primary` (Default / Pressed / Added foreground)
 - `colour.text-n-icon.muted` (Disabled foreground)
-- `Action_A14_SemiBold` (label and count text style)
+- `A14_SemiBold` (label and count text style)
 
 ## Do not use
 

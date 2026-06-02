@@ -217,10 +217,10 @@ export function FilterChip({
       numberOfLines={1}
       // @ts-expect-error — dataSet on Text on web
       dataSet={{
-        tokenTextStyle: "Action_A14_SemiBold",
+        tokenTextStyle: "A14_SemiBold",
         tokenColor: surface.fgToken,
       }}
-      style={[textStyles.Action_A14_SemiBold, { color: surface.fg }]}
+      style={[textStyles.A14_SemiBold, { color: surface.fg }]}
     >
       {label}
     </Text>
@@ -342,7 +342,7 @@ export function FilterChip({
         <Animated.View style={[{ overflow: "hidden" }, animatedCountStyle]}>
           <Text
             numberOfLines={1}
-            style={[textStyles.Action_A14_SemiBold, { color: surface.fg }]}
+            style={[textStyles.A14_SemiBold, { color: surface.fg }]}
           >
             {count ?? ""}
           </Text>

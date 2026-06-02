@@ -52,10 +52,10 @@ function MotionTimesheetTokenTable({ rows }: { rows: MotionTimesheetTokenRow[] }
           ...cellPad,
         }}
       >
-        <Text style={[textStyles.Body_B11_SemiBold, { flex: 1.15, color: shell.textSecondary }]}>
+        <Text style={[textStyles.B11_SemiBold, { flex: 1.15, color: shell.textSecondary }]}>
           Element · property
         </Text>
-        <Text style={[textStyles.Body_B11_SemiBold, { flex: 1, color: shell.textSecondary }]}>
+        <Text style={[textStyles.B11_SemiBold, { flex: 1, color: shell.textSecondary }]}>
           Token
         </Text>
       </View>
@@ -69,10 +69,10 @@ function MotionTimesheetTokenTable({ rows }: { rows: MotionTimesheetTokenRow[] }
             ...cellPad,
           }}
         >
-          <Text style={[textStyles.Body_B11_Regular, { flex: 1.15, color: shell.textPrimary }]}>
+          <Text style={[textStyles.B11_Regular, { flex: 1.15, color: shell.textPrimary }]}>
             {row.appliedTo}
           </Text>
-          <Text style={[textStyles.Body_B11_Regular, { flex: 1, color: shell.textTertiary }]}>
+          <Text style={[textStyles.B11_Regular, { flex: 1, color: shell.textTertiary }]}>
             {row.token}
           </Text>
         </View>
@@ -134,11 +134,11 @@ export function MotionTimesheet({
         alignSelf: "stretch",
       }}
     >
-      <Text style={[textStyles.Heading_H28_Bold, { color: shell.textPrimary }]}>
+      <Text style={[textStyles.H28_Bold, { color: shell.textPrimary }]}>
         {heading}
       </Text>
       {intro ? (
-        <Text style={[textStyles.Body_B14_Regular, { color: shell.textTertiary }]}>
+        <Text style={[textStyles.B14_Regular, { color: shell.textTertiary }]}>
           {intro}
         </Text>
       ) : null}
@@ -174,7 +174,7 @@ export function MotionTimesheet({
               <Text
                 numberOfLines={2}
                 style={[
-                  textStyles.Body_B12_SemiBold,
+                  textStyles.B12_SemiBold,
                   {
                     color: shell.textSecondary,
                     textAlign: "right",
@@ -346,7 +346,7 @@ export function MotionTimesheet({
                     <Text
                       numberOfLines={1}
                       style={[
-                        textStyles.Body_B11_Regular,
+                        textStyles.B11_Regular,
                         {
                           color: renderOutside ? shell.textSecondary : spine,
                           fontWeight: "500",
@@ -386,8 +386,8 @@ export function MotionTimesheet({
           {tokenRows?.length ? (
             <MotionTimesheetTokenTable rows={tokenRows} />
           ) : tokenSummary ? (
-            <Text style={[textStyles.Body_B12_Regular, { color: shell.textTertiary, lineHeight: 18 }]}>
-              <Text style={[textStyles.Body_B12_SemiBold, { color: shell.textSecondary }]}>
+            <Text style={[textStyles.B12_Regular, { color: shell.textTertiary, lineHeight: 18 }]}>
+              <Text style={[textStyles.B12_SemiBold, { color: shell.textSecondary }]}>
                 Tokens ·{" "}
               </Text>
               {tokenSummary}

@@ -98,7 +98,7 @@ export const RichBody: Story = {
           <Text
             key={line}
             style={[
-              textStyles.Body_B14_Regular,
+              textStyles.B14_Regular,
               { color: colour["text-n-icon"].primary },
             ]}
           >

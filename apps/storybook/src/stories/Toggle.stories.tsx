@@ -57,7 +57,7 @@ export const Sizes: Story = {
         <View key={s} style={{ gap: space["12"] }}>
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",
@@ -98,7 +98,7 @@ export const Controlled: Story = {
         <Toggle on={on} onChange={setOn} accessibilityLabel="Notifications" />
         <Text
           style={[
-            textStyles.Body_B12_Medium,
+            textStyles.B12_Medium,
             { color: colour["text-n-icon"].tertiary },
           ]}
         >

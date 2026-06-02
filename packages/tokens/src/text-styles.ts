@@ -15,206 +15,242 @@ export type FieldTextStyle = {
 };
 
 export const textStyles = {
-  Heading_H40_Bold: {
+  H40_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 40,
     fontWeight: "400",
     lineHeight: 48,
     letterSpacing: -0.25,
   },
-  Heading_H40_Extrabold: {
+  H40_Extrabold: {
     fontFamily: "Noontree-ExtraBold",
     fontSize: 40,
     fontWeight: "400",
     lineHeight: 48,
     letterSpacing: -0.25,
   },
-  Heading_H32_Bold: {
+  H32_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 32,
     fontWeight: "400",
     lineHeight: 40,
     letterSpacing: -0.25,
   },
-  Heading_H32_Extrabold: {
+  H32_Extrabold: {
     fontFamily: "Noontree-ExtraBold",
     fontSize: 32,
     fontWeight: "400",
     lineHeight: 40,
     letterSpacing: -0.25,
   },
-  Heading_H28_Bold: {
+  H28_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 28,
     fontWeight: "400",
     lineHeight: 36,
     letterSpacing: -0.25,
   },
-  Heading_H24_Bold: {
+  H24_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 24,
     fontWeight: "400",
     lineHeight: 32,
     letterSpacing: -0.25,
   },
-  Heading_H20_Bold: {
+  H20_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 20,
     fontWeight: "400",
     lineHeight: 28,
     letterSpacing: -0.25,
   },
-  Heading_H18_Bold: {
+  H18_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 18,
     fontWeight: "400",
     lineHeight: 24,
     letterSpacing: -0.15,
   },
-  Heading_H16_Bold: {
+  H16_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 20,
     letterSpacing: -0.15,
   },
-  Body_B16_Regular: {
+  B16_Regular: {
     fontFamily: "Noontree-Regular",
     fontSize: 16,
     fontWeight: "400",
-    lineHeight: 20,
+    lineHeight: 22,
     letterSpacing: -0.15,
   },
-  Body_B16_Medium: {
+  B16_Medium: {
     fontFamily: "Noontree-Medium",
     fontSize: 16,
     fontWeight: "400",
-    lineHeight: 20,
+    lineHeight: 22,
     letterSpacing: -0.15,
   },
-  Body_B16_SemiBold: {
+  B16_SemiBold: {
     fontFamily: "Noontree-SemiBold",
     fontSize: 16,
     fontWeight: "400",
-    lineHeight: 20,
+    lineHeight: 22,
     letterSpacing: -0.15,
   },
-  Body_B16_Bold: {
+  B16_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 16,
     fontWeight: "400",
-    lineHeight: 20,
+    lineHeight: 22,
     letterSpacing: -0.15,
   },
-  Body_B16_Strikethrough: {
+  B16_Strikethrough: {
     fontFamily: "Noontree-Regular",
     fontSize: 16,
     fontWeight: "400",
-    lineHeight: 20,
+    lineHeight: 22,
     letterSpacing: -0.15,
     textDecorationLine: "line-through",
   },
-  Body_B14_Regular: {
+  B14_Regular: {
     fontFamily: "Noontree-Regular",
     fontSize: 14,
     fontWeight: "400",
-    lineHeight: 18,
+    lineHeight: 20,
     letterSpacing: -0.1,
   },
-  Body_B14_Medium: {
+  B14_Medium: {
     fontFamily: "Noontree-Medium",
     fontSize: 14,
     fontWeight: "400",
-    lineHeight: 18,
+    lineHeight: 20,
     letterSpacing: -0.1,
   },
-  Body_B14_SemiBold: {
+  B14_SemiBold: {
     fontFamily: "Noontree-SemiBold",
     fontSize: 14,
     fontWeight: "400",
-    lineHeight: 18,
+    lineHeight: 20,
     letterSpacing: -0.1,
   },
-  Body_B14_Bold: {
+  B14_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 20,
+    letterSpacing: -0.1,
+  },
+  B14_Strikethrough: {
+    fontFamily: "Noontree-Regular",
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 20,
+    letterSpacing: -0.1,
+    textDecorationLine: "line-through",
+  },
+  B13_Regular: {
+    fontFamily: "Noontree-Regular",
+    fontSize: 13,
     fontWeight: "400",
     lineHeight: 18,
     letterSpacing: -0.1,
   },
-  Body_B14_Strikethrough: {
+  B13_Medium: {
+    fontFamily: "Noontree-Medium",
+    fontSize: 13,
+    fontWeight: "400",
+    lineHeight: 18,
+    letterSpacing: -0.1,
+  },
+  B13_SemiBold: {
+    fontFamily: "Noontree-SemiBold",
+    fontSize: 13,
+    fontWeight: "400",
+    lineHeight: 18,
+    letterSpacing: -0.1,
+  },
+  B13_Bold: {
+    fontFamily: "Noontree-Bold",
+    fontSize: 13,
+    fontWeight: "400",
+    lineHeight: 18,
+    letterSpacing: -0.1,
+  },
+  B13_Strikethrough: {
     fontFamily: "Noontree-Regular",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "400",
     lineHeight: 18,
     letterSpacing: -0.1,
     textDecorationLine: "line-through",
   },
-  Body_B12_Regular: {
+  B12_Regular: {
     fontFamily: "Noontree-Regular",
     fontSize: 12,
     fontWeight: "400",
-    lineHeight: 16,
+    lineHeight: 18,
     letterSpacing: -0.1,
   },
-  Body_B12_Medium: {
+  B12_Medium: {
     fontFamily: "Noontree-Medium",
     fontSize: 12,
     fontWeight: "400",
-    lineHeight: 16,
+    lineHeight: 18,
     letterSpacing: -0.1,
   },
-  Body_B12_SemiBold: {
+  B12_SemiBold: {
     fontFamily: "Noontree-SemiBold",
     fontSize: 12,
     fontWeight: "400",
-    lineHeight: 16,
+    lineHeight: 18,
     letterSpacing: -0.1,
   },
-  Body_B12_Bold: {
+  B12_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 12,
     fontWeight: "400",
-    lineHeight: 16,
+    lineHeight: 18,
     letterSpacing: -0.1,
   },
-  Body_B12_Strikethrough: {
+  B12_Strikethrough: {
     fontFamily: "Noontree-Regular",
     fontSize: 12,
     fontWeight: "400",
-    lineHeight: 16,
+    lineHeight: 18,
     letterSpacing: -0.1,
     textDecorationLine: "line-through",
   },
-  Body_B11_Regular: {
+  B11_Regular: {
     fontFamily: "Noontree-Regular",
     fontSize: 11,
     fontWeight: "400",
     lineHeight: 14,
     letterSpacing: -0.1,
   },
-  Body_B11_Medium: {
+  B11_Medium: {
     fontFamily: "Noontree-Medium",
     fontSize: 11,
     fontWeight: "400",
     lineHeight: 14,
     letterSpacing: -0.1,
   },
-  Body_B11_SemiBold: {
+  B11_SemiBold: {
     fontFamily: "Noontree-SemiBold",
     fontSize: 11,
     fontWeight: "400",
     lineHeight: 14,
     letterSpacing: -0.1,
   },
-  Body_B11_Bold: {
+  B11_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 11,
     fontWeight: "400",
     lineHeight: 14,
     letterSpacing: -0.1,
   },
-  Body_B11_Strikethrough: {
+  B11_Strikethrough: {
     fontFamily: "Noontree-Regular",
     fontSize: 11,
     fontWeight: "400",
@@ -222,49 +258,49 @@ export const textStyles = {
     letterSpacing: -0.1,
     textDecorationLine: "line-through",
   },
-  Action_A17_SemiBold: {
+  A17_SemiBold: {
     fontFamily: "Noontree-SemiBold",
     fontSize: 17,
     fontWeight: "400",
     lineHeight: 24,
     letterSpacing: -0.25,
   },
-  Action_A16_SemiBold: {
+  A16_SemiBold: {
     fontFamily: "Noontree-SemiBold",
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 24,
     letterSpacing: 0,
   },
-  Action_A16_Bold: {
+  A16_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 24,
     letterSpacing: 0,
   },
-  Action_A14_SemiBold: {
+  A14_SemiBold: {
     fontFamily: "Noontree-SemiBold",
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 20,
     letterSpacing: 0,
   },
-  Action_A14_Bold: {
+  A14_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 20,
     letterSpacing: 0,
   },
-  Action_A12_SemiBold: {
+  A12_SemiBold: {
     fontFamily: "Noontree-SemiBold",
     fontSize: 12,
     fontWeight: "400",
     lineHeight: 16,
     letterSpacing: 0,
   },
-  Action_A12_Bold: {
+  A12_Bold: {
     fontFamily: "Noontree-Bold",
     fontSize: 12,
     fontWeight: "400",
@@ -275,39 +311,44 @@ export const textStyles = {
 
 export type TextStyleName = keyof typeof textStyles;
 
-export const Heading_H40_Bold = textStyles.Heading_H40_Bold;
-export const Heading_H40_Extrabold = textStyles.Heading_H40_Extrabold;
-export const Heading_H32_Bold = textStyles.Heading_H32_Bold;
-export const Heading_H32_Extrabold = textStyles.Heading_H32_Extrabold;
-export const Heading_H28_Bold = textStyles.Heading_H28_Bold;
-export const Heading_H24_Bold = textStyles.Heading_H24_Bold;
-export const Heading_H20_Bold = textStyles.Heading_H20_Bold;
-export const Heading_H18_Bold = textStyles.Heading_H18_Bold;
-export const Heading_H16_Bold = textStyles.Heading_H16_Bold;
-export const Body_B16_Regular = textStyles.Body_B16_Regular;
-export const Body_B16_Medium = textStyles.Body_B16_Medium;
-export const Body_B16_SemiBold = textStyles.Body_B16_SemiBold;
-export const Body_B16_Bold = textStyles.Body_B16_Bold;
-export const Body_B16_Strikethrough = textStyles.Body_B16_Strikethrough;
-export const Body_B14_Regular = textStyles.Body_B14_Regular;
-export const Body_B14_Medium = textStyles.Body_B14_Medium;
-export const Body_B14_SemiBold = textStyles.Body_B14_SemiBold;
-export const Body_B14_Bold = textStyles.Body_B14_Bold;
-export const Body_B14_Strikethrough = textStyles.Body_B14_Strikethrough;
-export const Body_B12_Regular = textStyles.Body_B12_Regular;
-export const Body_B12_Medium = textStyles.Body_B12_Medium;
-export const Body_B12_SemiBold = textStyles.Body_B12_SemiBold;
-export const Body_B12_Bold = textStyles.Body_B12_Bold;
-export const Body_B12_Strikethrough = textStyles.Body_B12_Strikethrough;
-export const Body_B11_Regular = textStyles.Body_B11_Regular;
-export const Body_B11_Medium = textStyles.Body_B11_Medium;
-export const Body_B11_SemiBold = textStyles.Body_B11_SemiBold;
-export const Body_B11_Bold = textStyles.Body_B11_Bold;
-export const Body_B11_Strikethrough = textStyles.Body_B11_Strikethrough;
-export const Action_A17_SemiBold = textStyles.Action_A17_SemiBold;
-export const Action_A16_SemiBold = textStyles.Action_A16_SemiBold;
-export const Action_A16_Bold = textStyles.Action_A16_Bold;
-export const Action_A14_SemiBold = textStyles.Action_A14_SemiBold;
-export const Action_A14_Bold = textStyles.Action_A14_Bold;
-export const Action_A12_SemiBold = textStyles.Action_A12_SemiBold;
-export const Action_A12_Bold = textStyles.Action_A12_Bold;
+export const H40_Bold = textStyles.H40_Bold;
+export const H40_Extrabold = textStyles.H40_Extrabold;
+export const H32_Bold = textStyles.H32_Bold;
+export const H32_Extrabold = textStyles.H32_Extrabold;
+export const H28_Bold = textStyles.H28_Bold;
+export const H24_Bold = textStyles.H24_Bold;
+export const H20_Bold = textStyles.H20_Bold;
+export const H18_Bold = textStyles.H18_Bold;
+export const H16_Bold = textStyles.H16_Bold;
+export const B16_Regular = textStyles.B16_Regular;
+export const B16_Medium = textStyles.B16_Medium;
+export const B16_SemiBold = textStyles.B16_SemiBold;
+export const B16_Bold = textStyles.B16_Bold;
+export const B16_Strikethrough = textStyles.B16_Strikethrough;
+export const B14_Regular = textStyles.B14_Regular;
+export const B14_Medium = textStyles.B14_Medium;
+export const B14_SemiBold = textStyles.B14_SemiBold;
+export const B14_Bold = textStyles.B14_Bold;
+export const B14_Strikethrough = textStyles.B14_Strikethrough;
+export const B13_Regular = textStyles.B13_Regular;
+export const B13_Medium = textStyles.B13_Medium;
+export const B13_SemiBold = textStyles.B13_SemiBold;
+export const B13_Bold = textStyles.B13_Bold;
+export const B13_Strikethrough = textStyles.B13_Strikethrough;
+export const B12_Regular = textStyles.B12_Regular;
+export const B12_Medium = textStyles.B12_Medium;
+export const B12_SemiBold = textStyles.B12_SemiBold;
+export const B12_Bold = textStyles.B12_Bold;
+export const B12_Strikethrough = textStyles.B12_Strikethrough;
+export const B11_Regular = textStyles.B11_Regular;
+export const B11_Medium = textStyles.B11_Medium;
+export const B11_SemiBold = textStyles.B11_SemiBold;
+export const B11_Bold = textStyles.B11_Bold;
+export const B11_Strikethrough = textStyles.B11_Strikethrough;
+export const A17_SemiBold = textStyles.A17_SemiBold;
+export const A16_SemiBold = textStyles.A16_SemiBold;
+export const A16_Bold = textStyles.A16_Bold;
+export const A14_SemiBold = textStyles.A14_SemiBold;
+export const A14_Bold = textStyles.A14_Bold;
+export const A12_SemiBold = textStyles.A12_SemiBold;
+export const A12_Bold = textStyles.A12_Bold;

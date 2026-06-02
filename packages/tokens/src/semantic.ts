@@ -43,6 +43,7 @@ export const colour = {
     "yellow-bold": "#f5c400",
     "success-subtle": "#e3fcf2",
     "success-bold": "#0f8857",
+    "success-extrabold": "#083f3b",
     "overlay-subtle": "#0000003d",
     "overlay-bold": "#000000cc",
   },
@@ -107,17 +108,22 @@ export const font = {
   body: {
     b16: {
       size: 16,
-      "line-height": 20,
+      "line-height": 22,
       "letter-spacing": -0.15,
     },
     b14: {
       size: 14,
+      "line-height": 20,
+      "letter-spacing": -0.1,
+    },
+    b13: {
+      size: 13,
       "line-height": 18,
       "letter-spacing": -0.1,
     },
     b12: {
       size: 12,
-      "line-height": 16,
+      "line-height": 18,
       "letter-spacing": -0.1,
     },
     b11: {
@@ -271,6 +277,3 @@ export const motion = {
   },
 } as const;
 export type Motion = typeof motion;
-
-export const Icon_Color = "#1d2539" as const;
-export type IconColor = typeof Icon_Color;

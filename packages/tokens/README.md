@@ -12,14 +12,14 @@ src/
 │   └── text-styles.json Typography composites (Heading/Body/Action × weights)
 ├── base.ts             Generated — primitives as nested const objects
 ├── semantic.ts         Generated — semantic tokens with refs resolved to literal values
-├── text-styles.ts      Generated — RN-ready TextStyle objects (flat names, e.g. Heading_H40_Bold)
+├── text-styles.ts      Generated — RN-ready TextStyle objects (flat names, e.g. H40_Bold)
 └── index.ts            Re-exports
 ```
 
 ## Usage
 
 ```ts
-import { base, colour, space, textStyles, Heading_H40_Bold } from "@field-ds/tokens";
+import { base, colour, space, textStyles, H40_Bold } from "@field-ds/tokens";
 
 // primitive
 base.colour.brand_blue["700"]; // "#0f61ff"
@@ -29,7 +29,7 @@ colour.text_n_icon.primary;    // "#1d2539"
 space["16"];                   // 16
 
 // typography (RN TextStyle)
-<Text style={Heading_H40_Bold}>Hello</Text>
+<Text style={H40_Bold}>Hello</Text>
 // → { fontFamily: "Noontree-Bold", fontSize: 40, fontWeight: "700",
 //      lineHeight: 48, letterSpacing: -0.25 }
 ```

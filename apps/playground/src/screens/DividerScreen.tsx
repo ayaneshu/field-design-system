@@ -49,7 +49,7 @@ export function DividerScreen({ navigation }: Props) {
             <View key={`${v}-${e}`} style={{ gap: space["8"] }}>
               <Text
                 style={[
-                  textStyles.Body_B11_SemiBold,
+                  textStyles.B11_SemiBold,
                   {
                     color: colour["text-n-icon"].tertiary,
                     textTransform: "uppercase",
@@ -73,7 +73,7 @@ export function DividerScreen({ navigation }: Props) {
         <View style={{ gap: space["8"] }}>
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",
@@ -88,7 +88,7 @@ export function DividerScreen({ navigation }: Props) {
         <View style={{ gap: space["8"] }}>
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",
@@ -113,7 +113,7 @@ export function DividerScreen({ navigation }: Props) {
               <View style={{ paddingVertical: space["12"] }}>
                 <Text
                   style={[
-                    textStyles.Body_B14_Medium,
+                    textStyles.B14_Medium,
                     { color: colour["text-n-icon"].primary },
                   ]}
                 >
@@ -274,7 +274,7 @@ function PropLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B16_Medium,
+        textStyles.B16_Medium,
         { color: shell.textPrimary, minWidth: 96 },
       ]}
     >
