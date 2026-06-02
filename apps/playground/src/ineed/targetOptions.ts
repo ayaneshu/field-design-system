@@ -55,20 +55,27 @@ const TYPOGRAPHY = Object.keys(textStyles);
 
 const toOptions = (list: string[]): Option[] => list.map((n) => ({ value: n, label: n }));
 
+// Always offered as the last choice, so a request can point at something not in
+// the design system's own lists (or describe it free-form in the description).
+const OTHERS: Option = { value: "Others", label: "Others" };
+
 /** Options for the contextual "target" dropdown, keyed by the chosen category. */
 export function targetOptionsFor(category: string): Option[] {
-  switch (category) {
-    case "Components":
-      return toOptions(COMPONENTS);
-    case "Icon":
-      return toOptions([...iconNames].sort());
-    case "Colour":
-      return toOptions(COLOURS);
-    case "Typography":
-      return toOptions(TYPOGRAPHY);
-    default:
-      return [];
-  }
+  const base = ((): Option[] => {
+    switch (category) {
+      case "Components":
+        return toOptions(COMPONENTS);
+      case "Icon":
+        return toOptions([...iconNames].sort());
+      case "Colour":
+        return toOptions(COLOURS);
+      case "Typography":
+        return toOptions(TYPOGRAPHY);
+      default:
+        return [];
+    }
+  })();
+  return [...base, OTHERS];
 }
 
 /** Label/placeholder for the contextual dropdown, keyed by category. */

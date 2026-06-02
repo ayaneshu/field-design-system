@@ -64,9 +64,11 @@ export function INeedScreen({ navigation }: Props) {
       base.value = 0;
       video.value = 0;
       base.value = withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) });
+      // Start the sky fade early (soon after the content begins revealing) but
+      // let it take a gentle 800ms to ease in behind the page.
       video.value = withDelay(
-        820,
-        withTiming(1, { duration: 1100, easing: Easing.inOut(Easing.quad) }),
+        300,
+        withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) }),
       );
     }, [reducedMotion, base, video]),
   );

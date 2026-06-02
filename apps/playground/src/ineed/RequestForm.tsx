@@ -10,11 +10,7 @@
  */
 import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeOutUp,
-  LinearTransition,
-} from "react-native-reanimated";
+import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 
 import { createRequest } from "./api";
 import { Button } from "./Button";
@@ -129,7 +125,7 @@ export function RequestForm({
   return (
     <View style={{ flex: 1, width: "100%" }}>
       {/* Fixed header */}
-      <View style={{ paddingHorizontal: 40, paddingTop: 40, paddingBottom: 20, gap: 8 }}>
+      <View style={{ paddingHorizontal: 32, paddingTop: 32, paddingBottom: 20, gap: 8 }}>
         <Text style={[ts("Heading_H32_Bold"), { color: c.textPrimary }]}>Make a request</Text>
         <Text style={[ts("Body_B16_Regular"), { color: c.textTertiary }]}>
           Takes under a minute
@@ -139,12 +135,14 @@ export function RequestForm({
       {/* Scrollable fields */}
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingHorizontal: 40, paddingBottom: 28, gap: 24 }}
+        contentContainerStyle={{ paddingHorizontal: 32, paddingBottom: 24, gap: 24 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* 01 Category */}
-        <Animated.View layout={LinearTransition.duration(240)}>
+        {/* 01 Category — plain View: a layout transition here re-animates the
+            whole row every time the auto-assign hint changes its height, which
+            reads as a jumpy glitch. The contextual field below still animates. */}
+        <View>
           <FieldGroup
             index="01"
             label="Category"
@@ -167,21 +165,23 @@ export function RequestForm({
               invalid={touched && !category}
             />
           </FieldGroup>
-        </Animated.View>
+        </View>
 
         {/* 02 Type */}
-        <Animated.View layout={LinearTransition.duration(240)}>
+        <View>
           <FieldGroup index="02" label="Type">
             <Segmented value={type} onChange={pickType} options={typeOptions} />
           </FieldGroup>
-        </Animated.View>
+        </View>
 
-        {/* Contextual target — animates in when improving an existing item */}
+        {/* Contextual target — fades in when improving an existing item. Only
+            this field animates; sibling fields use plain Views, because
+            reanimated's LinearTransition layout shifts leave stale transforms
+            on RN-web (fields ended up overlapping). */}
         {needsTarget ? (
           <Animated.View
             entering={FadeInDown.duration(280)}
             exiting={FadeOutUp.duration(160)}
-            layout={LinearTransition.duration(240)}
           >
             <FieldGroup
               index={targetIndex}
@@ -205,7 +205,7 @@ export function RequestForm({
         ) : null}
 
         {/* Description */}
-        <Animated.View layout={LinearTransition.duration(240)}>
+        <View>
           <FieldGroup
             index={descIndex}
             label="Description"
@@ -243,10 +243,10 @@ export function RequestForm({
               invalid={(touched && !description.trim()) || overLimit}
             />
           </FieldGroup>
-        </Animated.View>
+        </View>
 
         {/* Figma Link (optional) */}
-        <Animated.View layout={LinearTransition.duration(240)}>
+        <View>
           <FieldGroup
             index={figmaIndex}
             label="Figma Link"
@@ -265,15 +265,15 @@ export function RequestForm({
               invalid={touched && !figmaValid}
             />
           </FieldGroup>
-        </Animated.View>
+        </View>
       </ScrollView>
 
       {/* Sticky submit footer */}
       <View
         style={{
-          paddingHorizontal: 40,
+          paddingHorizontal: 32,
           paddingTop: 20,
-          paddingBottom: 28,
+          paddingBottom: 32,
           borderTopWidth: 1,
           borderTopColor: c.borderSubtle,
         }}

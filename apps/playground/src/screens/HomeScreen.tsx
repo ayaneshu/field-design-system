@@ -8,6 +8,14 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { space } from "@field-ds/tokens";
@@ -136,6 +144,46 @@ export function HomeScreen({ navigation }: Props) {
   const horizontalPad = width >= 1100 ? 60 : width >= 720 ? 32 : 20;
   const topPad = width >= 1100 ? 60 : width >= 720 ? 40 : 28;
 
+  // Watercolour backdrop fade-in. Hold the image hidden until the page's
+  // assets have finished loading (window `load`) and the hero image itself is
+  // decoded, then wait 500ms and fade it in over 2500ms so it settles in last.
+  const reducedMotion = useReducedMotion();
+  const bg = useSharedValue(0);
+  useEffect(() => {
+    if (Platform.OS !== "web") {
+      bg.value = 1;
+      return;
+    }
+    if (reducedMotion) {
+      bg.value = 1;
+      return;
+    }
+    let cancelled = false;
+    const fade = () => {
+      if (cancelled) return;
+      bg.value = withDelay(
+        500,
+        withTiming(1, { duration: 2500, easing: Easing.out(Easing.cubic) }),
+      );
+    };
+    // Once everything else is loaded, make sure the backdrop image is decoded
+    // before kicking off the delay + fade.
+    const afterAssets = () => {
+      const img = new window.Image();
+      img.onload = fade;
+      img.onerror = fade; // fail-safe — still reveal if it can't decode
+      img.src = "/home-bg.png";
+      if (img.complete) fade();
+    };
+    if (document.readyState === "complete") afterAssets();
+    else window.addEventListener("load", afterAssets, { once: true });
+    return () => {
+      cancelled = true;
+      window.removeEventListener("load", afterAssets);
+    };
+  }, [reducedMotion, bg]);
+  const bgStyle = useAnimatedStyle(() => ({ opacity: bg.value }));
+
   // Hover bloom state — works in both modes. When the cursor enters
   // the "field" title, an opposite-mode veil grows from the cursor
   // position so it looks like the inverted theme is "blooming" out of
@@ -230,30 +278,38 @@ export function HomeScreen({ navigation }: Props) {
             anchored to the bottom. Sits behind all content (first child →
             painted first). */}
         {mode === "light" ? (
-          Platform.OS === "web" ? (
-            <View
-              pointerEvents="none"
-              // @ts-expect-error web-only background-image props
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-                backgroundImage: "url(/home-bg.png)",
-                backgroundSize: "cover",
-                backgroundPosition: "bottom center",
-                backgroundRepeat: "no-repeat",
-              }}
-            />
-          ) : (
-            <Image
-              source={{ uri: "/home-bg.png" }}
-              resizeMode="cover"
-              pointerEvents="none"
-              style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
-            />
-          )
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              { position: "absolute", left: 0, right: 0, top: 0, bottom: 0 },
+              bgStyle,
+            ]}
+          >
+            {Platform.OS === "web" ? (
+              <View
+                pointerEvents="none"
+                // @ts-expect-error web-only background-image props
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  backgroundImage: "url(/home-bg.png)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "bottom center",
+                  backgroundRepeat: "no-repeat",
+                }}
+              />
+            ) : (
+              <Image
+                source={{ uri: "/home-bg.png" }}
+                resizeMode="cover"
+                pointerEvents="none"
+                style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
+              />
+            )}
+          </Animated.View>
         ) : null}
 
         <TopHeader active={null} transparent />
