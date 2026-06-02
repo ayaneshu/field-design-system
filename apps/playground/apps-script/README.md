@@ -24,7 +24,8 @@ file is the source of truth — keep it in sync with the live deployment.
 
 ## Columns
 
-`Timestamp | Category | Type | Description | Figma Link | Assignee | Status | Target`
+`Timestamp | Category | Type | Target | Description | Figma Link | Assignee | Status`
 
-`Target` is appended last so existing 7-column rows stay aligned; the header is
-backfilled automatically on the next call.
+`Target` sits next to `Type`. `ensureLayout_()` self-heals older sheets where
+Target was appended last — it moves that column (with its data) into place on
+the next request, so a redeploy is all that's needed.
