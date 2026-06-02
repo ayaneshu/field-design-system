@@ -35,7 +35,7 @@ const ROUND_SIZE: Record<RoundButtonSize, RoundSpec> = {
     gap: space["6"],
     iconSize: 20,
     spinnerSize: 20,
-    text: textStyles.Action_A14_SemiBold,
+    text: textStyles.A14_SemiBold,
   },
   H36: {
     height: 36,
@@ -44,7 +44,7 @@ const ROUND_SIZE: Record<RoundButtonSize, RoundSpec> = {
     gap: space["4"],
     iconSize: 16,
     spinnerSize: 16,
-    text: textStyles.Action_A12_SemiBold,
+    text: textStyles.A12_SemiBold,
   },
 };
 
@@ -86,8 +86,8 @@ export function RoundButton({
   const isInert = disabled || loading;
   const tokenTextStyle =
     size === "H40"
-      ? "textStyles.Action_A14_SemiBold"
-      : "textStyles.Action_A12_SemiBold";
+      ? "textStyles.A14_SemiBold"
+      : "textStyles.A12_SemiBold";
 
   const press = usePressScale(isInert);
 

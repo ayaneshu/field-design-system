@@ -33,7 +33,7 @@ import { Icon } from "@field-ds/icons";
   title="Specifications"
   expanded={open}
   onExpandedChange={setOpen}
-  iconLeft={<Icon name="system-info" size={20} />}
+  iconLeft={<Icon name="system-info-circle" size={20} />}
 >
   <SpecsTable />
 </Accordion>
@@ -44,7 +44,7 @@ import { Icon } from "@field-ds/icons";
 | Prop                | Type                          | Default | Notes                                                              |
 | ------------------- | ----------------------------- | ------- | ------------------------------------------------------------------ |
 | `title`             | `string`                      | —       | Header text. Truncates to one line.                                |
-| `children`          | `ReactNode`                   | —       | Content slot. Strings auto-wrap in `Body_B14_Regular`; nodes render as-is. |
+| `children`          | `ReactNode`                   | —       | Content slot. Strings auto-wrap in `B14_Regular`; nodes render as-is. |
 | `expanded`          | `boolean`                     | —       | Controlled open state. Omit to use uncontrolled.                   |
 | `defaultExpanded`   | `boolean`                     | `false` | Initial open state in uncontrolled mode.                           |
 | `onExpandedChange`  | `(next: boolean) => void`     | —       | Fires after the user toggles.                                      |
@@ -54,7 +54,7 @@ import { Icon } from "@field-ds/icons";
 ## Content slot
 
 The body is a slot — anything passed as `children` renders inside the expanded
-panel. Pass a string for the default `Body_B14_Regular` text, or any React node
+panel. Pass a string for the default `B14_Regular` text, or any React node
 to compose custom content (lists, tables, forms, etc).
 
 ## Animation
@@ -68,4 +68,4 @@ The body renders at its intrinsic size; an animated wrapper with `overflow: hidd
 - `colour.surface.primary` (container)
 - `colour.surface.secondary` (header + body fill)
 - `colour.text-n-icon.primary` (title, body text, chevron)
-- `space.1 / 4 / 8 / 12 / 20 / 44`, `radius.12`, `textStyles.Body_B14_SemiBold`, `textStyles.Body_B14_Regular`
+- `space.1 / 4 / 8 / 12 / 20 / 44`, `radius.12`, `textStyles.B14_SemiBold`, `textStyles.B14_Regular`

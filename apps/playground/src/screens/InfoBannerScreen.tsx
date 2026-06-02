@@ -307,7 +307,7 @@ function SectionLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B11_SemiBold,
+        textStyles.B11_SemiBold,
         {
           color: colour["text-n-icon"].tertiary,
           textTransform: "uppercase",
@@ -327,7 +327,7 @@ function StateCell({ label, children }: { label: string; children: ReactNode }) 
       {children}
       <Text
         style={[
-          textStyles.Body_B11_Medium,
+          textStyles.B11_Medium,
           { color: colour["text-n-icon"].tertiary, textAlign: "center" },
         ]}
       >
@@ -371,7 +371,7 @@ function PropLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B16_Medium,
+        textStyles.B16_Medium,
         { color: shell.textPrimary, minWidth: 96 },
       ]}
     >
@@ -419,7 +419,7 @@ function DSTextInput({
         placeholderTextColor={colour["text-n-icon"].muted}
         // @ts-expect-error — outlineStyle is web-only and supported by RN-Web
         style={[
-          textStyles.Body_B14_SemiBold,
+          textStyles.B14_SemiBold,
           {
             color: colour["text-n-icon"].primary,
             paddingTop: 0,

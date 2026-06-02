@@ -151,6 +151,10 @@
         "$type": "color",
         "$value": "{base.colour.green.700}"
       },
+      "success-extrabold": {
+        "$type": "color",
+        "$value": "{base.colour.emerald.900}"
+      },
       "overlay-subtle": {
         "$type": "color",
         "$value": "{base.colour.alpha-dark.24}"
@@ -332,7 +336,7 @@
         },
         "line-height": {
           "$type": "dimension",
-          "$value": "{base.number.20}"
+          "$value": "{base.number.22}"
         },
         "letter-spacing": {
           "$type": "dimension",
@@ -343,6 +347,20 @@
         "size": {
           "$type": "dimension",
           "$value": "{base.number.14}"
+        },
+        "line-height": {
+          "$type": "dimension",
+          "$value": "{base.number.20}"
+        },
+        "letter-spacing": {
+          "$type": "dimension",
+          "$value": "{base.number.negative-point-1}"
+        }
+      },
+      "b13": {
+        "size": {
+          "$type": "dimension",
+          "$value": "{base.number.13}"
         },
         "line-height": {
           "$type": "dimension",
@@ -360,7 +378,7 @@
         },
         "line-height": {
           "$type": "dimension",
-          "$value": "{base.number.16}"
+          "$value": "{base.number.18}"
         },
         "letter-spacing": {
           "$type": "dimension",
@@ -677,23 +695,48 @@
     "easing": {
       "standard": {
         "$type": "cubicBezier",
-        "$value": [0.32, 0.72, 0, 1]
+        "$value": [
+          0.32,
+          0.72,
+          0,
+          1
+        ]
       },
       "loft": {
         "$type": "cubicBezier",
-        "$value": [0.22, 1, 0.36, 1]
+        "$value": [
+          0.22,
+          1,
+          0.36,
+          1
+        ]
       },
       "accelerate": {
         "$type": "cubicBezier",
-        "$value": [0.4, 0, 1, 1]
+        "$value": [
+          0.4,
+          0,
+          1,
+          1
+        ]
       },
       "decelerate": {
         "$type": "cubicBezier",
-        "$value": [0, 0, 0.2, 1]
+        "$value": [
+          0,
+          0,
+          0.2,
+          1
+        ]
       },
       "easeInOut": {
         "$type": "cubicBezier",
-        "$value": [0.6, 0, 0.4, 1]
+        "$value": [
+          0.6,
+          0,
+          0.4,
+          1
+        ]
       }
     },
     "spring": {
@@ -733,9 +776,5 @@
         }
       }
     }
-  },
-  "Icon_Color": {
-    "$type": "color",
-    "$value": "#1d2539"
   }
 }

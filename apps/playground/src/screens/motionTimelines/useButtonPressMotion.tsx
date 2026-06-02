@@ -80,7 +80,7 @@ export function ButtonPressPreview({
     <View style={{ alignItems: "center", gap: space["12"] }}>
       <Text
         style={[
-          textStyles.Body_B11_SemiBold,
+          textStyles.B11_SemiBold,
           {
             color: shell.textTertiary,
             textTransform: "uppercase",
@@ -101,7 +101,7 @@ export function ButtonPressPreview({
       </Pressable>
       <Text
         style={[
-          textStyles.Body_B11_Regular,
+          textStyles.B11_Regular,
           { color: shell.textMuted, textAlign: "center" },
         ]}
       >

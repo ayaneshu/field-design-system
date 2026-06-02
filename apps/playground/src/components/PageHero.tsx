@@ -154,7 +154,7 @@ export function PageHero({
             />
             <Text
               style={[
-                textStyles.Body_B11_SemiBold,
+                textStyles.B11_SemiBold,
                 {
                   color: colour["text-n-icon"].tertiary,
                   textTransform: "uppercase",
@@ -168,7 +168,7 @@ export function PageHero({
           </View>
           <Text
             style={[
-              textStyles.Heading_H32_Bold,
+              textStyles.H32_Bold,
               { color: colour["text-n-icon"].primary, fontSize: 44, lineHeight: 48 },
             ]}
           >
@@ -177,7 +177,7 @@ export function PageHero({
           {subtitle ? (
             <Text
               style={[
-                textStyles.Body_B16_Regular,
+                textStyles.B16_Regular,
                 {
                   color: colour["text-n-icon"].secondary,
                   marginTop: space["10"],

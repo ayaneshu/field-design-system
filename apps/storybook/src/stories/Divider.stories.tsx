@@ -70,7 +70,7 @@ export const AllVariants: Story = {
           <View key={`${v}-${e}`} style={{ gap: space["8"] }}>
             <Text
               style={[
-                textStyles.Body_B11_SemiBold,
+                textStyles.B11_SemiBold,
                 {
                   color: colour["text-n-icon"].tertiary,
                   textTransform: "uppercase",
@@ -95,7 +95,7 @@ export const WithPadding: Story = {
     <View style={{ gap: space["20"] }}>
       <Text
         style={[
-          textStyles.Body_B11_SemiBold,
+          textStyles.B11_SemiBold,
           {
             color: colour["text-n-icon"].tertiary,
             textTransform: "uppercase",
@@ -108,7 +108,7 @@ export const WithPadding: Story = {
       <Divider paddingLeft={16} paddingRight={16} />
       <Text
         style={[
-          textStyles.Body_B11_SemiBold,
+          textStyles.B11_SemiBold,
           {
             color: colour["text-n-icon"].tertiary,
             textTransform: "uppercase",
@@ -147,7 +147,7 @@ export const InListRow: Story = {
             <View style={{ paddingVertical: space["12"] }}>
               <Text
                 style={[
-                  textStyles.Body_B14_Medium,
+                  textStyles.B14_Medium,
                   { color: colour["text-n-icon"].primary },
                 ]}
               >

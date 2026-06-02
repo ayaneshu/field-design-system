@@ -231,7 +231,7 @@ export const InputTextarea = forwardRef<TextInput, InputTextareaProps>(
         {!!label && (
           <View style={styles.labelRow}>
             <Text
-              style={[textStyles.Body_B12_Medium, { color: labelColour }]}
+              style={[textStyles.B12_Medium, { color: labelColour }]}
               numberOfLines={1}
             >
               {label}
@@ -239,7 +239,7 @@ export const InputTextarea = forwardRef<TextInput, InputTextareaProps>(
             {required && (
               <Text
                 style={[
-                  textStyles.Body_B12_Medium,
+                  textStyles.B12_Medium,
                   {
                     color: colour["text-n-icon"].error,
                     marginLeft: space["2"],
@@ -293,8 +293,8 @@ export const InputTextarea = forwardRef<TextInput, InputTextareaProps>(
               style={[
                 styles.input,
                 hasValue
-                  ? textStyles.Body_B14_Medium
-                  : textStyles.Body_B14_Regular,
+                  ? textStyles.B14_Medium
+                  : textStyles.B14_Regular,
                 { color: valueTextColour },
                 WEB_INPUT_RESET,
               ]}
@@ -308,7 +308,7 @@ export const InputTextarea = forwardRef<TextInput, InputTextareaProps>(
             {helperVisible ? (
               <Text
                 style={[
-                  textStyles.Body_B12_Regular,
+                  textStyles.B12_Regular,
                   { color: helperColour, flex: 1 },
                 ]}
               >
@@ -320,7 +320,7 @@ export const InputTextarea = forwardRef<TextInput, InputTextareaProps>(
             {counterVisible && (
               <Text
                 style={[
-                  textStyles.Body_B11_Regular,
+                  textStyles.B11_Regular,
                   {
                     color: colour["text-n-icon"].muted,
                     marginLeft: space["8"],

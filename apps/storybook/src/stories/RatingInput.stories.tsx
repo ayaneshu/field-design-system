@@ -60,7 +60,7 @@ export const Sizes: Story = {
         <View key={s}>
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",
@@ -127,7 +127,7 @@ export const Controlled: Story = {
         <RatingInput value={rating} onChange={setRating} size={32} />
         <Text
           style={[
-            textStyles.Body_B14_Medium,
+            textStyles.B14_Medium,
             { color: colour["text-n-icon"].secondary },
           ]}
         >
@@ -167,7 +167,7 @@ function Row({
     <View style={{ flexDirection: "row", alignItems: "center", gap: space["16"] }}>
       <Text
         style={[
-          textStyles.Body_B11_Medium,
+          textStyles.B11_Medium,
           {
             color: colour["text-n-icon"].tertiary,
             minWidth: 96,

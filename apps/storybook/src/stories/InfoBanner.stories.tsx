@@ -218,7 +218,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B11_SemiBold,
+        textStyles.B11_SemiBold,
         {
           color: colour["text-n-icon"].tertiary,
           textTransform: "uppercase",
@@ -244,7 +244,7 @@ function Cell({
       {children}
       <Text
         style={[
-          textStyles.Body_B11_Medium,
+          textStyles.B11_Medium,
           { color: colour["text-n-icon"].tertiary, textAlign: "center" },
         ]}
       >

@@ -84,7 +84,7 @@ export function Button({
       ]}
     >
       {iconLeft}
-      <Text style={[ts("Action_A17_SemiBold"), { color: v.fg }, textStyle]}>
+      <Text style={[ts("A17_SemiBold"), { color: v.fg }, textStyle]}>
         {children}
       </Text>
       {iconRight}

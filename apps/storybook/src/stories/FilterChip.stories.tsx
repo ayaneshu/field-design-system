@@ -157,7 +157,7 @@ export const SlotWithCustomNode: Story = {
       >
         <Text
           style={[
-            textStyles.Body_B11_SemiBold,
+            textStyles.B11_SemiBold,
             { color: colour["text-n-icon"].primary, fontSize: 10 },
           ]}
         >
@@ -245,7 +245,7 @@ export const Interactive: Story = {
         />
         <Text
           style={[
-            textStyles.Body_B12_Medium,
+            textStyles.B12_Medium,
             { color: colour["text-n-icon"].tertiary },
           ]}
         >
@@ -260,7 +260,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B11_SemiBold,
+        textStyles.B11_SemiBold,
         {
           color: colour["text-n-icon"].tertiary,
           textTransform: "uppercase",
@@ -286,7 +286,7 @@ function StateCell({
       {children}
       <Text
         style={[
-          textStyles.Body_B11_Medium,
+          textStyles.B11_Medium,
           { color: colour["text-n-icon"].tertiary, textAlign: "center" },
         ]}
       >

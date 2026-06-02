@@ -37,10 +37,10 @@ export function FieldGroup({
   return (
     <View style={{ gap: 12, width: "100%" }}>
       <View style={{ flexDirection: "row", gap: 8, alignItems: "baseline" }}>
-        <Text style={[ts("Body_B16_Bold"), { color: c.action }]}>{index}</Text>
-        <Text style={[ts("Body_B16_SemiBold"), { color: c.textPrimary }]}>{label}</Text>
+        <Text style={[ts("B16_Bold"), { color: c.action }]}>{index}</Text>
+        <Text style={[ts("B16_SemiBold"), { color: c.textPrimary }]}>{label}</Text>
         {optional ? (
-          <Text style={[ts("Body_B12_Regular"), { color: c.textMuted }]}>(optional)</Text>
+          <Text style={[ts("B12_Regular"), { color: c.textMuted }]}>(optional)</Text>
         ) : null}
       </View>
       {children}
@@ -76,7 +76,7 @@ export function TextField({
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={[
-        ts("Body_B14_Regular"),
+        ts("B14_Regular"),
         {
           height: 48,
           paddingHorizontal: 16,
@@ -118,7 +118,7 @@ export function TextAreaField({
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={[
-        ts("Body_B14_Regular"),
+        ts("B14_Regular"),
         {
           minHeight: 132,
           paddingHorizontal: 16,
@@ -210,7 +210,7 @@ export function Select({
             placeholderTextColor={c.textMuted}
             autoFocus
             style={[
-              ts("Body_B14_Regular"),
+              ts("B14_Regular"),
               {
                 height: 38,
                 paddingHorizontal: 12,
@@ -229,7 +229,7 @@ export function Select({
       <ScrollView style={{ maxHeight: 240 }} keyboardShouldPersistTaps="handled">
         {visibleOptions.length === 0 ? (
           <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
-            <Text style={[ts("Body_B14_Regular"), { color: c.textMuted }]}>No matches</Text>
+            <Text style={[ts("B14_Regular"), { color: c.textMuted }]}>No matches</Text>
           </View>
         ) : null}
         {visibleOptions.map((o) => {
@@ -253,7 +253,7 @@ export function Select({
           >
             <Text
               style={[
-                ts("Body_B14_Regular"),
+                ts("B14_Regular"),
                 {
                   color: dark ? "#ffffff" : c.textPrimary,
                   fontFamily: active ? "Noontree-SemiBold" : "Noontree-Regular",
@@ -299,7 +299,7 @@ export function Select({
         <Text
           numberOfLines={1}
           style={[
-            ts("Body_B14_Regular"),
+            ts("B14_Regular"),
             { color: empty ? c.textMuted : dark ? "#ffffff" : c.textPrimary, flex: 1 },
           ]}
         >
@@ -393,7 +393,7 @@ export function Segmented({
           >
             <Text
               style={[
-                ts("Body_B14_SemiBold"),
+                ts("B14_SemiBold"),
                 { color: active ? c.textPrimary : c.textTertiary },
               ]}
             >

@@ -203,7 +203,7 @@ export function BottomNavScreen({ navigation }: Props) {
                   >
                     <Text
                       style={[
-                        textStyles.Body_B12_SemiBold,
+                        textStyles.B12_SemiBold,
                         {
                           color: on
                             ? colour["text-n-icon"]["on-surface-bold"]
@@ -231,7 +231,7 @@ export function BottomNavScreen({ navigation }: Props) {
       >
         <Text
           style={[
-            textStyles.Body_B14_Medium,
+            textStyles.B14_Medium,
             {
               color: colour["text-n-icon"].secondary,
               marginBottom: space["16"],
@@ -297,7 +297,7 @@ export function BottomNavScreen({ navigation }: Props) {
           />
           <Text
             style={[
-              textStyles.Body_B14_SemiBold,
+              textStyles.B14_SemiBold,
               { color: colour["text-n-icon"].primary },
             ]}
           >
@@ -322,7 +322,7 @@ export function BottomNavScreen({ navigation }: Props) {
         >
           <Text
             style={[
-              textStyles.Body_B12_SemiBold,
+              textStyles.B12_SemiBold,
               { color: colour["text-n-icon"].secondary },
             ]}
           >
@@ -435,7 +435,7 @@ function TabEditor({
             placeholderTextColor={colour["text-n-icon"].muted}
             // @ts-expect-error — outlineStyle is web-only and supported by RN-Web
             style={[
-              textStyles.Body_B14_Regular,
+              textStyles.B14_Regular,
               {
                 color: colour["text-n-icon"].primary,
                 backgroundColor: colour.surface.primary,
@@ -545,7 +545,7 @@ function FieldLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B12_SemiBold,
+        textStyles.B12_SemiBold,
         { color: colour["text-n-icon"].secondary, minWidth: 72 },
       ]}
     >
@@ -578,7 +578,7 @@ function PropLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B14_SemiBold,
+        textStyles.B14_SemiBold,
         { color: shell.textPrimary, minWidth: 96 },
       ]}
     >

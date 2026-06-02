@@ -70,7 +70,7 @@ export function ListItem({
   style,
 }: ListItemProps) {
   const titleStyle =
-    size === "big" ? textStyles.Heading_H16_Bold : textStyles.Body_B14_SemiBold;
+    size === "big" ? textStyles.H16_Bold : textStyles.B14_SemiBold;
 
   const baseRowStyle: ViewStyle = {
     backgroundColor: colour.surface.primary,
@@ -124,8 +124,8 @@ export function ListItem({
             dataSet={{
               tokenTextStyle:
                 size === "big"
-                  ? "textStyles.Heading_H16_Bold"
-                  : "textStyles.Body_B14_SemiBold",
+                  ? "textStyles.H16_Bold"
+                  : "textStyles.B14_SemiBold",
               tokenColor: "colour.text-n-icon.primary",
             }}
             style={[
@@ -154,11 +154,11 @@ export function ListItem({
             numberOfLines={2}
             // @ts-expect-error — dataSet on Text on web
             dataSet={{
-              tokenTextStyle: "textStyles.Body_B12_Regular",
+              tokenTextStyle: "textStyles.B12_Regular",
               tokenColor: "colour.text-n-icon.secondary",
             }}
             style={[
-              textStyles.Body_B12_Regular,
+              textStyles.B12_Regular,
               { color: colour["text-n-icon"].secondary },
             ]}
           >

@@ -254,7 +254,7 @@ function EntryPreview({
     <View style={{ alignItems: "center", gap: space["12"] }}>
       <Text
         style={[
-          textStyles.Body_B11_SemiBold,
+          textStyles.B11_SemiBold,
           {
             color: shell.textTertiary,
             textTransform: "uppercase",
@@ -298,7 +298,7 @@ function EntryPreview({
             <View style={{ padding: space["12"] }}>
               <Text
                 style={[
-                  textStyles.Body_B11_Regular,
+                  textStyles.B11_Regular,
                   { color: colour["text-n-icon"].secondary },
                 ]}
               >
@@ -312,7 +312,7 @@ function EntryPreview({
       </View>
       <Text
         style={[
-          textStyles.Body_B11_Regular,
+          textStyles.B11_Regular,
           { color: shell.textMuted, textAlign: "center" },
         ]}
       >
@@ -354,7 +354,7 @@ function SampleHeader() {
     >
       <Text
         style={[
-          textStyles.Heading_H16_Bold,
+          textStyles.H16_Bold,
           { color: colour["text-n-icon"].primary },
         ]}
       >
@@ -369,7 +369,7 @@ function SampleBody() {
     <View style={{ padding: space["20"], gap: space["12"] }}>
       <Text
         style={[
-          textStyles.Body_B14_Regular,
+          textStyles.B14_Regular,
           { color: colour["text-n-icon"].secondary },
         ]}
       >

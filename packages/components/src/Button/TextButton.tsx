@@ -37,7 +37,7 @@ const TEXT_SIZE: Record<TextButtonSize, TextSpec> = {
     gap: space["4"],
     radius: radius["6"],
     iconSize: 20,
-    text: textStyles.Action_A14_SemiBold,
+    text: textStyles.A14_SemiBold,
   },
   A12: {
     height: 24,
@@ -46,7 +46,7 @@ const TEXT_SIZE: Record<TextButtonSize, TextSpec> = {
     gap: space["4"],
     radius: radius["4"],
     iconSize: 16,
-    text: textStyles.Action_A12_SemiBold,
+    text: textStyles.A12_SemiBold,
   },
 };
 
@@ -140,8 +140,8 @@ export function TextButton({
           dataSet={{
             tokenTextStyle:
               size === "A14"
-                ? "textStyles.Action_A14_SemiBold"
-                : "textStyles.Action_A12_SemiBold",
+                ? "textStyles.A14_SemiBold"
+                : "textStyles.A12_SemiBold",
             tokenColor: "colour.text-n-icon.action",
           }}
           style={[noFauxBold(spec.text), { color: fg }]}

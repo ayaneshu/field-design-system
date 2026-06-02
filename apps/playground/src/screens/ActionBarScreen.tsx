@@ -145,7 +145,7 @@ function SectionCaption({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B11_SemiBold,
+        textStyles.B11_SemiBold,
         {
           color: colour["text-n-icon"].tertiary,
           textTransform: "uppercase",
@@ -163,7 +163,7 @@ function RowCaption({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B11_Medium,
+        textStyles.B11_Medium,
         {
           color: colour["text-n-icon"].tertiary,
           marginBottom: space["4"],

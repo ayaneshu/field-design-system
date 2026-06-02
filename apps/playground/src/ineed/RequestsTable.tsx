@@ -9,8 +9,8 @@ import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import type { DesignRequest } from "./types";
 
-const HEADER = textStyles.Body_B16_Bold;
-const CELL = textStyles.Body_B16_Regular; // Noontree-Medium look in design ≈ Regular weight token
+const HEADER = textStyles.B16_Bold;
+const CELL = textStyles.B16_Regular; // Noontree-Medium look in design ≈ Regular weight token
 
 // Column sizing — fixed widths for the short columns, flex for the long ones,
 // mirroring the Figma layout (# · Category · Type · Description · Figma · Assignee · Status).
@@ -55,7 +55,7 @@ export function RequestsTable({ rows }: { rows: DesignRequest[] }) {
 
       {rows.length === 0 ? (
         <View style={{ paddingVertical: 56, alignItems: "center" }}>
-          <Text style={[textStyles.Body_B16_Regular, { color: colour["text-n-icon"].muted }]}>
+          <Text style={[textStyles.B16_Regular, { color: colour["text-n-icon"].muted }]}>
             No requests match these filters.
           </Text>
         </View>
@@ -137,7 +137,7 @@ function StatusPill({ status }: { status: string }) {
         paddingHorizontal: 14,
       }}
     >
-      <Text numberOfLines={1} style={[textStyles.Body_B16_Bold, { color: s.fg }]}>
+      <Text numberOfLines={1} style={[textStyles.B16_Bold, { color: s.fg }]}>
         {(status || "—").toLowerCase()}
       </Text>
     </View>

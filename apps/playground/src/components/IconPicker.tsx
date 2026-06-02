@@ -156,7 +156,7 @@ function PickerTrigger({
         <Text
           numberOfLines={1}
           style={[
-            textStyles.Body_B12_SemiBold,
+            textStyles.B12_SemiBold,
             { color: shell.textPrimary, flex: 1 },
           ]}
         >
@@ -411,7 +411,7 @@ function DropdownRow({
       <Text
         numberOfLines={1}
         style={[
-          textStyles.Body_B14_Medium,
+          textStyles.B14_Medium,
           {
             color: active ? colour["text-n-icon"].action : shell.textPrimary,
             flex: 1,

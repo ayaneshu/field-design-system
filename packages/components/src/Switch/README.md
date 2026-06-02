@@ -68,7 +68,7 @@ import { Switch } from "@field-ds/components";
 - `colour["text-n-icon"].tertiary` — inactive label
 - `radius.rounded` — pill rounding
 - `space["4"]`, `space["10"]` — track padding, slot inner padding
-- `textStyles.Body_B12_SemiBold` (H40), `textStyles.Body_B14_SemiBold` (H48)
+- `textStyles.B12_SemiBold` (H40), `textStyles.B14_SemiBold` (H48)
 
 ## Motion
 

@@ -161,7 +161,7 @@ export function InputTextareaScreen({ navigation }: Props) {
         >
           <Text
             style={[
-              textStyles.Body_B12_SemiBold,
+              textStyles.B12_SemiBold,
               { color: colour["text-n-icon"].action },
             ]}
           >
@@ -204,7 +204,7 @@ function SectionLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B11_SemiBold,
+        textStyles.B11_SemiBold,
         {
           color: colour["text-n-icon"].tertiary,
           textTransform: "uppercase",
@@ -253,7 +253,7 @@ function PropLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B16_Medium,
+        textStyles.B16_Medium,
         { color: shell.textPrimary, minWidth: 96, paddingTop: 2 },
       ]}
     >
@@ -298,7 +298,7 @@ function DSTextInput({
         onChangeText={onChangeText}
         placeholderTextColor={colour["text-n-icon"].muted}
         style={[
-          textStyles.Body_B14_SemiBold,
+          textStyles.B14_SemiBold,
           {
             color: colour["text-n-icon"].primary,
             paddingTop: 0,

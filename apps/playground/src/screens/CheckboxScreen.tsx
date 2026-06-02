@@ -78,7 +78,7 @@ export function CheckboxScreen({ navigation }: Props) {
         <PreviewSurface key={s}>
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",
@@ -141,7 +141,7 @@ export function CheckboxScreen({ navigation }: Props) {
             />
             <Text
               style={[
-                textStyles.Body_B14_Medium,
+                textStyles.B14_Medium,
                 { color: colour["text-n-icon"].primary },
               ]}
             >
@@ -233,7 +233,7 @@ function SelectPreview({
     <View style={{ alignItems: "center", gap: space["12"] }}>
       <Text
         style={[
-          textStyles.Body_B11_SemiBold,
+          textStyles.B11_SemiBold,
           {
             color: shell.textTertiary,
             textTransform: "uppercase",
@@ -254,7 +254,7 @@ function SelectPreview({
       </Pressable>
       <Text
         style={[
-          textStyles.Body_B11_Regular,
+          textStyles.B11_Regular,
           { color: shell.textMuted, textAlign: "center" },
         ]}
       >
@@ -295,7 +295,7 @@ function StateCell({ label, children }: { label: string; children: ReactNode }) 
       {children}
       <Text
         style={[
-          textStyles.Body_B11_Medium,
+          textStyles.B11_Medium,
           {
             color: colour["text-n-icon"].tertiary,
             textAlign: "center",
@@ -336,7 +336,7 @@ function PropLabel({ children }: { children: ReactNode }) {
   return (
     <Text
       style={[
-        textStyles.Body_B16_Medium,
+        textStyles.B16_Medium,
         { color: shell.textPrimary, minWidth: 96 },
       ]}
     >

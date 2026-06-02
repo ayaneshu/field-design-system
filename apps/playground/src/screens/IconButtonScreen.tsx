@@ -84,7 +84,7 @@ export function IconButtonScreen({ navigation }: Props) {
                 </View>
                 <Text
                   style={[
-                    textStyles.Body_B11_Medium,
+                    textStyles.B11_Medium,
                     { color: colour["text-n-icon"].tertiary },
                   ]}
                 >

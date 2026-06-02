@@ -45,7 +45,7 @@ export function RadiusContent({
           ink, capped at ~640px so it doesn't run wide. */}
       <Text
         style={[
-          textStyles.Body_B16_Regular,
+          textStyles.B16_Regular,
           {
             color: shell.textTertiary,
             maxWidth: 640,
@@ -56,7 +56,7 @@ export function RadiusContent({
         Corner radii from sharp (0) to fully{" "}
         <Text
           style={[
-            textStyles.Body_B16_SemiBold,
+            textStyles.B16_SemiBold,
             { color: shell.textSecondary },
           ]}
         >
@@ -65,7 +65,7 @@ export function RadiusContent({
         . The{" "}
         <Text
           style={[
-            textStyles.Body_B16_SemiBold,
+            textStyles.B16_SemiBold,
             { color: shell.textSecondary },
           ]}
         >
@@ -75,7 +75,7 @@ export function RadiusContent({
         perfectly pill-shaped. Tap a tile to copy{" "}
         <Text
           style={[
-            textStyles.Body_B16_SemiBold,
+            textStyles.B16_SemiBold,
             { color: shell.textSecondary },
           ]}
         >
@@ -156,7 +156,7 @@ function RadiusTile({
       <View style={{ alignItems: "center" }}>
         <Text
           style={[
-            textStyles.Heading_H16_Bold,
+            textStyles.H16_Bold,
             {
               color: shell.textPrimary,
               fontVariant: ["tabular-nums"],
@@ -167,7 +167,7 @@ function RadiusTile({
         </Text>
         <Text
           style={[
-            textStyles.Body_B12_Regular,
+            textStyles.B12_Regular,
             {
               color: shell.textTertiary,
               fontVariant: ["tabular-nums"],

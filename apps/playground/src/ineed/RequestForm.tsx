@@ -119,15 +119,15 @@ export function RequestForm({
     }
   }
 
-  const errStyle = [ts("Body_B11_Regular"), { color: c.error }];
-  const hintStyle = [ts("Body_B11_Regular"), { color: c.textMuted }];
+  const errStyle = [ts("B11_Regular"), { color: c.error }];
+  const hintStyle = [ts("B11_Regular"), { color: c.textMuted }];
 
   return (
     <View style={{ flex: 1, width: "100%" }}>
       {/* Fixed header */}
       <View style={{ paddingHorizontal: 32, paddingTop: 32, paddingBottom: 20, gap: 8 }}>
-        <Text style={[ts("Heading_H32_Bold"), { color: c.textPrimary }]}>Make a request</Text>
-        <Text style={[ts("Body_B16_Regular"), { color: c.textTertiary }]}>
+        <Text style={[ts("H32_Bold"), { color: c.textPrimary }]}>Make a request</Text>
+        <Text style={[ts("B16_Regular"), { color: c.textTertiary }]}>
           Takes under a minute
         </Text>
       </View>
@@ -219,7 +219,7 @@ export function RequestForm({
                       ? errStyle
                       : overLimit
                         ? errStyle
-                        : [ts("Body_B11_Regular"), { color: c.textMuted, opacity: 0 }]
+                        : [ts("B11_Regular"), { color: c.textMuted, opacity: 0 }]
                   }
                 >
                   {touched && !description.trim()
@@ -229,7 +229,7 @@ export function RequestForm({
                       : "."}
                 </Text>
                 <Text
-                  style={[ts("Body_B11_Regular"), { color: overLimit ? c.error : c.textMuted }]}
+                  style={[ts("B11_Regular"), { color: overLimit ? c.error : c.textMuted }]}
                 >
                   {words}/{DESCRIPTION_WORD_LIMIT}
                 </Text>

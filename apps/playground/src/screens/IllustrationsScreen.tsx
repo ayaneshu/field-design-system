@@ -122,7 +122,7 @@ function TabButton({
     >
       <Text
         style={[
-          textStyles.Body_B12_SemiBold,
+          textStyles.B12_SemiBold,
           {
             color: active
               ? colour["text-n-icon"].primary
@@ -200,7 +200,7 @@ function Library({
           >
             <Text
               style={[
-                textStyles.Body_B12_SemiBold,
+                textStyles.B12_SemiBold,
                 {
                   color:
                     b === brand
@@ -236,7 +236,7 @@ function Library({
         >
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",
@@ -275,7 +275,7 @@ function Library({
             />
             <Text
               style={[
-                textStyles.Body_B11_SemiBold,
+                textStyles.B11_SemiBold,
                 { color: colour["text-n-icon"].primary },
               ]}
             >
@@ -328,7 +328,7 @@ function Library({
             placeholderTextColor={colour["text-n-icon"].muted}
             // @ts-expect-error — outlineStyle is web-only
             style={[
-              textStyles.Body_B14_Regular,
+              textStyles.B14_Regular,
               {
                 flex: 1,
                 color: colour["text-n-icon"].primary,
@@ -340,7 +340,7 @@ function Library({
         </View>
         <Text
           style={[
-            textStyles.Body_B11_SemiBold,
+            textStyles.B11_SemiBold,
             {
               color: colour["text-n-icon"].tertiary,
               textTransform: "uppercase",
@@ -498,7 +498,7 @@ function Slider({
     >
       <Text
         style={[
-          textStyles.Body_B12_SemiBold,
+          textStyles.B12_SemiBold,
           { color: colour["text-n-icon"].secondary },
         ]}
       >
@@ -506,7 +506,7 @@ function Slider({
       </Text>
       <Text
         style={[
-          textStyles.Body_B12_SemiBold,
+          textStyles.B12_SemiBold,
           {
             color: colour["text-n-icon"].primary,
             fontVariant: ["tabular-nums"],
@@ -630,7 +630,7 @@ function IllustrationCard({
           <Text
             numberOfLines={1}
             style={[
-              textStyles.Body_B14_SemiBold,
+              textStyles.B14_SemiBold,
               { color: colour["text-n-icon"].primary },
             ]}
           >
@@ -638,7 +638,7 @@ function IllustrationCard({
           </Text>
           <Text
             style={[
-              textStyles.Body_B11_Regular,
+              textStyles.B11_Regular,
               { color: colour["text-n-icon"].tertiary, marginTop: 1 },
             ]}
           >
@@ -789,7 +789,7 @@ function Playground({
       >
         <Text
           style={[
-            textStyles.Body_B11_SemiBold,
+            textStyles.B11_SemiBold,
             {
               color: colour["text-n-icon"].tertiary,
               textTransform: "uppercase",
@@ -850,7 +850,7 @@ function Playground({
         >
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",
@@ -906,7 +906,7 @@ function Playground({
         >
           <Text
             style={[
-              textStyles.Body_B11_SemiBold,
+              textStyles.B11_SemiBold,
               {
                 color: colour["text-n-icon"].tertiary,
                 textTransform: "uppercase",
@@ -931,7 +931,7 @@ function Playground({
             >
               <Text
                 style={[
-                  textStyles.Body_B12_SemiBold,
+                  textStyles.B12_SemiBold,
                   { color: colour["text-n-icon"].primary },
                 ]}
               >
@@ -955,7 +955,7 @@ function Playground({
               <Icon name="system-copy" size={12} color={colour.surface.primary} />
               <Text
                 style={[
-                  textStyles.Body_B12_SemiBold,
+                  textStyles.B12_SemiBold,
                   { color: colour["text-n-icon"]["on-surface-bold"] },
                 ]}
               >
@@ -984,7 +984,7 @@ function Playground({
         ) : (
           <Text
             style={[
-              textStyles.Body_B12_Regular,
+              textStyles.B12_Regular,
               {
                 color: colour["text-n-icon"].tertiary,
                 marginTop: space["12"],
@@ -1191,7 +1191,7 @@ function SelectionInspector({
     >
       <Text
         style={[
-          textStyles.Body_B12_SemiBold,
+          textStyles.B12_SemiBold,
           { color: colour["text-n-icon"].primary },
         ]}
       >
@@ -1221,7 +1221,7 @@ function SelectionInspector({
       >
         <Text
           style={[
-            textStyles.Body_B12_SemiBold,
+            textStyles.B12_SemiBold,
             { color: colour.surface["error-bold"] },
           ]}
         >

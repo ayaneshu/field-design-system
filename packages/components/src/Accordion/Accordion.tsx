@@ -34,7 +34,7 @@ export type AccordionProps = {
   title: string;
   /**
    * Content slot. Anything passed as children renders inside the expanded
-   * body. Strings are auto-wrapped in `Body_B14_Regular`; nodes render as-is,
+   * body. Strings are auto-wrapped in `B14_Regular`; nodes render as-is,
    * letting consumers compose custom content (lists, tables, controls, etc).
    */
   children?: ReactNode;
@@ -128,7 +128,7 @@ export function Accordion({
   // Structure mirrors the Figma "Details > Content Slot" hierarchy:
   //   Details — surface.secondary background, space.12 padding (the body fill).
   //   Content Slot — wraps whatever children the consumer passes, centered.
-  // Strings get auto-wrapped in Body_B14_Regular as a convenience; ReactNodes
+  // Strings get auto-wrapped in B14_Regular as a convenience; ReactNodes
   // render untouched so consumers can compose any layout in the slot.
   const renderBodyContent = () => (
     <View
@@ -153,10 +153,10 @@ export function Accordion({
           <Text
             // @ts-expect-error — dataSet on Text on web
             dataSet={{
-              tokenTextStyle: "textStyles.Body_B14_Regular",
+              tokenTextStyle: "textStyles.B14_Regular",
               tokenColor: "colour.text-n-icon.primary",
             }}
-            style={[textStyles.Body_B14_Regular, { color: colour["text-n-icon"].primary }]}
+            style={[textStyles.B14_Regular, { color: colour["text-n-icon"].primary }]}
           >
             {children}
           </Text>
@@ -218,10 +218,10 @@ export function Accordion({
             numberOfLines={1}
             // @ts-expect-error — dataSet on Text on web
             dataSet={{
-              tokenTextStyle: "textStyles.Body_B14_SemiBold",
+              tokenTextStyle: "textStyles.B14_SemiBold",
               tokenColor: "colour.text-n-icon.primary",
             }}
-            style={[textStyles.Body_B14_SemiBold, { color: colour["text-n-icon"].primary, flex: 1 }]}
+            style={[textStyles.B14_SemiBold, { color: colour["text-n-icon"].primary, flex: 1 }]}
           >
             {title}
           </Text>

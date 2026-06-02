@@ -97,7 +97,7 @@ function Block({
     <View>
       <Text
         style={[
-          textStyles.Body_B16_Bold,
+          textStyles.B16_Bold,
           { color: shell.textPrimary },
         ]}
       >
@@ -105,7 +105,7 @@ function Block({
       </Text>
       <Text
         style={[
-          textStyles.Body_B12_Regular,
+          textStyles.B12_Regular,
           {
             color: shell.textTertiary,
             marginTop: space["4"],
@@ -211,7 +211,7 @@ function SwatchMeta({ name, hex }: { name: string; hex: string }) {
       <Text
         numberOfLines={1}
         style={[
-          textStyles.Body_B14_Bold,
+          textStyles.B14_Bold,
           { color: shell.textPrimary, marginTop: space["12"] },
         ]}
       >
@@ -219,7 +219,7 @@ function SwatchMeta({ name, hex }: { name: string; hex: string }) {
       </Text>
       <Text
         style={[
-          textStyles.Body_B12_Regular,
+          textStyles.B12_Regular,
           {
             color: shell.textTertiary,
             marginTop: space["2"],
@@ -285,7 +285,7 @@ function SwatchList({
             />
             <Text
               style={[
-                textStyles.Body_B14_SemiBold,
+                textStyles.B14_SemiBold,
                 { color: colour["text-n-icon"].primary, flex: 1 },
               ]}
             >
@@ -293,7 +293,7 @@ function SwatchList({
             </Text>
             <Text
               style={[
-                textStyles.Body_B12_Regular,
+                textStyles.B12_Regular,
                 {
                   color: colour["text-n-icon"].tertiary,
                   fontVariant: ["tabular-nums"],
@@ -306,7 +306,7 @@ function SwatchList({
             </Text>
             <Text
               style={[
-                textStyles.Body_B12_Regular,
+                textStyles.B12_Regular,
                 {
                   color: colour["text-n-icon"].muted,
                   fontVariant: ["tabular-nums"],
@@ -319,7 +319,7 @@ function SwatchList({
             </Text>
             <Text
               style={[
-                textStyles.Body_B14_SemiBold,
+                textStyles.B14_SemiBold,
                 {
                   color: tintedInkOn("#ffffff"),
                   fontVariant: ["tabular-nums"],
@@ -342,7 +342,7 @@ function SectionHeading({ children }: { children: string }) {
   return (
     <Text
       style={[
-        textStyles.Heading_H32_Bold,
+        textStyles.H32_Bold,
         { color: shell.textPrimary, letterSpacing: -0.5 },
       ]}
     >
