@@ -73,6 +73,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
       RatingInput: "components/rating-input",
       SearchBar: "components/search-bar",
       Switch: "components/switch",
+      Toast: "components/toast",
       Toggle: "components/toggle",
     },
   },

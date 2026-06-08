@@ -2,7 +2,6 @@ import {
   forwardRef,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useRef,
   useState,
 } from "react";
@@ -123,8 +122,15 @@ export const InputTextarea = forwardRef<TextInput, InputTextareaProps>(
     const [internalValue, setInternalValue] = useState(defaultValue);
     const value = isControlled ? controlledValue : internalValue;
 
-    const innerRef = useRef<TextInput>(null);
-    useImperativeHandle(ref, () => innerRef.current as TextInput);
+    const innerRef = useRef<TextInput | null>(null);
+    const setRef = useCallback(
+      (node: TextInput | null) => {
+        innerRef.current = node;
+        if (typeof ref === "function") ref(node);
+        else if (ref) ref.current = node;
+      },
+      [ref],
+    );
 
     const [isFocused, setIsFocused] = useState(false);
     const hasError = !!error;
@@ -271,7 +277,7 @@ export const InputTextarea = forwardRef<TextInput, InputTextareaProps>(
             ]}
           >
             <TextInput
-              ref={innerRef}
+              ref={setRef}
               value={value}
               onChangeText={handleChangeText}
               onFocus={handleFocus}
@@ -340,7 +346,6 @@ export const InputTextarea = forwardRef<TextInput, InputTextareaProps>(
 const styles = StyleSheet.create({
   root: {
     width: "100%",
-    minWidth: 320,
     gap: HELPER_GAP,
   },
   labelRow: {

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
+import type { ElementRef } from "react";
 import { Pressable, type StyleProp, type ViewStyle } from "react-native";
 import Animated, {
   interpolate,
@@ -46,6 +47,8 @@ const FILL_BOX_D =
 const CHECK_STROKE_D = "M 8 12 L 10.5 14.5 L 16 9.5";
 const CHECK_PATH_LENGTH = 11;
 
+export type CheckboxRef = ElementRef<typeof Pressable>;
+
 export type CheckboxProps = {
   /** Controlled selected state. Omit to use uncontrolled mode with `defaultSelected`. */
   selected?: boolean;
@@ -68,15 +71,18 @@ export type CheckboxProps = {
  * the system: outline cross-fades into the filled box, the tick scales in
  * from the centre, and the box gives a tiny lift on selection.
  */
-export function Checkbox({
-  selected: controlledSelected,
-  defaultSelected = false,
-  onChange,
-  size = "H24",
-  disabled = false,
-  accessibilityLabel,
-  style,
-}: CheckboxProps) {
+export const Checkbox = forwardRef<CheckboxRef, CheckboxProps>(function Checkbox(
+  {
+    selected: controlledSelected,
+    defaultSelected = false,
+    onChange,
+    size = "H24",
+    disabled = false,
+    accessibilityLabel,
+    style,
+  },
+  ref,
+) {
   const isControlled = controlledSelected !== undefined;
   const [internalSelected, setInternalSelected] = useState(defaultSelected);
   const selected = isControlled ? controlledSelected : internalSelected;
@@ -143,12 +149,16 @@ export function Checkbox({
 
   return (
     <Pressable
+      ref={ref}
       onPress={toggle}
       disabled={disabled}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: selected, disabled }}
       accessibilityLabel={accessibilityLabel}
-      hitSlop={size === "H16" ? 8 : 4}
+      // hitSlop sized from the box so the effective touch target reaches
+      // ~44px on each axis: H16 → 16+14*2=44, H20 → 20+12*2=44. Visual box
+      // size is unchanged.
+      hitSlop={size === "H16" ? 14 : size === "H20" ? 12 : 4}
       // @ts-expect-error — dataSet on Pressable on web
       dataSet={{
         component: "Checkbox",
@@ -230,4 +240,4 @@ export function Checkbox({
       </Animated.View>
     </Pressable>
   );
-}
+});

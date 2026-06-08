@@ -1,4 +1,5 @@
-import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import * as React from "react";
+import { I18nManager, Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { Icon, type IconName } from "@field-ds/icons";
@@ -54,6 +55,8 @@ const FG = colour["text-n-icon"].action;
 const FG_DISABLED = colour["text-n-icon"].muted;
 const BG_PRESSED = colour.surface["action-subtle"];
 
+export type TextButtonRef = React.ElementRef<typeof Pressable>;
+
 export type TextButtonProps = {
   label: string;
   size?: TextButtonSize;
@@ -75,16 +78,20 @@ export type TextButtonProps = {
  *   <TextButton label="View all" />
  *   <TextButton label="Edit" iconLeft="system-plus" size="A12" />
  */
-export function TextButton({
-  label,
-  size = "A14",
-  iconLeft,
-  iconRight,
-  disabled = false,
-  onPress,
-  accessibilityLabel,
-  style,
-}: TextButtonProps) {
+export const TextButton = React.forwardRef<TextButtonRef, TextButtonProps>(
+  function TextButton(
+    {
+      label,
+      size = "A14",
+      iconLeft,
+      iconRight,
+      disabled = false,
+      onPress,
+      accessibilityLabel,
+      style,
+    },
+    ref,
+  ) {
   const spec = TEXT_SIZE[size];
   const fg = disabled ? FG_DISABLED : FG;
 
@@ -95,6 +102,7 @@ export function TextButton({
       style={[press.animatedStyle, { alignSelf: "flex-start" }, style]}
     >
     <Pressable
+      ref={ref}
       onPress={disabled ? undefined : onPress}
       onPressIn={press.onPressIn}
       onPressOut={press.onPressOut}
@@ -126,7 +134,10 @@ export function TextButton({
     >
       <View
         style={{
-          flexDirection: "row",
+          // Logical ordering: under RTL the row reverses so the `iconLeft`
+          // slot lands on the visual start and `iconRight` on the visual
+          // end. Prop names stay stable.
+          flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
           alignItems: "center",
           gap: spec.gap,
         }}
@@ -155,4 +166,5 @@ export function TextButton({
     </Pressable>
     </Animated.View>
   );
-}
+  },
+);

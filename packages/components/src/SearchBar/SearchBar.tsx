@@ -32,6 +32,8 @@ import Animated, {
 import { Icon } from "@field-ds/icons";
 import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
 
+import { SHADOW_TINT } from "../internal/elevation";
+
 // Cubic Bézier tokens are `motion.easing.*`; Reanimated expects `Easing.bezier`(…).
 const se = motion.easing.standard;
 const PRESS_EASING = Easing.bezier(se[0], se[1], se[2], se[3]);
@@ -104,7 +106,7 @@ const SIZE_SPEC = {
 // Sm elevation from Figma: 0 1px 1.5px rgba(14,14,14,0.07).
 const ELEVATION_STYLE = Platform.select<ViewStyle>({
   ios: {
-    shadowColor: "#0E0E0E",
+    shadowColor: SHADOW_TINT,
     shadowOpacity: 0.07,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 1.5,
@@ -114,7 +116,7 @@ const ELEVATION_STYLE = Platform.select<ViewStyle>({
   },
   default: {
     // Web — RN-Web maps shadow* to box-shadow.
-    shadowColor: "#0E0E0E",
+    shadowColor: SHADOW_TINT,
     shadowOpacity: 0.07,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 1.5,
@@ -172,7 +174,9 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
 
     const isControlled = controlledValue !== undefined;
     const [internalValue, setInternalValue] = useState(defaultValue);
-    const value = isControlled ? controlledValue : internalValue;
+    // A controlled consumer may pass `value={undefined}`/`null`; coerce to ""
+    // so `.length` and rendering never throw.
+    const value = (isControlled ? controlledValue : internalValue) ?? "";
 
     const innerRef = useRef<TextInput>(null);
     useImperativeHandle(ref, () => innerRef.current as TextInput);

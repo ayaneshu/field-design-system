@@ -39,4 +39,5 @@ export type RootStackParamList = {
   SearchBar: undefined;
   Switch: undefined;
   Toggle: undefined;
+  Toast: undefined;
 };

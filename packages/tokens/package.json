@@ -3,10 +3,24 @@
   "version": "0.0.0",
   "description": "Field Design System — design tokens (colors, typography, spacing). DTCG JSON sources + generated TypeScript.",
   "license": "MIT",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "source": "./src/index.ts",
+  "main": "./lib/commonjs/index.js",
+  "module": "./lib/module/index.js",
+  "react-native": "./src/index.ts",
+  "types": "./lib/typescript/src/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "source": "./src/index.ts",
+      "react-native": "./src/index.ts",
+      "import": {
+        "types": "./lib/typescript/src/index.d.ts",
+        "default": "./lib/module/index.js"
+      },
+      "require": {
+        "types": "./lib/typescript/src/index.d.ts",
+        "default": "./lib/commonjs/index.js"
+      }
+    },
     "./base": "./src/base.ts",
     "./semantic": "./src/semantic.ts",
     "./text-styles": "./src/text-styles.ts",
@@ -16,14 +30,26 @@
     "./raw/text-styles.json": "./src/raw/text-styles.json"
   },
   "files": [
-    "src"
+    "src",
+    "lib"
   ],
   "scripts": {
     "build": "tsx scripts/build-tokens.ts",
+    "build:lib": "bob build",
+    "prepare": "bob build",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
   }
 }

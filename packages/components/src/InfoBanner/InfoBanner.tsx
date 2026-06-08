@@ -118,8 +118,10 @@ const SURFACES: Record<InfoBannerColor, Surface> = {
 
 type Geometry = {
   borderRadius: number;
-  paddingLeft: number;
-  paddingRight: number;
+  // Logical start/end padding so the asymmetric icon-hugging padding mirrors
+  // correctly under RTL (icon on the start side, label gets the roomy end).
+  paddingStart: number;
+  paddingEnd: number;
   paddingVertical: number;
   gap: number;
   iconSize: number;
@@ -127,16 +129,18 @@ type Geometry = {
   textStyleName: "B11_Medium" | "B12_Medium";
 };
 
-// Small variants use asymmetric horizontal padding — the icon hugs the left
-// edge (pl=4) and the trailing label gets more breathing room (pr=8 or 6).
-// Large variants stay symmetric. Padding stays the same when `showIcon` is
-// false so a label-only pill keeps its rhythm with the rest of the row.
+// Small variants use asymmetric horizontal padding — the icon hugs the start
+// edge (paddingStart=4) and the trailing label gets more breathing room
+// (paddingEnd=8 or 6). Logical start/end keeps this correct under RTL, where
+// the icon (rendered first in the row) flips to the right edge. Large variants
+// stay symmetric. Padding stays the same when `showIcon` is false so a
+// label-only pill keeps its rhythm with the rest of the row.
 function geometryFor(size: InfoBannerSize, shape: InfoBannerShape): Geometry {
   if (size === "small" && shape === "rounded") {
     return {
       borderRadius: radius.rounded,
-      paddingLeft: space["4"],
-      paddingRight: space["8"],
+      paddingStart: space["4"],
+      paddingEnd: space["8"],
       paddingVertical: space["4"],
       gap: space["2"],
       iconSize: 14,
@@ -147,8 +151,8 @@ function geometryFor(size: InfoBannerSize, shape: InfoBannerShape): Geometry {
   if (size === "small" && shape === "rectangular") {
     return {
       borderRadius: radius["6"],
-      paddingLeft: space["4"],
-      paddingRight: space["6"],
+      paddingStart: space["4"],
+      paddingEnd: space["6"],
       paddingVertical: space["4"],
       gap: space["2"],
       iconSize: 14,
@@ -159,8 +163,8 @@ function geometryFor(size: InfoBannerSize, shape: InfoBannerShape): Geometry {
   if (size === "large" && shape === "rounded") {
     return {
       borderRadius: radius.rounded,
-      paddingLeft: space["8"],
-      paddingRight: space["8"],
+      paddingStart: space["8"],
+      paddingEnd: space["8"],
       paddingVertical: space["8"],
       gap: space["4"],
       iconSize: 18,
@@ -170,8 +174,8 @@ function geometryFor(size: InfoBannerSize, shape: InfoBannerShape): Geometry {
   }
   return {
     borderRadius: radius["6"],
-    paddingLeft: space["6"],
-    paddingRight: space["6"],
+    paddingStart: space["6"],
+    paddingEnd: space["6"],
     paddingVertical: space["6"],
     gap: space["4"],
     iconSize: 18,
@@ -229,8 +233,8 @@ export function InfoBanner({
           alignItems: "center",
           justifyContent: "center",
           borderRadius: geom.borderRadius,
-          paddingLeft: geom.paddingLeft,
-          paddingRight: geom.paddingRight,
+          paddingStart: geom.paddingStart,
+          paddingEnd: geom.paddingEnd,
           paddingVertical: geom.paddingVertical,
           gap: geom.gap,
           overflow: "hidden",

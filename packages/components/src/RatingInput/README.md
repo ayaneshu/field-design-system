@@ -46,7 +46,7 @@ back to zero (no separate clear control).
 | `defaultValue`       | `number`                      | `0`     | Initial value in uncontrolled mode.                         |
 | `onChange`           | `(next: number) => void`      | —       | Fires after a star is tapped.                               |
 | `size`               | `20 \| 28 \| 32`              | `28`    | Star px. 20 inline, 28 default review, 32 large CTA.        |
-| `emojis`             | `boolean`                     | `true`  | Show an emoji at the selected star.                         |
+| `emojis`             | `boolean`                     | `false` | Show an emoji at the selected star.                         |
 | `emoji`              | `string`                      | `"😊"`   | Override the emoji glyph.                                   |
 | `disabled`           | `boolean`                     | `false` | Non-interactive, muted colour.                              |
 | `accessibilityLabel` | `string`                      | —       | Defaults to `"Rating, N out of 5"`.                         |

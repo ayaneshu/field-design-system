@@ -44,6 +44,7 @@ import { RatingInputScreen } from "./src/screens/RatingInputScreen";
 import { SearchBarScreen } from "./src/screens/SearchBarScreen";
 import { SwitchScreen } from "./src/screens/SwitchScreen";
 import { ToggleScreen } from "./src/screens/ToggleScreen";
+import { ToastScreen } from "./src/screens/ToastScreen";
 import { linking } from "./src/navigation/linking";
 import type { RootStackParamList } from "./src/navigation/types";
 import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
@@ -228,6 +229,7 @@ function ThemedNavigationShell() {
         <RootStack.Screen name="SearchBar" component={SearchBarScreen} />
         <RootStack.Screen name="Switch" component={SwitchScreen} />
         <RootStack.Screen name="Toggle" component={ToggleScreen} />
+        <RootStack.Screen name="Toast" component={ToastScreen} />
       </RootStack.Navigator>
     </NavigationContainer>
   );

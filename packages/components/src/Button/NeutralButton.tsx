@@ -1,6 +1,15 @@
+import * as React from "react";
+
 import { colour } from "@field-ds/tokens";
 
-import { RectButton, type RectButtonBaseProps, type RectButtonTone } from "./_RectButton";
+import {
+  RectButton,
+  type RectButtonBaseProps,
+  type RectButtonRef,
+  type RectButtonTone,
+} from "./_RectButton";
+
+export type NeutralButtonRef = RectButtonRef;
 
 // Sizes per Figma `M-NeutralButton` (752:70). Adds H32 — only this family
 // ships the dense toolbar height per the DS.
@@ -35,17 +44,18 @@ export type NeutralButtonProps = RectButtonBaseProps & {
  *   <NeutralButton label="Login" size="H40" />
  *   <NeutralButton label="Compact" size="H32" />
  */
-export function NeutralButton({
-  size = "H56",
-  ...rest
-}: NeutralButtonProps) {
+export const NeutralButton = React.forwardRef<
+  NeutralButtonRef,
+  NeutralButtonProps
+>(function NeutralButton({ size = "H56", ...rest }, ref) {
   return (
     <RectButton
       {...rest}
+      ref={ref}
       size={size}
       tone={TONE}
       variantKey="neutral"
       componentName="NeutralButton"
     />
   );
-}
+});

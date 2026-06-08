@@ -2,7 +2,6 @@ import {
   forwardRef,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useRef,
   useState,
   type ReactNode,
@@ -149,8 +148,15 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
   const [internalValue, setInternalValue] = useState(defaultValue);
   const value = isControlled ? controlledValue : internalValue;
 
-  const innerRef = useRef<TextInput>(null);
-  useImperativeHandle(ref, () => innerRef.current as TextInput);
+  const innerRef = useRef<TextInput | null>(null);
+  const setRef = useCallback(
+    (node: TextInput | null) => {
+      innerRef.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref],
+  );
 
   const [isFocused, setIsFocused] = useState(false);
   const hasError = !!error;
@@ -352,7 +358,7 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
                   style={[
                     styles.inlineFloatLabel,
                     {
-                      fontFamily: "Noontree-Medium",
+                      fontFamily: textStyles.B12_Medium.fontFamily,
                       fontWeight: "500",
                       letterSpacing: -0.1,
                       color: inlineLabelColour,
@@ -374,7 +380,7 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
                 pointerEvents={isFocused || hasValue ? "auto" : "none"}
               >
                 <AnimatedTextInput
-                  ref={innerRef}
+                  ref={setRef}
                   value={value}
                   onChangeText={handleChangeText}
                   onFocus={handleFocus}
@@ -404,7 +410,7 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
             </View>
           ) : (
             <AnimatedTextInput
-              ref={innerRef}
+              ref={setRef}
               value={value}
               onChangeText={handleChangeText}
               onFocus={handleFocus}
@@ -471,7 +477,6 @@ export const InputText = forwardRef<TextInput, InputTextProps>(function InputTex
 const styles = StyleSheet.create({
   root: {
     width: "100%",
-    minWidth: 320,
     gap: HELPER_GAP,
   },
   labelRow: {

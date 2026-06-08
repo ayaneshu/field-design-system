@@ -1,6 +1,15 @@
+import * as React from "react";
+
 import { colour } from "@field-ds/tokens";
 
-import { RectButton, type RectButtonBaseProps, type RectButtonTone } from "./_RectButton";
+import {
+  RectButton,
+  type RectButtonBaseProps,
+  type RectButtonRef,
+  type RectButtonTone,
+} from "./_RectButton";
+
+export type PrimaryButtonRef = RectButtonRef;
 
 // Sizes per Figma `M-PrimaryButton` (596:201). H32 only ships on
 // `NeutralButton`, so it's omitted here.
@@ -28,17 +37,18 @@ export type PrimaryButtonProps = RectButtonBaseProps & {
  *   <PrimaryButton label="Saving" loading />
  *   <PrimaryButton label="Unavailable" disabled />
  */
-export function PrimaryButton({
-  size = "H56",
-  ...rest
-}: PrimaryButtonProps) {
+export const PrimaryButton = React.forwardRef<
+  PrimaryButtonRef,
+  PrimaryButtonProps
+>(function PrimaryButton({ size = "H56", ...rest }, ref) {
   return (
     <RectButton
       {...rest}
+      ref={ref}
       size={size}
       tone={TONE}
       variantKey="primary"
       componentName="PrimaryButton"
     />
   );
-}
+});

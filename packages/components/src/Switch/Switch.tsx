@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ElementRef,
+  type ForwardedRef,
+} from "react";
 import {
   PanResponder,
   Platform,
@@ -17,6 +25,10 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { colour, motion, radius, space, textStyles } from "@field-ds/tokens";
+
+import { SHADOW_TINT } from "../internal/elevation";
+
+export type SwitchRef = ElementRef<typeof View>;
 
 const SPRING_TAB_THUMB = motion.spring.springLight;
 
@@ -69,30 +81,20 @@ export type SwitchProps<T = string> = {
   testID?: string;
 };
 
-/**
- * Switch — pill-shaped segmented control for picking one of 2–4 options.
- *
- *   <Switch
- *     options={[{ value: "off", label: "Off" }, { value: "on", label: "On" }]}
- *     defaultValue="off"
- *     onChange={setMode}
- *   />
- *
- * The active slot is highlighted by a white thumb that moves between
- * positions using **`motion.spring.springLight`** (`withSpring`). Honors
- * `useReducedMotion()` by snapping instead of sliding.
- */
-export function Switch<T = string>({
-  options,
-  value: controlledValue,
-  defaultValue,
-  onChange,
-  size = "H40",
-  disabled = false,
-  accessibilityLabel,
-  style,
-  testID,
-}: SwitchProps<T>) {
+function SwitchInner<T = string>(
+  {
+    options,
+    value: controlledValue,
+    defaultValue,
+    onChange,
+    size = "H40",
+    disabled = false,
+    accessibilityLabel,
+    style,
+    testID,
+  }: SwitchProps<T>,
+  ref: ForwardedRef<SwitchRef>,
+) {
   const isControlled = controlledValue !== undefined;
   const fallback = (defaultValue ?? options[0]?.value) as T;
   const [internal, setInternal] = useState<T>(fallback);
@@ -236,6 +238,7 @@ export function Switch<T = string>({
 
   return (
     <View
+      ref={ref}
       onLayout={onTrackLayout}
       accessibilityRole="tablist"
       accessibilityLabel={accessibilityLabel}
@@ -279,7 +282,7 @@ export function Switch<T = string>({
               width: slotWidth,
               borderRadius: radius.rounded,
               backgroundColor: colour.surface.primary,
-              shadowColor: "#222222",
+              shadowColor: SHADOW_TINT,
               shadowOffset: { width: 0, height: 1 },
               shadowOpacity: 0.06,
               shadowRadius: 3,
@@ -342,3 +345,24 @@ export function Switch<T = string>({
     </View>
   );
 }
+
+/**
+ * Switch — pill-shaped segmented control for picking one of 2–4 options.
+ *
+ *   <Switch
+ *     options={[{ value: "off", label: "Off" }, { value: "on", label: "On" }]}
+ *     defaultValue="off"
+ *     onChange={setMode}
+ *   />
+ *
+ * The active slot is highlighted by a white thumb that moves between positions
+ * using **`motion.spring.springLight`** (`withSpring`). Honors
+ * `useReducedMotion()` by snapping instead of sliding.
+ *
+ * Wrapped in `forwardRef` (ref points at the root container `View`). The cast
+ * preserves the generic `<T>` option type, which a plain `forwardRef` call
+ * would otherwise erase.
+ */
+export const Switch = forwardRef(SwitchInner) as unknown as <T = string>(
+  props: SwitchProps<T> & { ref?: ForwardedRef<SwitchRef> },
+) => ReturnType<typeof SwitchInner>;

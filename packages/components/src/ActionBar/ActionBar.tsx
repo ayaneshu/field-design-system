@@ -42,7 +42,7 @@ export type ActionBarProps = {
   topSlot?: ReactNode;
   /** Leading content for `split` / `leadingTrailing` — rendered to the left of the buttons. */
   leading?: ReactNode;
-  /** Toggle the optional slot for `single` / `stacked` / `split`. `leadingTrailing` always renders the leading slot. Default true. */
+  /** Toggle the optional slot for `single` / `stacked` / `split`. `leadingTrailing` always renders the leading slot. Default false — opt in to show the slot (and its placeholder when no content is supplied). */
   showSlot?: boolean;
 
   /** Primary CTA label (the dominant button — `Primary` or `Neutral` per tone). */
@@ -78,7 +78,7 @@ export function ActionBar({
   tone = "action",
   topSlot,
   leading,
-  showSlot = true,
+  showSlot = false,
   primaryLabel = "Continue",
   onPrimaryPress,
   primaryLoading,

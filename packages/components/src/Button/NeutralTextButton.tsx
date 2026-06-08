@@ -1,4 +1,5 @@
-import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import * as React from "react";
+import { I18nManager, Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { Icon, type IconName } from "@field-ds/icons";
@@ -54,6 +55,8 @@ const FG = colour["text-n-icon"].primary;
 const FG_DISABLED = colour["text-n-icon"].muted;
 const BG_PRESSED = colour.surface.secondary;
 
+export type NeutralTextButtonRef = React.ElementRef<typeof Pressable>;
+
 export type NeutralTextButtonProps = {
   label: string;
   size?: NeutralTextButtonSize;
@@ -75,16 +78,22 @@ export type NeutralTextButtonProps = {
  *   <NeutralTextButton label="Dismiss" />
  *   <NeutralTextButton label="Edit" iconLeft="system-edit" size="A12" />
  */
-export function NeutralTextButton({
-  label,
-  size = "A14",
-  iconLeft,
-  iconRight,
-  disabled = false,
-  onPress,
-  accessibilityLabel,
-  style,
-}: NeutralTextButtonProps) {
+export const NeutralTextButton = React.forwardRef<
+  NeutralTextButtonRef,
+  NeutralTextButtonProps
+>(function NeutralTextButton(
+  {
+    label,
+    size = "A14",
+    iconLeft,
+    iconRight,
+    disabled = false,
+    onPress,
+    accessibilityLabel,
+    style,
+  },
+  ref,
+) {
   const spec = TEXT_SIZE[size];
   const fg = disabled ? FG_DISABLED : FG;
 
@@ -95,6 +104,7 @@ export function NeutralTextButton({
       style={[press.animatedStyle, { alignSelf: "flex-start" }, style]}
     >
     <Pressable
+      ref={ref}
       onPress={disabled ? undefined : onPress}
       onPressIn={press.onPressIn}
       onPressOut={press.onPressOut}
@@ -126,7 +136,10 @@ export function NeutralTextButton({
     >
       <View
         style={{
-          flexDirection: "row",
+          // Logical ordering: under RTL the row reverses so the `iconLeft`
+          // slot lands on the visual start and `iconRight` on the visual
+          // end. Prop names stay stable.
+          flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
           alignItems: "center",
           gap: spec.gap,
         }}
@@ -155,4 +168,4 @@ export function NeutralTextButton({
     </Pressable>
     </Animated.View>
   );
-}
+});

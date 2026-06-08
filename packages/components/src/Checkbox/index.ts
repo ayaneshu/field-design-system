@@ -5,4 +5,5 @@ export {
   CHECKBOX_TICK_DELAY_MS,
   type CheckboxProps,
   type CheckboxSize,
+  type CheckboxRef,
 } from "./Checkbox";

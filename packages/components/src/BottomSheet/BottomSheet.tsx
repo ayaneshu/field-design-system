@@ -17,10 +17,12 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colour, motion, radius, space } from "@field-ds/tokens";
 
 import { ActionBar } from "../ActionBar";
+import { SHADOW_TINT } from "../internal/elevation";
 
 // Figma: M-BottomSheet (3207:15). Floats with 12px horizontal inset, all
 // four corners rounded, grabber + home indicator sit OUTSIDE the sheet
@@ -146,6 +148,16 @@ export function BottomSheet({
   const reducedMotion = useReducedMotion();
   const progress = useSharedValue(0);
   const { height: screenH } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+
+  // Drive the home-indicator chrome off the real bottom safe-area inset so it
+  // clears the device home indicator / gesture bar on notched + gesture-nav
+  // devices. Fall back to the fixed block height when there's no inset (older
+  // devices, web, contained previews).
+  const homeIndicatorBlockH =
+    insets.bottom > 0
+      ? space["20"] + HOME_INDICATOR_H + insets.bottom
+      : HOME_INDICATOR_BLOCK_H;
 
   const [containerH, setContainerH] = useState(screenH);
   const slideDistance = presentation === "inline" ? containerH : screenH;
@@ -316,7 +328,7 @@ export function BottomSheet({
             right: 0,
             // Anchored above the home-indicator chrome so the indicator
             // stays put when the sheet slides / drags.
-            bottom: HOME_INDICATOR_BLOCK_H,
+            bottom: homeIndicatorBlockH,
             alignItems: "center",
           },
           sheetStyle,
@@ -360,7 +372,7 @@ export function BottomSheet({
               maxHeight: SHEET_MAX_HEIGHT,
               backgroundColor: colour.surface.primary,
               borderRadius: radius["16"],
-              shadowColor: "#000000",
+              shadowColor: SHADOW_TINT,
               shadowOffset: { width: 0, height: -2 },
               shadowOpacity: 0.12,
               shadowRadius: 16,
@@ -412,7 +424,7 @@ export function BottomSheet({
           left: 0,
           right: 0,
           bottom: 0,
-          height: HOME_INDICATOR_BLOCK_H,
+          height: homeIndicatorBlockH,
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -441,6 +453,7 @@ export function BottomSheet({
       transparent
       animationType="none"
       onRequestClose={onClose}
+      accessibilityViewIsModal
       accessibilityLabel={accessibilityLabel}
     >
       {content}

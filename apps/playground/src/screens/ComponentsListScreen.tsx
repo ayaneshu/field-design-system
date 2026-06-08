@@ -119,6 +119,11 @@ const COMPONENTS: ComponentEntry[] = [
     illustration: NeutralTextButtonIllustration,
   },
   {
+    route: "Toast",
+    name: "Toast",
+    illustration: ToastIllustration,
+  },
+  {
     route: "Toggle",
     name: "Toggle",
     illustration: ToggleIllustration,
@@ -1778,6 +1783,85 @@ function InfoBannerIllustration({ tone }: { tone: string }) {
               <LabelBar width={52} alpha={1} tone={tone} height={STROKE} />
             </View>
           </View>
+        </View>
+      </View>
+    </IlloFrame>
+  );
+}
+
+function ToastIllustration({ tone }: { tone: string }) {
+  // A toast card with a second card peeking out behind it (the stacked /
+  // queued presentation). Front card carries a leading asset dot, a title +
+  // subtitle-with-chevron, and a trailing action chip — the full M-Toast
+  // anatomy. The peeking back card is the designer's note that lifts this
+  // above a generic single card and signals "2+ queued".
+  const ToastCard = ({ width }: { width: number }) => (
+    <View
+      style={{
+        width,
+        flexDirection: "row",
+        alignItems: "center",
+        borderWidth: STROKE,
+        borderColor: tone,
+        borderRadius: radius["12"],
+        backgroundColor: tone,
+        paddingLeft: 8,
+        paddingRight: 6,
+        paddingVertical: 8,
+        gap: 8,
+      }}
+    >
+      {/* Leading asset */}
+      <View
+        style={{
+          width: 18,
+          height: 18,
+          borderRadius: 9999,
+          backgroundColor: tone,
+          opacity: 0.45,
+        }}
+      />
+      {/* Title + subtitle */}
+      <View style={{ flex: 1, gap: 4 }}>
+        <View style={{ width: 56, height: STROKE + 1, borderRadius: 1, backgroundColor: tone, opacity: 0.85 }} />
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+          <View style={{ width: 38, height: STROKE, borderRadius: 1, backgroundColor: tone, opacity: 0.45 }} />
+          <View
+            style={{
+              width: 0,
+              height: 0,
+              borderTopWidth: 3,
+              borderBottomWidth: 3,
+              borderLeftWidth: 4,
+              borderTopColor: "transparent",
+              borderBottomColor: "transparent",
+              borderLeftColor: tone,
+              opacity: 0.45,
+            }}
+          />
+        </View>
+      </View>
+      {/* Action chip */}
+      <View
+        style={{
+          width: 30,
+          height: 18,
+          borderRadius: 5,
+          borderWidth: STROKE,
+          borderColor: tone,
+          opacity: 0.55,
+        }}
+      />
+    </View>
+  );
+  return (
+    <IlloFrame>
+      <View style={{ alignItems: "center" }}>
+        {/* Back (peeking) card — narrower, behind the front card */}
+        <ToastCard width={148} />
+        {/* Front card — overlaps the back card, leaving a thin peek above */}
+        <View style={{ marginTop: -22 }}>
+          <ToastCard width={168} />
         </View>
       </View>
     </IlloFrame>

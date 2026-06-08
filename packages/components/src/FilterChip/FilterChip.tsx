@@ -40,8 +40,11 @@ const SHAPE_EASING = Easing.bezier(SE[0], SE[1], SE[2], SE[3]);
 export const FILTER_CHIP_TRANSITION_MS = motion.duration.xl;
 /** Easing token reference for the chip resize + cross slide-in. */
 export const FILTER_CHIP_SHAPE_EASING_TOKEN = "motion.easing.easeInOut" as const;
-/** Reserved max width for the count text when fully expanded. */
-export const FILTER_CHIP_COUNT_MAX_W = 40;
+/** Max width the count text can reveal to when fully expanded. Generous
+ *  ceiling (not a hard content clamp) so the open/close width morph has a
+ *  value to animate toward while still leaving room for long counts like
+ *  "(120)" without clipping them under `overflow:"hidden"`. */
+export const FILTER_CHIP_COUNT_MAX_W = 160;
 /** Reserved width for the divider + clear-cross zone when fully expanded. */
 export const FILTER_CHIP_CLEAR_ZONE_W = 40;
 /** Offset from which the cross icon slides in (px, leftward). */
@@ -261,7 +264,7 @@ export function FilterChip({
         accessibilityLabel={accessibilityLabel ?? label}
         // @ts-expect-error — dataSet on Pressable on web
         dataSet={{ component: "FilterChip", content, state: stateName }}
-        style={({ pressed }) => [
+        style={[
           {
             alignSelf: "flex-start",
           },

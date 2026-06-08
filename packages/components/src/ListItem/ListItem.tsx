@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import {
+  I18nManager,
   Pressable,
   Text,
   View,
@@ -171,7 +172,14 @@ export function ListItem({
         <View
           // @ts-expect-error — dataSet on web
           dataSet={{ slot: "trailing" }}
-          style={{ flexShrink: 0, alignItems: "flex-end" }}
+          style={[
+            { flexShrink: 0, alignItems: "flex-end" },
+            // Mirror the trailing affordance under RTL so a disclosure
+            // chevron/arrow points toward the (now-flipped) leading edge.
+            // The leading/trailing columns themselves already swap sides via
+            // the row's auto-mirrored flexDirection.
+            I18nManager.isRTL && { transform: [{ scaleX: -1 }] },
+          ]}
         >
           {trailing}
         </View>
