@@ -1,6 +1,15 @@
+import * as React from "react";
+
 import { colour } from "@field-ds/tokens";
 
-import { RectButton, type RectButtonBaseProps, type RectButtonTone } from "./_RectButton";
+import {
+  RectButton,
+  type RectButtonBaseProps,
+  type RectButtonRef,
+  type RectButtonTone,
+} from "./_RectButton";
+
+export type SecondaryNeutralButtonRef = RectButtonRef;
 
 // Sizes per Figma `M-SecondaryNeutralButton` (944:12577).
 export type SecondaryNeutralButtonSize =
@@ -37,17 +46,18 @@ export type SecondaryNeutralButtonProps = RectButtonBaseProps & {
  *   <SecondaryNeutralButton label="Skip" />
  *   <SecondaryNeutralButton label="Manage" iconLeft="system-edit" />
  */
-export function SecondaryNeutralButton({
-  size = "H56",
-  ...rest
-}: SecondaryNeutralButtonProps) {
+export const SecondaryNeutralButton = React.forwardRef<
+  SecondaryNeutralButtonRef,
+  SecondaryNeutralButtonProps
+>(function SecondaryNeutralButton({ size = "H56", ...rest }, ref) {
   return (
     <RectButton
       {...rest}
+      ref={ref}
       size={size}
       tone={TONE}
       variantKey="secondary-neutral"
       componentName="SecondaryNeutralButton"
     />
   );
-}
+});

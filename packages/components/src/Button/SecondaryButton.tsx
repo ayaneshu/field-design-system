@@ -1,6 +1,15 @@
+import * as React from "react";
+
 import { colour } from "@field-ds/tokens";
 
-import { RectButton, type RectButtonBaseProps, type RectButtonTone } from "./_RectButton";
+import {
+  RectButton,
+  type RectButtonBaseProps,
+  type RectButtonRef,
+  type RectButtonTone,
+} from "./_RectButton";
+
+export type SecondaryButtonRef = RectButtonRef;
 
 // Sizes per Figma `M-SecondaryButton` (610:188).
 export type SecondaryButtonSize = "H56" | "H52" | "H48" | "H40" | "H36";
@@ -29,17 +38,18 @@ export type SecondaryButtonProps = RectButtonBaseProps & {
  *   <SecondaryButton label="Cancel" />
  *   <SecondaryButton label="Edit" iconLeft="system-edit" />
  */
-export function SecondaryButton({
-  size = "H56",
-  ...rest
-}: SecondaryButtonProps) {
+export const SecondaryButton = React.forwardRef<
+  SecondaryButtonRef,
+  SecondaryButtonProps
+>(function SecondaryButton({ size = "H56", ...rest }, ref) {
   return (
     <RectButton
       {...rest}
+      ref={ref}
       size={size}
       tone={TONE}
       variantKey="secondary"
       componentName="SecondaryButton"
     />
   );
-}
+});

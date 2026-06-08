@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
+import type { ElementRef } from "react";
 import { Pressable, type StyleProp, type ViewStyle } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedProps,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
@@ -36,6 +38,8 @@ export type RadioSize = keyof typeof SIZE_PX;
 const CHECK_STROKE_D = "M 8 12 L 10.5 14.5 L 16 9.5";
 const CHECK_PATH_LENGTH = 11;
 
+export type RadioRef = ElementRef<typeof Pressable>;
+
 export type RadioProps = {
   /** Controlled selected state. Omit to use uncontrolled mode with `defaultSelected`. */
   selected?: boolean;
@@ -59,15 +63,18 @@ export type RadioProps = {
  * fades out, the filled disc fades in (no scale), and the tick is drawn on
  * top via a trim-path animation after a `motion.delay.beat` pause.
  */
-export function Radio({
-  selected: controlledSelected,
-  defaultSelected = false,
-  onChange,
-  size = "H24",
-  disabled = false,
-  accessibilityLabel,
-  style,
-}: RadioProps) {
+export const Radio = forwardRef<RadioRef, RadioProps>(function Radio(
+  {
+    selected: controlledSelected,
+    defaultSelected = false,
+    onChange,
+    size = "H24",
+    disabled = false,
+    accessibilityLabel,
+    style,
+  },
+  ref,
+) {
   const isControlled = controlledSelected !== undefined;
   const [internalSelected, setInternalSelected] = useState(defaultSelected);
   const selected = isControlled ? controlledSelected : internalSelected;
@@ -76,15 +83,22 @@ export function Radio({
 
   // 0 = unselected, 1 = selected.
   const progress = useSharedValue(selected ? 1 : 0);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    progress.value = withTiming(selected ? 1 : 0, {
+    const target = selected ? 1 : 0;
+    if (reducedMotion) {
+      // Snap to the end-state — no select/tick draw animation.
+      progress.value = target;
+      return;
+    }
+    progress.value = withTiming(target, {
       duration: selected
         ? motion.duration.emphasized
         : motion.duration.recede,
       easing: fieldEasingStandard,
     });
-  }, [selected, progress]);
+  }, [selected, reducedMotion, progress]);
 
   // Fraction of the check-in driver that the tick waits before it starts
   // drawing — token-driven (`motion.delay.beat / motion.duration.emphasized`).
@@ -129,12 +143,16 @@ export function Radio({
 
   return (
     <Pressable
+      ref={ref}
       onPress={select}
       disabled={disabled}
       accessibilityRole="radio"
       accessibilityState={{ selected, disabled }}
       accessibilityLabel={accessibilityLabel}
-      hitSlop={size === "H16" ? 8 : 4}
+      // hitSlop sized from the disc so the effective touch target reaches
+      // ~44px on each axis: H16 → 16+14*2=44, H20 → 20+12*2=44. Visual disc
+      // size is unchanged.
+      hitSlop={size === "H16" ? 14 : size === "H20" ? 12 : 4}
       // @ts-expect-error — dataSet on Pressable on web
       dataSet={{
         component: "Radio",
@@ -223,4 +241,4 @@ export function Radio({
       </Animated.View>
     </Pressable>
   );
-}
+});

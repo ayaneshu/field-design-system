@@ -15,8 +15,14 @@ export {
   type SwitchProps,
   type SwitchSize,
   type SwitchOption,
+  type SwitchRef,
 } from "./Switch";
-export { Toggle, type ToggleProps, type ToggleSize } from "./Toggle";
+export {
+  Toggle,
+  type ToggleProps,
+  type ToggleSize,
+  type ToggleRef,
+} from "./Toggle";
 export {
   Toast,
   type ToastProps,
@@ -31,6 +37,7 @@ export {
   CHECKBOX_TICK_DELAY_MS,
   type CheckboxProps,
   type CheckboxSize,
+  type CheckboxRef,
 } from "./Checkbox";
 export {
   Radio,
@@ -39,6 +46,7 @@ export {
   RADIO_TICK_DELAY_MS,
   type RadioProps,
   type RadioSize,
+  type RadioRef,
 } from "./Radio";
 export {
   FilterChip,
@@ -62,6 +70,7 @@ export {
   type DividerProps,
   type DividerStyle,
   type DividerEmphasis,
+  type DividerRef,
 } from "./Divider";
 export {
   BottomNav,
@@ -127,6 +136,14 @@ export {
   type TextButtonSize,
   type NeutralTextButtonProps,
   type NeutralTextButtonSize,
+  type PrimaryButtonRef,
+  type SecondaryButtonRef,
+  type SecondaryNeutralButtonRef,
+  type NeutralButtonRef,
+  type IconButtonRef,
+  type RoundButtonRef,
+  type TextButtonRef,
+  type NeutralTextButtonRef,
   BUTTON_PRESS_SCALE,
   LOADING_FADE_DURATION_MS,
 } from "./Button";

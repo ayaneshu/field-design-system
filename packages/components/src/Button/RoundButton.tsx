@@ -1,4 +1,5 @@
-import { ActivityIndicator, Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import * as React from "react";
+import { ActivityIndicator, I18nManager, Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { Icon, type IconName } from "@field-ds/icons";
@@ -48,6 +49,8 @@ const ROUND_SIZE: Record<RoundButtonSize, RoundSpec> = {
   },
 };
 
+export type RoundButtonRef = React.ElementRef<typeof Pressable>;
+
 export type RoundButtonProps = {
   label: string;
   size?: RoundButtonSize;
@@ -70,18 +73,22 @@ export type RoundButtonProps = {
  *   <RoundButton label="Filter" iconLeft="system-plus" />
  *   <RoundButton label="Save" loading />
  */
-export function RoundButton({
-  label,
-  size = "H40",
-  iconLeft,
-  iconRight,
-  loading = false,
-  disabled = false,
-  fullWidth = false,
-  onPress,
-  accessibilityLabel,
-  style,
-}: RoundButtonProps) {
+export const RoundButton = React.forwardRef<RoundButtonRef, RoundButtonProps>(
+  function RoundButton(
+    {
+      label,
+      size = "H40",
+      iconLeft,
+      iconRight,
+      loading = false,
+      disabled = false,
+      fullWidth = false,
+      onPress,
+      accessibilityLabel,
+      style,
+    },
+    ref,
+  ) {
   const spec = ROUND_SIZE[size];
   const isInert = disabled || loading;
   const tokenTextStyle =
@@ -100,6 +107,7 @@ export function RoundButton({
       ]}
     >
     <Pressable
+      ref={ref}
       onPress={isInert ? undefined : onPress}
       onPressIn={press.onPressIn}
       onPressOut={press.onPressOut}
@@ -149,7 +157,10 @@ export function RoundButton({
             <View
               aria-hidden={loading || undefined}
               style={{
-                flexDirection: "row",
+                // Logical ordering: under RTL the row reverses so the
+                // `iconLeft` slot lands on the visual start and `iconRight`
+                // on the visual end. Prop names stay stable.
+                flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
                 alignItems: "center",
                 gap: spec.gap,
                 opacity: loading ? 0 : 1,
@@ -210,4 +221,5 @@ export function RoundButton({
     </Pressable>
     </Animated.View>
   );
-}
+  },
+);

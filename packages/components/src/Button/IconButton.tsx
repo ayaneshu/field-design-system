@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Pressable, type StyleProp, type ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -74,6 +75,8 @@ const SIZE: Record<IconButtonSize, IconBoxSpec> = {
   H36: { size: 36, iconSize: 20, padding: space["8"] },
 };
 
+export type IconButtonRef = React.ElementRef<typeof Pressable>;
+
 export type IconButtonProps = {
   /** Required — icon-only buttons have no visible label. */
   icon: IconName;
@@ -98,15 +101,19 @@ export type IconButtonProps = {
  *   <IconButton icon="system-plus" emphasis="action" accessibilityLabel="Add" />
  */
 
-export function IconButton({
-  icon,
-  size = "H40",
-  emphasis = "default",
-  disabled = false,
-  onPress,
-  accessibilityLabel,
-  style,
-}: IconButtonProps) {
+export const IconButton = React.forwardRef<IconButtonRef, IconButtonProps>(
+  function IconButton(
+    {
+      icon,
+      size = "H40",
+      emphasis = "default",
+      disabled = false,
+      onPress,
+      accessibilityLabel,
+      style,
+    },
+    ref,
+  ) {
   const box = SIZE[size];
   const e = EMPHASIS[emphasis];
   const fg = disabled ? e.fgDisabled : e.fg;
@@ -116,6 +123,7 @@ export function IconButton({
   return (
     <Animated.View style={[press.animatedStyle, style]}>
       <Pressable
+        ref={ref}
         onPress={disabled ? undefined : onPress}
         onPressIn={press.onPressIn}
         onPressOut={press.onPressOut}
@@ -155,4 +163,5 @@ export function IconButton({
       </Pressable>
     </Animated.View>
   );
-}
+  },
+);

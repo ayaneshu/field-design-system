@@ -2,6 +2,41 @@
 
 React Native components for the Field Design System.
 
+## Installation & setup (consuming app)
+
+```sh
+pnpm add @field-ds/components @field-ds/tokens @field-ds/icons
+```
+
+Install the peer dependencies the components rely on:
+
+```sh
+pnpm add react-native-reanimated react-native-svg react-native-safe-area-context
+```
+
+Then wire up the standard RN setup in the **consuming app** (not shipped by this
+package):
+
+1. **Reanimated Babel plugin** — add `react-native-reanimated/plugin` as the
+   **last** plugin in the app's `babel.config.js`. The components use Reanimated
+   worklets; without the plugin their animations won't run.
+2. **Gesture/safe-area providers** — wrap the app in
+   `GestureHandlerRootView` (if you use gesture-driven screens) and
+   `SafeAreaProvider` from `react-native-safe-area-context` (used by
+   `BottomSheet`).
+3. **Fonts** — load the `Noontree-*` font family (Regular / Medium / SemiBold /
+   Bold) the text styles reference, e.g. via `expo-font` or
+   `react-native.config.js` asset linking.
+
+### Packaging
+
+The package ships compiled output: `main`/`module` → `lib/commonjs` /
+`lib/module`, types → `lib/typescript`, built with
+[`react-native-builder-bob`](https://github.com/callstack/react-native-builder-bob)
+(`pnpm --filter @field-ds/components build`). In this monorepo, Metro resolves
+the `source` / `react-native` field straight to `src/` so the playground and
+Storybook always run against source.
+
 ## Layout
 
 Each component lives in its own folder under `src/`:

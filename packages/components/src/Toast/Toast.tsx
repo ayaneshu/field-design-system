@@ -30,6 +30,8 @@ import Animated, {
 import { Icon, type IconName } from "@field-ds/icons";
 import { base, colour, motion, radius, space, textStyles } from "@field-ds/tokens";
 
+import { SHADOW_TINT } from "../internal/elevation";
+
 // Figma: M-Toast (4227:76702) + M-Stacked Toast (4229:76747) +
 // M-Toast/ActionContainer (4227:76655).
 //
@@ -113,8 +115,7 @@ type Palette = {
  *  treatment; dark/error/success → white-overlay treatment. */
 type ActionTone = "dark" | "light";
 
-// Figma drop shadow 0 12 14 rgba(11,12,14,0.1) — shadow tint is not tokenised.
-const SHADOW_COLOR = "#0b0c0e";
+// Figma drop shadow 0 12 14 rgba(11,12,14,0.1); tint via the shared token.
 
 const PALETTES: Record<ToastType, Palette> = {
   dark: {
@@ -190,7 +191,7 @@ const EASE_ACCELERATE = Easing.bezier(
 const TOAST_SHADOW = Platform.select<ViewStyle>({
   android: { elevation: 8 },
   default: {
-    shadowColor: SHADOW_COLOR,
+    shadowColor: SHADOW_TINT,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.1,
     shadowRadius: 14,

@@ -9,6 +9,7 @@ import {
 import Animated, {
   interpolate,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
@@ -188,13 +189,19 @@ function BottomNavItem({
   // Selection driver: 0 = inactive, 1 = active. Drives the highlight scale-in,
   // a subtle icon "pop", and label fade — same curve as motion.easing.standard
   // as Accordion + Checkbox.
+  const reducedMotion = useReducedMotion();
   const progress = useSharedValue(active ? 1 : 0);
   useEffect(() => {
+    if (reducedMotion) {
+      // Snap to the end state — no highlight scale-in or icon pop.
+      progress.value = active ? 1 : 0;
+      return;
+    }
     progress.value = withTiming(active ? 1 : 0, {
       duration: motion.duration.lg,
       easing: fieldEasingStandard,
     });
-  }, [active, progress]);
+  }, [active, progress, reducedMotion]);
 
   // Explicit dep array — Reanimated requires it on web without the Babel plugin.
   const highlightStyle = useAnimatedStyle(() => ({

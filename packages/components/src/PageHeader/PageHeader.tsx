@@ -1,12 +1,12 @@
 import { type ReactNode } from "react";
 import {
+  I18nManager,
   Image,
   type ImageSourcePropType,
   Pressable,
   type StyleProp,
   StyleSheet,
   Text,
-  TextInput,
   View,
   type ViewStyle,
 } from "react-native";
@@ -15,6 +15,7 @@ import { Icon, type IconName } from "@field-ds/icons";
 import { colour, radius, space, textStyles } from "@field-ds/tokens";
 
 import { IconButton } from "../Button/IconButton";
+import { SearchBar } from "../SearchBar";
 
 // Maps to Figma M-PageHeader (1753:285). Single component set with nine layout
 // types — one component, nine `type` values, each owning the slots that make
@@ -28,10 +29,10 @@ import { IconButton } from "../Button/IconButton";
 //   • Up to 3 trailing icons; anything past 3 is sliced with a dev warning.
 //   • search-bar / search-pill[-wide] don't take a leadingIcon-only override —
 //     the surface is the search affordance itself.
-//   • M-SearchBar and M-SearchPill aren't in the repo yet; the search-bar /
-//     search-pill / search-pill-wide variants render inline approximations
-//     using the same tokens. Swap to the real primitives when they land
-//     without changing this component's API.
+//   • search-bar composes the real M-SearchBar primitive. M-SearchPill isn't
+//     in the repo yet; the search-pill / search-pill-wide variants render
+//     inline approximations using the same tokens. Swap to the real pill
+//     primitive when it lands without changing this component's API.
 export type PageHeaderType =
   | "title"
   | "title-center"
@@ -97,7 +98,6 @@ const IMAGE_SIZE = 38;
 const HEADER_HEIGHT = space["56"];
 const SEARCH_BAR_HEIGHT = space["64"];
 const SEARCH_PILL_HEIGHT = space["40"];
-const SEARCH_FIELD_HEIGHT = space["48"];
 
 /**
  * M-PageHeader — top-of-screen header. Pick a `type` to switch layout:
@@ -165,6 +165,15 @@ function clampTrailing(t: PageHeaderTrailing[] | undefined): PageHeaderTrailing[
 
 // ─── shared bits ────────────────────────────────────────────────────────────
 
+// Directional back/forward glyphs that must mirror under RTL. Symmetric
+// glyphs (menu, close, etc.) passed via leadingIcon are left untouched.
+const DIRECTIONAL_LEADING_ICONS = new Set<IconName>([
+  "system-chevron-left",
+  "system-chevron-right",
+  "system-arrow-left",
+  "system-arrow-right",
+]);
+
 function Leading({
   icon = "system-chevron-left",
   onPress,
@@ -176,12 +185,14 @@ function Leading({
   label?: string;
   emphasis?: "default" | "ghost";
 }) {
+  const flip = I18nManager.isRTL && DIRECTIONAL_LEADING_ICONS.has(icon);
   return (
     <IconButton
       icon={icon}
       emphasis={emphasis}
       onPress={onPress}
       accessibilityLabel={label}
+      style={flip ? styles.rtlFlip : undefined}
     />
   );
 }
@@ -247,23 +258,18 @@ function SearchBarBody({
   searchValue,
   onSearchChangeText,
 }: PageHeaderProps) {
+  // Compose the real M-SearchBar. PageHeader's search props map onto
+  // SearchBar 1:1: searchValue→value (controlled), onSearchChangeText→
+  // onChangeText, searchPlaceholder→placeholder. SearchBar derives its
+  // visual state from focus+value internally, so nothing else is wired.
   return (
     <View style={[styles.row, styles.gapZero]}>
-      <View style={styles.searchField}>
-        <Icon
-          name="system-search"
-          size={ICON_SIZE}
-          color={colour["text-n-icon"].secondary}
-        />
-        <TextInput
-          value={searchValue}
-          onChangeText={onSearchChangeText}
-          placeholder={searchPlaceholder}
-          placeholderTextColor={colour["text-n-icon"].secondary}
-          style={styles.searchInput}
-          accessibilityLabel={searchPlaceholder}
-        />
-      </View>
+      <SearchBar
+        value={searchValue}
+        onChangeText={onSearchChangeText}
+        placeholder={searchPlaceholder}
+        style={styles.searchBar}
+      />
     </View>
   );
 }
@@ -320,7 +326,6 @@ function LocationBody({
   leadingAccessibilityLabel,
   trailing,
 }: PageHeaderProps & { trailing: PageHeaderTrailing[] }) {
-  const single = trailing[0];
   return (
     <View style={[styles.row, styles.gapDefault]}>
       <Leading
@@ -349,13 +354,7 @@ function LocationBody({
           </Text>
         ) : null}
       </View>
-      {single ? (
-        <IconButton
-          icon={single.icon}
-          onPress={single.onPress}
-          accessibilityLabel={single.accessibilityLabel}
-        />
-      ) : null}
+      <TrailingRow trailing={trailing} />
     </View>
   );
 }
@@ -367,7 +366,6 @@ function BreadcrumbBody({
   onAddressPress,
   trailing,
 }: PageHeaderProps & { trailing: PageHeaderTrailing[] }) {
-  const single = trailing[0];
   return (
     <View style={[styles.row, styles.gapDefault]}>
       <Pressable
@@ -389,13 +387,7 @@ function BreadcrumbBody({
           color={colour["text-n-icon"].primary}
         />
       </Pressable>
-      {single ? (
-        <IconButton
-          icon={single.icon}
-          onPress={single.onPress}
-          accessibilityLabel={single.accessibilityLabel}
-        />
-      ) : null}
+      <TrailingRow trailing={trailing} />
     </View>
   );
 }
@@ -457,6 +449,7 @@ const styles = StyleSheet.create({
   gapTitle: { gap: space["4"] },
   gapZero: { gap: 0 },
   spaceBetween: { justifyContent: "space-between" },
+  rtlFlip: { transform: [{ scaleX: -1 }] },
 
   image: {
     width: IMAGE_SIZE,
@@ -492,22 +485,11 @@ const styles = StyleSheet.create({
     gap: space["4"],
   },
 
-  // Search bar (search-bar)
-  searchField: {
+  // Search bar (search-bar) — the real M-SearchBar stretched to fill the row.
+  // Override SearchBar's H48 minWidth (320) so it flexes inside the header.
+  searchBar: {
     flex: 1,
-    height: SEARCH_FIELD_HEIGHT,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space["8"],
-    paddingHorizontal: space["12"],
-    backgroundColor: colour.surface.tertiary,
-    borderRadius: radius["12"],
-  },
-  searchInput: {
-    flex: 1,
-    ...textStyles.B14_Regular,
-    color: colour["text-n-icon"].primary,
-    padding: 0,
+    minWidth: 0,
   },
 
   // Search pill (search-pill / search-pill-wide)

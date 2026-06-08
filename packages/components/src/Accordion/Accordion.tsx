@@ -10,6 +10,7 @@ import {
 import Animated, {
   interpolate,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
@@ -73,6 +74,7 @@ export function Accordion({
   const isControlled = controlledExpanded !== undefined;
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
   const expanded = isControlled ? controlledExpanded : internalExpanded;
+  const reducedMotion = useReducedMotion();
 
   // Intrinsic body height (incl. the hairline gap above it). null until measured.
   const [bodyHeight, setBodyHeight] = useState<number | null>(null);
@@ -81,13 +83,18 @@ export function Accordion({
   const progress = useSharedValue(defaultExpanded ? 1 : 0);
 
   useEffect(() => {
+    if (reducedMotion) {
+      // Snap straight to the end state — no height/chevron animation.
+      progress.value = expanded ? 1 : 0;
+      return;
+    }
     progress.value = withTiming(expanded ? 1 : 0, {
       duration: expanded
         ? motion.duration.xl
         : motion.duration.lg,
       easing: fieldEasingStandard,
     });
-  }, [expanded, progress]);
+  }, [expanded, progress, reducedMotion]);
 
   const onMeasureBody = (e: LayoutChangeEvent) => {
     const h = e.nativeEvent.layout.height;

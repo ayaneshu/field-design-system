@@ -5,4 +5,5 @@ export {
   RADIO_TICK_DELAY_MS,
   type RadioProps,
   type RadioSize,
+  type RadioRef,
 } from "./Radio";

@@ -1,5 +1,7 @@
+import * as React from "react";
 import {
   ActivityIndicator,
+  I18nManager,
   Pressable,
   Text,
   View,
@@ -78,21 +80,26 @@ type Props = RectButtonBaseProps & {
  * package — callers use the dedicated public components so each family's
  * size + tone are narrowly typed.
  */
-export function RectButton({
-  label,
-  size,
-  tone,
-  variantKey,
-  componentName,
-  iconLeft,
-  iconRight,
-  loading = false,
-  disabled = false,
-  fullWidth = false,
-  onPress,
-  accessibilityLabel,
-  style,
-}: Props) {
+export type RectButtonRef = React.ElementRef<typeof Pressable>;
+
+export const RectButton = React.forwardRef<RectButtonRef, Props>(function RectButton(
+  {
+    label,
+    size,
+    tone,
+    variantKey,
+    componentName,
+    iconLeft,
+    iconRight,
+    loading = false,
+    disabled = false,
+    fullWidth = false,
+    onPress,
+    accessibilityLabel,
+    style,
+  },
+  ref,
+) {
   const spec = getButtonSpec(variantKey, size);
   const isInert = disabled || loading;
 
@@ -108,6 +115,7 @@ export function RectButton({
       ]}
     >
       <Pressable
+        ref={ref}
         onPress={isInert ? undefined : onPress}
         onPressIn={press.onPressIn}
         onPressOut={press.onPressOut}
@@ -170,7 +178,10 @@ export function RectButton({
                 aria-hidden={loading || undefined}
                 style={[
                   {
-                    flexDirection: "row",
+                    // Logical ordering: under RTL the row reverses so the
+                    // `iconLeft` slot lands on the visual start and
+                    // `iconRight` on the visual end. Prop names stay stable.
+                    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
                     alignItems: "center",
                     gap: spec.gap,
                   },
@@ -237,4 +248,4 @@ export function RectButton({
       </Pressable>
     </Animated.View>
   );
-}
+});

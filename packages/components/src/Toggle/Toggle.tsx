@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState, type ElementRef } from "react";
 import {
   I18nManager,
   Pressable,
@@ -17,10 +17,17 @@ import Animated, {
 
 import { colour, motion, radius, space } from "@field-ds/tokens";
 
+import { SHADOW_TINT } from "../internal/elevation";
+
+export type ToggleRef = ElementRef<typeof Pressable>;
+
 // Figma: M-Toggle — binary on/off thumb-slide.
 //   H16 compact · H20 standard · H24 prominent.
 // Pair with a visible label; the component renders no text of its own.
 
+// `trackW` / `trackH` are intentional fixed pixel dimensions straight from the
+// Field DS spec — these are the canonical track footprints per size and are not
+// derived from the spacing scale, so the raw numbers here are by design.
 const SIZE_CFG = {
   H16: { trackW: 28, trackH: 16, thumb: space["12"], shadowRadius: 3.84 },
   H20: { trackW: 34, trackH: 20, thumb: space["16"], shadowRadius: 4.8 },
@@ -61,17 +68,20 @@ export type ToggleProps = {
  * whole track scales down to `TRACK_PRESS_SCALE` while held. Honours
  * `useReducedMotion()` by snapping instead of animating.
  */
-export function Toggle({
-  on: controlledOn,
-  defaultOn = false,
-  onChange,
-  size = "H20",
-  disabled = false,
-  accessibilityLabel,
-  accessibilityHint,
-  style,
-  testID,
-}: ToggleProps) {
+export const Toggle = forwardRef<ToggleRef, ToggleProps>(function Toggle(
+  {
+    on: controlledOn,
+    defaultOn = false,
+    onChange,
+    size = "H20",
+    disabled = false,
+    accessibilityLabel,
+    accessibilityHint,
+    style,
+    testID,
+  },
+  ref,
+) {
   const isControlled = controlledOn !== undefined;
   const [internal, setInternal] = useState<boolean>(defaultOn);
   const value = isControlled ? controlledOn : internal;
@@ -158,6 +168,7 @@ export function Toggle({
 
   return (
     <Pressable
+      ref={ref}
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
@@ -188,8 +199,7 @@ export function Toggle({
               height: cfg.thumb,
               borderRadius: radius.rounded,
               backgroundColor: thumbColor,
-              // Figma source: ⚠️ Alpha/grey/300 — not yet a published semantic token.
-              shadowColor: "#0e0e0e",
+              shadowColor: SHADOW_TINT,
               shadowOffset: { width: 0, height: 0 },
               shadowOpacity: 0.07,
               shadowRadius: cfg.shadowRadius,
@@ -201,4 +211,4 @@ export function Toggle({
       </Animated.View>
     </Pressable>
   );
-}
+});

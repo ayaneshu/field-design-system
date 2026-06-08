@@ -68,7 +68,7 @@ export type RatingInputProps = {
   defaultValue?: number;
   onChange?: (next: number) => void;
   size?: RatingInputSize;
-  /** Show an emoji at the selected star. Default true. */
+  /** Show an emoji at the selected star. Default false. */
   emojis?: boolean;
   /** Override the emoji glyph rendered at the selected star. Default `"😊"`. */
   emoji?: string;
@@ -124,6 +124,9 @@ export function RatingInput({
     <View
       accessibilityRole="radiogroup"
       accessibilityLabel={accessibilityLabel ?? `Rating, ${value} out of 5`}
+      accessibilityHint={
+        disabled ? undefined : "Tap a star to rate. Tap the current rating again to clear it."
+      }
       accessibilityState={{ disabled }}
       // @ts-expect-error — dataSet on View on web
       dataSet={{ component: "RatingInput", size, emojis: emojis ? "yes" : "no" }}

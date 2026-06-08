@@ -31,3 +31,6 @@ pnpm-debug.log*
 # coverage
 coverage/
 .vercel
+
+# Package build output (bob)
+packages/*/lib/
