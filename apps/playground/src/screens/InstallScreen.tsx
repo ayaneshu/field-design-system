@@ -364,7 +364,7 @@ function CodeSurface({
       >
         <Icon
           name={copied ? "system-check-circle-filled" : "system-copy"}
-          size={14}
+          size={24}
           color={copied ? colour["text-n-icon"].success : colour["text-n-icon"].secondary}
         />
         <Text
