@@ -348,11 +348,9 @@ function CodeSurface({
         accessibilityLabel={copied ? "Copied" : "Copy to clipboard"}
         onPress={onCopy}
         style={({ pressed }) => ({
-          flexDirection: "row",
           alignItems: "center",
-          gap: space["4"],
-          paddingHorizontal: space["8"],
-          paddingVertical: space["6"],
+          justifyContent: "center",
+          padding: space["8"],
           borderRadius: radius["8"],
           borderWidth: 1,
           backgroundColor: copied
@@ -367,15 +365,6 @@ function CodeSurface({
           size={24}
           color={copied ? colour["text-n-icon"].success : colour["text-n-icon"].secondary}
         />
-        <Text
-          style={{
-            fontFamily: "Noontree-SemiBold",
-            fontSize: 12,
-            color: copied ? colour["text-n-icon"].success : colour["text-n-icon"].secondary,
-          }}
-        >
-          {copied ? "Copied" : "Copy"}
-        </Text>
       </Pressable>
     </View>
   );
