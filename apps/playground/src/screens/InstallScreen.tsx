@@ -26,6 +26,58 @@ const MONO =
     default: "monospace",
   }) ?? "monospace";
 
+// ─────────── lightweight syntax highlighting ───────────
+// Its own palette (not DS tokens) — tuned for contrast on the light code surface.
+const SYNTAX = {
+  text: colour["text-n-icon"].primary, // #1d2539
+  comment: "#8a93a6",
+  string: "#0a7d52",
+  keyword: "#6d28d9",
+  jsx: "#0f61ff",
+  number: "#b45309",
+};
+
+const KEYWORDS =
+  "import|from|export|default|function|return|const|let|var|new|await|async|type|module|exports";
+const TOKEN_RE = new RegExp(
+  [
+    "(\\/\\/[^\\n]*)", // 1 comment
+    "('(?:[^'\\\\]|\\\\.)*'|\"(?:[^\"\\\\]|\\\\.)*\"|`(?:[^`\\\\]|\\\\.)*`)", // 2 string
+    `\\b(${KEYWORDS})\\b`, // 3 keyword
+    "(<\\/?>|<\\/?[A-Za-z][\\w.]*|\\/>)", // 4 jsx bracket/tag
+    "\\b([A-Z][A-Za-z0-9]*)\\b", // 5 Capitalised identifier (component / type)
+    "\\b(\\d+(?:\\.\\d+)?)\\b", // 6 number
+  ].join("|"),
+  "g",
+);
+
+type Seg = { t: string; c: string };
+function tokenize(code: string): Seg[] {
+  const out: Seg[] = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  TOKEN_RE.lastIndex = 0;
+  while ((m = TOKEN_RE.exec(code)) !== null) {
+    if (m.index > last) out.push({ t: code.slice(last, m.index), c: SYNTAX.text });
+    const [full, comment, str, kw, jsx, cap, num] = m;
+    const c = comment
+      ? SYNTAX.comment
+      : str
+        ? SYNTAX.string
+        : kw
+          ? SYNTAX.keyword
+          : jsx || cap
+            ? SYNTAX.jsx
+            : num
+              ? SYNTAX.number
+              : SYNTAX.text;
+    out.push({ t: full, c });
+    last = m.index + full.length;
+  }
+  if (last < code.length) out.push({ t: code.slice(last), c: SYNTAX.text });
+  return out;
+}
+
 type PM = "pnpm" | "npm" | "yarn";
 const PMS: PM[] = ["pnpm", "npm", "yarn"];
 function addCmd(pm: PM, pkgs: string): string {
@@ -275,10 +327,13 @@ function CommandBlock({ shell, command }: { shell: Shell; command: string }) {
     <CodeSurface shell={shell} copyText={command}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: space["8"], flex: 1, minWidth: 0 }}>
         <Text style={{ fontFamily: MONO, fontSize: 14, color: colour["text-n-icon"].muted }}>$</Text>
-        <Text
-          style={{ fontFamily: MONO, fontSize: 14, lineHeight: 22, color: colour["text-n-icon"].primary, flex: 1 }}
-        >
-          {command}
+        <Text style={{ fontFamily: MONO, fontSize: 14, lineHeight: 22, flex: 1 }}>
+          {command.split(" ").map((w, i, arr) => (
+            <Text key={i} style={{ color: i < 2 ? SYNTAX.keyword : SYNTAX.string }}>
+              {w}
+              {i < arr.length - 1 ? " " : ""}
+            </Text>
+          ))}
         </Text>
       </View>
     </CodeSurface>
@@ -289,16 +344,12 @@ function CommandBlock({ shell, command }: { shell: Shell; command: string }) {
 function CodeBlock({ shell, code }: { shell: Shell; code: string }) {
   return (
     <CodeSurface shell={shell} copyText={code} align="flex-start">
-      <Text
-        style={{
-          fontFamily: MONO,
-          fontSize: 13,
-          lineHeight: 21,
-          color: colour["text-n-icon"].primary,
-          flex: 1,
-        }}
-      >
-        {code}
+      <Text style={{ fontFamily: MONO, fontSize: 13, lineHeight: 21, flex: 1 }}>
+        {tokenize(code).map((s, i) => (
+          <Text key={i} style={{ color: s.c }}>
+            {s.t}
+          </Text>
+        ))}
       </Text>
     </CodeSurface>
   );
