@@ -27,6 +27,7 @@ export const linking: LinkingOptions<RootStackParamList> = {
   ],
   config: {
     screens: {
+      Install: "install",
       Home: "",
       Foundations: {
         // Optional trailing segment so both `/foundations` and

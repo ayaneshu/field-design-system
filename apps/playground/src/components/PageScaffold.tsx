@@ -78,7 +78,13 @@ export function PageScaffold({
   heroImage,
   children,
 }: {
-  topNavActive?: "Foundations" | "Components" | "Patterns" | "I need" | null;
+  topNavActive?:
+    | "Foundations"
+    | "Components"
+    | "Patterns"
+    | "Install"
+    | "I need"
+    | null;
   title: string;
   /** Short description rendered under the title. Only renders on
    * component-style pages (i.e. when `version` or `repoUrl` is set). */

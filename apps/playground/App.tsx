@@ -16,6 +16,7 @@ import { HomeScreen } from "./src/screens/HomeScreen";
 import { FoundationsScreen } from "./src/screens/FoundationsScreen";
 import { ComponentsListScreen } from "./src/screens/ComponentsListScreen";
 import { PatternsScreen } from "./src/screens/PatternsScreen";
+import { InstallScreen } from "./src/screens/InstallScreen";
 import { INeedScreen } from "./src/screens/INeedScreen";
 import { INeedRequestsScreen } from "./src/screens/INeedRequestsScreen";
 import { IllustrationsScreen } from "./src/screens/IllustrationsScreen";
@@ -180,6 +181,7 @@ function ThemedNavigationShell() {
         <RootStack.Screen name="Foundations" component={FoundationsScreen} />
         <RootStack.Screen name="Components" component={ComponentsListScreen} />
         <RootStack.Screen name="Patterns" component={PatternsScreen} />
+        <RootStack.Screen name="Install" component={InstallScreen} />
         <RootStack.Screen name="INeed" component={INeedScreen} />
         <RootStack.Screen name="INeedRequests" component={INeedRequestsScreen} />
         <RootStack.Screen name="Illustrations" component={IllustrationsScreen} />
