@@ -276,7 +276,7 @@ function CommandBlock({ shell, command }: { shell: Shell; command: string }) {
       <View style={{ flexDirection: "row", alignItems: "center", gap: space["8"], flex: 1, minWidth: 0 }}>
         <Text style={{ fontFamily: MONO, fontSize: 14, color: colour["text-n-icon"].muted }}>$</Text>
         <Text
-          style={{ fontFamily: MONO, fontSize: 14, lineHeight: 22, color: "#e8ecf5", flex: 1 }}
+          style={{ fontFamily: MONO, fontSize: 14, lineHeight: 22, color: colour["text-n-icon"].primary, flex: 1 }}
         >
           {command}
         </Text>
@@ -294,7 +294,7 @@ function CodeBlock({ shell, code }: { shell: Shell; code: string }) {
           fontFamily: MONO,
           fontSize: 13,
           lineHeight: 21,
-          color: "#e8ecf5",
+          color: colour["text-n-icon"].primary,
           flex: 1,
         }}
       >
@@ -334,10 +334,10 @@ function CodeSurface({
         flexDirection: "row",
         alignItems: align,
         gap: space["12"],
-        backgroundColor: colour.surface["secondary-inverted"],
+        backgroundColor: colour.surface.tertiary,
         borderRadius: radius["12"],
         borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.08)",
+        borderColor: colour.border.primary,
         paddingVertical: space["14"],
         paddingHorizontal: space["16"],
       }}
@@ -354,22 +354,24 @@ function CodeSurface({
           paddingHorizontal: space["8"],
           paddingVertical: space["6"],
           borderRadius: radius["8"],
+          borderWidth: 1,
           backgroundColor: copied
-            ? "rgba(15,136,87,0.22)"
-            : "rgba(255,255,255,0.10)",
+            ? colour.surface["success-subtle"]
+            : colour.surface.primary,
+          borderColor: copied ? colour.border.success : colour.border.primary,
           opacity: pressed ? 0.7 : 1,
         })}
       >
         <Icon
           name={copied ? "system-check-circle-filled" : "system-copy"}
           size={14}
-          color={copied ? "#3ddc97" : "#cdd4e0"}
+          color={copied ? colour["text-n-icon"].success : colour["text-n-icon"].secondary}
         />
         <Text
           style={{
             fontFamily: "Noontree-SemiBold",
             fontSize: 12,
-            color: copied ? "#3ddc97" : "#cdd4e0",
+            color: copied ? colour["text-n-icon"].success : colour["text-n-icon"].secondary,
           }}
         >
           {copied ? "Copied" : "Copy"}
