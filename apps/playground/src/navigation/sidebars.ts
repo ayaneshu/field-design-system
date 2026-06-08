@@ -147,6 +147,7 @@ export function componentsSidebar(activeKey: string): SidebarItem[] {
       active: activeKey === "SearchBar",
     },
     { key: "Switch", label: "Switch", active: activeKey === "Switch" },
+    { key: "Toast", label: "Toast", active: activeKey === "Toast" },
     { key: "Toggle", label: "Toggle", active: activeKey === "Toggle" },
   ];
 }
