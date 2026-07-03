@@ -119,6 +119,10 @@
         "$type": "color",
         "$value": "{base.colour.red.700}"
       },
+      "error-extrabold": {
+        "$type": "color",
+        "$value": "{base.colour.red.800}"
+      },
       "warning-subtle": {
         "$type": "color",
         "$value": "{base.colour.orange.100}"
@@ -169,6 +173,10 @@
         "$type": "color",
         "$value": "{base.colour.neutral.white}"
       },
+      "overlay": {
+        "$type": "color",
+        "$value": "{base.colour.alpha-light.8}"
+      },
       "primary": {
         "$type": "color",
         "$value": "{base.colour.grey.300}"
@@ -191,7 +199,7 @@
       },
       "action": {
         "$type": "color",
-        "$value": "{base.colour.brand-blue.300}"
+        "$value": "{base.colour.brand-blue.200}"
       },
       "action-bold": {
         "$type": "color",
@@ -203,7 +211,7 @@
       },
       "error": {
         "$type": "color",
-        "$value": "{base.colour.red.300}"
+        "$value": "{base.colour.red.200}"
       },
       "error_bold": {
         "$type": "color",
@@ -219,7 +227,7 @@
       },
       "success": {
         "$type": "color",
-        "$value": "{base.colour.green.300}"
+        "$value": "{base.colour.green.200}"
       },
       "success_bold": {
         "$type": "color",
@@ -364,7 +372,7 @@
         },
         "line-height": {
           "$type": "dimension",
-          "$value": "{base.number.18}"
+          "$value": "{base.number.20}"
         },
         "letter-spacing": {
           "$type": "dimension",
